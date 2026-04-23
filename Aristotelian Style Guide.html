@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#F4EDE4" />
+  <title>Aristotelian — Style Guide</title>
+
+  <template id="__bundler_thumbnail" data-bg-color="#F4EDE4">
+    <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="300" fill="#F4EDE4"/>
+      <text x="200" y="130" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="300" font-size="38" fill="#2B2018">Aristotelian</text>
+      <text x="200" y="162" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" letter-spacing="4" fill="#B0A49C">STYLE GUIDE</text>
+      <rect x="176" y="178" width="48" height="1" fill="#B8956A" opacity=".5"/>
+    </svg>
+  </template>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" />
+  <link rel="stylesheet" href="Aristotelian App/app.css" />
+  <style>
+    /* ── Style guide chrome ── */
+    :root{--sg-max:860px;--sg-gap:3.5rem;}
+    .sg-body{background:var(--bg);color:var(--dark);padding:0 0 8rem;}
+    body.theme-dark .sg-body{background:var(--dk-bg);color:var(--dk-text);}
+
+    /* sticky top bar */
+    .sg-topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(244,237,228,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+    body.theme-dark .sg-topbar{background:rgba(14,10,6,.92);border-bottom:1px solid var(--dk-border);}
+    .sg-topbar-title{font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--dark);}
+    body.theme-dark .sg-topbar-title{color:var(--dk-text);}
+    .sg-theme-btn{background:none;border:1px solid var(--border);cursor:pointer;width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--muted);transition:color .15s,border-color .15s;}
+    .sg-theme-btn:hover{color:var(--dark);border-color:var(--border-hover);}
+    body.theme-dark .sg-theme-btn{color:var(--dk-muted);border-color:var(--dk-border);}
+    body.theme-dark .sg-theme-btn:hover{color:var(--dk-text);border-color:var(--dk-border-hover);}
+
+    /* layout */
+    .sg-wrap{max-width:var(--sg-max);margin:0 auto;padding:4.5rem 2rem 0;}
+    .sg-hero{padding:5rem 0 4rem;border-bottom:1px solid var(--border);}
+    body.theme-dark .sg-hero{border-bottom-color:var(--dk-border);}
+    .sg-hero-eye{font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:1rem;}
+    body.theme-dark .sg-hero-eye{color:var(--dk-faint);}
+    .sg-hero-h{font-family:var(--serif);font-style:italic;font-weight:300;font-size:3.4rem;color:var(--dark);line-height:1.08;}
+    body.theme-dark .sg-hero-h{color:var(--dk-text);}
+    .sg-hero-sub{font-family:var(--sans);font-weight:300;font-size:.9rem;color:var(--muted);margin-top:1rem;max-width:520px;line-height:1.8;}
+    body.theme-dark .sg-hero-sub{color:var(--dk-muted);}
+
+    /* sections */
+    .sg-section{padding:var(--sg-gap) 0 0;}
+    .sg-section-head{margin-bottom:2rem;}
+    .sg-section-label{font-family:var(--sans);font-size:.6rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:.5rem;}
+    body.theme-dark .sg-section-label{color:var(--dk-faint);}
+    .sg-section-title{font-family:var(--serif);font-size:1.7rem;font-weight:400;color:var(--dark);line-height:1.2;}
+    body.theme-dark .sg-section-title{color:var(--dk-text);}
+    .sg-section-desc{font-family:var(--sans);font-weight:300;font-size:.86rem;color:var(--muted);margin-top:.5rem;line-height:1.75;max-width:580px;}
+    body.theme-dark .sg-section-desc{color:var(--dk-muted);}
+
+    /* component frame */
+    .sg-frame{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-top:1.5rem;}
+    body.theme-dark .sg-frame{border-color:var(--dk-border);}
+    .sg-preview{padding:2.5rem 2rem;display:flex;flex-wrap:wrap;gap:1.25rem;align-items:center;background:var(--surface);}
+    body.theme-dark .sg-preview{background:var(--dk-surface);}
+    .sg-preview-col{flex-direction:column;align-items:flex-start;}
+    .sg-preview-center{justify-content:center;}
+    .sg-code{background:rgba(43,32,24,.04);border-top:1px solid var(--border);padding:1.1rem 1.4rem;font-family:'Courier New',monospace;font-size:.76rem;color:var(--muted);line-height:1.75;white-space:pre-wrap;overflow-x:auto;}
+    body.theme-dark .sg-code{background:rgba(255,255,255,.03);border-top-color:var(--dk-border);color:var(--dk-muted);}
+    .sg-usage{background:rgba(43,32,24,.025);border-top:1px solid var(--border);padding:1rem 1.4rem;font-family:var(--sans);font-size:.78rem;color:var(--muted);line-height:1.7;}
+    body.theme-dark .sg-usage{background:rgba(255,255,255,.02);border-top-color:var(--dk-border);color:var(--dk-muted);}
+    .sg-usage strong{font-weight:600;color:var(--dark);}
+    body.theme-dark .sg-usage strong{color:var(--dk-text);}
+    .sg-do{color:#7B9E80;}
+    .sg-dont{color:#C4806A;}
+
+    /* token grid */
+    .sg-tokens{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.85rem;margin-top:1.25rem;}
+    .sg-token{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
+    body.theme-dark .sg-token{border-color:var(--dk-border);}
+    .sg-token-swatch{height:52px;}
+    .sg-token-info{padding:.55rem .75rem;background:var(--surface);}
+    body.theme-dark .sg-token-info{background:var(--dk-surface);}
+    .sg-token-name{font-family:var(--sans);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--dark);}
+    body.theme-dark .sg-token-name{color:var(--dk-text);}
+    .sg-token-val{font-family:'Courier New',monospace;font-size:.7rem;color:var(--muted);margin-top:.15rem;}
+    body.theme-dark .sg-token-val{color:var(--dk-muted);}
+
+    /* radius demos */
+    .sg-radius-row{display:flex;flex-wrap:wrap;gap:1.25rem;align-items:flex-end;margin-top:1.25rem;}
+    .sg-radius-box{background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;padding:1rem 1.4rem;}
+    body.theme-dark .sg-radius-box{background:var(--dk-card);border-color:var(--dk-border);}
+    .sg-radius-label{font-family:var(--sans);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
+    body.theme-dark .sg-radius-label{color:var(--dk-faint);}
+
+    /* type scale */
+    .sg-type-row{display:flex;flex-direction:column;gap:1.6rem;margin-top:1.25rem;}
+    .sg-type-item{display:flex;align-items:baseline;gap:1.5rem;padding-bottom:1.4rem;border-bottom:1px solid var(--border);}
+    body.theme-dark .sg-type-item{border-bottom-color:var(--dk-border);}
+    .sg-type-item:last-child{border-bottom:none;padding-bottom:0;}
+    .sg-type-meta{flex-shrink:0;width:130px;font-family:var(--sans);font-size:.63rem;color:var(--faint);line-height:1.6;}
+    body.theme-dark .sg-type-meta{color:var(--dk-faint);}
+
+    /* divider */
+    .sg-divider{height:1px;background:var(--border);margin-top:var(--sg-gap);}
+    body.theme-dark .sg-divider{background:var(--dk-border);}
+
+    /* inline tag */
+    .sg-tag{display:inline-block;font-family:var(--sans);font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.18rem .5rem;border-radius:var(--r-sm);background:rgba(43,32,24,.06);color:var(--muted);margin-left:.3rem;vertical-align:middle;}
+    body.theme-dark .sg-tag{background:rgba(255,255,255,.07);color:var(--dk-muted);}
+
+    /* nav demo wrapper */
+    .sg-nav-demo{position:relative;height:64px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);}
+    body.theme-dark .sg-nav-demo{border-color:var(--dk-border);}
+    .sg-nav-demo .gnav{position:absolute;border-radius:0;}
+
+    /* card row */
+    .sg-card-row{display:flex;flex-direction:column;gap:.8rem;width:100%;}
+
+    /* pill row */
+    .sg-pill-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+  </style>
+</head>
+<body class="sg-body">
+
+  <!-- Sticky topbar -->
+  <div class="sg-topbar">
+    <span class="sg-topbar-title">Aristotelian — Style Guide</span>
+    <button class="sg-theme-btn" id="themeToggle" aria-label="Toggle dark mode">
+      <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="sg-wrap">
+
+    <!-- Hero -->
+    <div class="sg-hero">
+      <p class="sg-hero-eye">Design System · v1</p>
+      <h1 class="sg-hero-h">Aristotelian<br>Style Guide</h1>
+      <p class="sg-hero-sub">
+        All tokens, components, and usage rules for the Aristotelian Character Forge. 
+        Light mode by default; dark mode via the toggle. 
+        Built on two typefaces, one border colour, and a strict no-gradient rule.
+      </p>
+    </div>
+
+    <!-- ── COLOUR TOKENS ────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">01 — Foundations</p>
+        <h2 class="sg-section-title">Colour Tokens</h2>
+        <p class="sg-section-desc">All colours are defined as CSS custom properties on <code style="font-size:.82em">:root</code>. Use tokens — never hardcode hex values.</p>
+      </div>
+
+      <p style="font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:.65rem">Light palette</p>
+      <div class="sg-tokens">
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#F4EDE4"></div><div class="sg-token-info"><div class="sg-token-name">--bg</div><div class="sg-token-val">#F4EDE4</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#FDF8F0"></div><div class="sg-token-info"><div class="sg-token-name">--surface</div><div class="sg-token-val">#FDF8F0</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#2B2018"></div><div class="sg-token-info"><div class="sg-token-name">--dark</div><div class="sg-token-val">#2B2018</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#9A8C85"></div><div class="sg-token-info"><div class="sg-token-name">--muted</div><div class="sg-token-val">#9A8C85</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#B0A49C"></div><div class="sg-token-info"><div class="sg-token-name">--faint</div><div class="sg-token-val">#B0A49C</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#B8956A"></div><div class="sg-token-info"><div class="sg-token-name">--amber</div><div class="sg-token-val">#B8956A · quotes + brand dot</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#C4806A"></div><div class="sg-token-info"><div class="sg-token-name">--dust</div><div class="sg-token-val">#C4806A · ghost btn</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#7B9E80"></div><div class="sg-token-info"><div class="sg-token-name">--sage</div><div class="sg-token-val">#7B9E80 · secondary</div></div></div>
+      </div>
+
+      <p style="font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:1.75rem 0 .65rem">Dark palette</p>
+      <div class="sg-tokens">
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#0E0A06"></div><div class="sg-token-info"><div class="sg-token-name">--dk-bg</div><div class="sg-token-val">#0E0A06</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#161008"></div><div class="sg-token-info"><div class="sg-token-name">--dk-surface</div><div class="sg-token-val">#161008</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#1C1409"></div><div class="sg-token-info"><div class="sg-token-name">--dk-card</div><div class="sg-token-val">#1C1409</div></div></div>
+        <div class="sg-token"><div class="sg-token-swatch" style="background:#F4EDE4"></div><div class="sg-token-info"><div class="sg-token-name">--dk-text</div><div class="sg-token-val">#F4EDE4</div></div></div>
+      </div>
+
+      <div class="sg-frame" style="margin-top:1.5rem">
+        <div class="sg-usage">
+          <strong>✅ Do</strong> — <code>color: var(--muted)</code> for secondary text, <code>background: var(--surface)</code> for elevated surfaces.<br>
+          <strong class="sg-dont">✕ Don't</strong> — hardcode <code>#9A8C85</code> or any hex. Don't invent new colours — extend the scale with opacity: <code>rgba(43,32,24,.06)</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── TYPOGRAPHY ───────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">02 — Typography</p>
+        <h2 class="sg-section-title">Type Scale</h2>
+        <p class="sg-section-desc">Two typefaces only. Cormorant Garamond (serif) for display, headings, and all buttons. Jost (sans) for labels, body copy, and UI chrome.</p>
+      </div>
+
+      <div class="sg-type-row">
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Display<br>Cormorant · italic · 300<br>2.6rem / 1.05</div>
+          <span class="t-display">Every character contains their undoing.</span>
+        </div>
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Heading<br>Cormorant · 400<br>1.8rem / 1.15</div>
+          <span class="t-heading">Name your world</span>
+        </div>
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Quote<br>Cormorant · italic · 300<br>1.05rem / 1.65</div>
+          <span class="t-quote">"A likely impossibility is always preferable to an unconvincing possibility."</span>
+        </div>
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Body<br>Jost · 300<br>.88rem / 1.8</div>
+          <span class="t-body">Each world is a frame. Every character you forge inherits its tone, rules, and history.</span>
+        </div>
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Eyebrow<br>Jost · 500 · uppercase<br>.63rem / tracking .18em</div>
+          <span class="t-eyebrow">Your Library</span>
+        </div>
+        <div class="sg-type-item">
+          <div class="sg-type-meta">Hint<br>Jost · 300<br>.65rem · right-aligned</div>
+          <span class="t-hint">240 / 600</span>
+        </div>
+      </div>
+
+      <div class="sg-frame" style="margin-top:1.5rem">
+        <div class="sg-code">&lt;!-- Headings --&gt;
+&lt;h1 class="t-display"&gt;Every character contains their undoing.&lt;/h1&gt;
+&lt;h2 class="t-heading"&gt;Name your world&lt;/h2&gt;
+
+&lt;!-- Body --&gt;
+&lt;p class="t-body"&gt;Each world is a frame...&lt;/p&gt;
+&lt;p class="t-quote"&gt;"A likely impossibility..."&lt;/p&gt;
+
+&lt;!-- Labels --&gt;
+&lt;span class="t-eyebrow"&gt;Your Library&lt;/span&gt;
+&lt;span class="t-hint"&gt;240 / 600&lt;/span&gt;</div>
+        <div class="sg-usage">
+          <strong>✅ Do</strong> — use serif italic for all primary headings and display text. Use Jost for any UI label, badge, or data.<br>
+          <strong class="sg-dont">✕ Don't</strong> — mix weights inside a single heading. Don't use bold Cormorant — the system uses 300–400 only.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── SPACING & RADIUS ─────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">03 — Spacing & Radius</p>
+        <h2 class="sg-section-title">Border Radius</h2>
+        <p class="sg-section-desc">Four radius steps. Use the right one for the right context — no pill shapes on interactive elements.</p>
+      </div>
+      <div class="sg-radius-row">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">
+          <div class="sg-radius-box" style="border-radius:4px;width:80px;height:52px"><span class="sg-radius-label">--r-sm</span><span style="font-family:var(--sans);font-size:.72rem;color:var(--muted)">4px</span></div>
+          <span style="font-family:var(--sans);font-size:.66rem;color:var(--faint)">Buttons, tags, inputs</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">
+          <div class="sg-radius-box" style="border-radius:10px;width:80px;height:52px"><span class="sg-radius-label">--r-md</span><span style="font-family:var(--sans);font-size:.72rem;color:var(--muted)">10px</span></div>
+          <span style="font-family:var(--sans);font-size:.66rem;color:var(--faint)">Dropdowns, inputs</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">
+          <div class="sg-radius-box" style="border-radius:16px;width:80px;height:52px"><span class="sg-radius-label">--r-lg</span><span style="font-family:var(--sans);font-size:.72rem;color:var(--muted)">16px</span></div>
+          <span style="font-family:var(--sans);font-size:.66rem;color:var(--faint)">Cards, feature blocks</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">
+          <div class="sg-radius-box" style="border-radius:20px;width:80px;height:52px"><span class="sg-radius-label">--r-xl</span><span style="font-family:var(--sans);font-size:.72rem;color:var(--muted)">20px</span></div>
+          <span style="font-family:var(--sans);font-size:.66rem;color:var(--faint)">Modals, plan cards</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── BUTTONS ──────────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Buttons</h2>
+        <p class="sg-section-desc">Serif italic, 4px radius. Hover lifts <code style="font-size:.82em">translateY(-3px)</code> with a dark drop-shadow. No coloured glows, no breathing animation. Use <code style="font-size:.82em">.btn-block</code> for full-width (bottom-bar context only).</p>
+      </div>
+
+      <!-- Primary -->
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-center" style="gap:1.5rem;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-primary">Start building free</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn .btn-primary</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-primary btn-block" style="max-width:280px">Forge Character</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn-primary .btn-block</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-primary" disabled>Disabled</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">:disabled</span>
+          </div>
+        </div>
+        <div class="sg-code">&lt;button class="btn btn-primary"&gt;Start building free&lt;/button&gt;
+&lt;button class="btn btn-primary btn-block"&gt;Forge Character&lt;/button&gt;  &lt;!-- full width --&gt;
+&lt;button class="btn btn-primary" disabled&gt;Disabled&lt;/button&gt;</div>
+        <div class="sg-usage">
+          <strong>Use for:</strong> the single primary action on a screen — Create, Forge, Submit, Sign in. One per view.<br>
+          <strong class="sg-dont">✕ Don't</strong> — use for navigation, cancel, or secondary actions.
+        </div>
+      </div>
+
+      <!-- Ghost -->
+      <div class="sg-frame" style="margin-top:1rem">
+        <div class="sg-preview sg-preview-center" style="gap:1.5rem;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-ghost">See how it works</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn .btn-ghost</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-ghost btn-block" style="max-width:280px">Cancel</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn-ghost .btn-block</span>
+          </div>
+        </div>
+        <div class="sg-code">&lt;button class="btn btn-ghost"&gt;See how it works&lt;/button&gt;
+&lt;button class="btn btn-ghost btn-block"&gt;Cancel&lt;/button&gt;</div>
+        <div class="sg-usage">
+          <strong>Use for:</strong> secondary actions alongside a primary — Cancel, Back, "See how it works". Always paired with a primary.
+        </div>
+      </div>
+
+      <!-- Sage + Destroy -->
+      <div class="sg-frame" style="margin-top:1rem">
+        <div class="sg-preview sg-preview-center" style="gap:1.5rem;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-sage">✦ Expand Character</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn-sage</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn btn-destroy">Delete</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn-destroy</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+            <button class="btn-delete-world">Delete world</button>
+            <span style="font-family:var(--sans);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)">.btn-delete-world</span>
+          </div>
+        </div>
+        <div class="sg-code">&lt;button class="btn btn-sage"&gt;✦ Expand Character&lt;/button&gt;
+&lt;button class="btn btn-destroy"&gt;Delete&lt;/button&gt;
+&lt;button class="btn-delete-world"&gt;Delete world&lt;/button&gt;  &lt;!-- text-only --&gt;</div>
+        <div class="sg-usage">
+          <strong>.btn-sage</strong> — feature unlock / AI actions. <strong>.btn-destroy</strong> — destructive confirm (always inside a confirm flow). <strong>.btn-delete-world</strong> — text-only link style for low-priority destructive actions.
+        </div>
+      </div>
+
+      <!-- Nav buttons -->
+      <div class="sg-frame" style="margin-top:1rem">
+        <div class="sg-preview sg-preview-center" style="gap:.75rem">
+          <button class="btn btn-ghost btn-nav">Log in</button>
+          <button class="btn btn-primary btn-nav">Get started</button>
+        </div>
+        <div class="sg-code">&lt;button class="btn btn-ghost btn-nav"&gt;Log in&lt;/button&gt;
+&lt;button class="btn btn-primary btn-nav"&gt;Get started&lt;/button&gt;</div>
+        <div class="sg-usage">
+          <strong>.btn-nav</strong> — compact modifier for the global nav. Reduces padding and font-size. Always used inside <code>.gnav-right</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── CARDS ────────────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Cards</h2>
+        <p class="sg-section-desc">Used for worlds and characters in lists. <code style="font-size:.82em">border-radius: 16px</code>. Interactive — <code style="font-size:.82em">cursor:pointer</code>, lifts 2px on hover.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-col" style="gap:1rem">
+          <div class="sg-card-row" style="max-width:460px">
+            <!-- World card -->
+            <div class="card">
+              <div class="card-top">
+                <span class="card-name">The Broken Coast</span>
+                <span class="card-badge">2 characters</span>
+              </div>
+              <p class="card-desc">A salt-bleached crime drama. Fishing villages losing to tourism, inherited debts, a coastline that keeps its secrets.</p>
+              <span class="card-cta">Enter →</span>
+            </div>
+            <!-- Character card -->
+            <div class="card">
+              <div class="card-top">
+                <span class="card-name">Mara Ostin</span>
+                <span class="card-badge">Human · Woman · 41</span>
+              </div>
+              <span class="card-role-line">Lead</span>
+              <p class="card-quote">"Tide comes in whether you're ready or not."</p>
+              <span class="card-cta">View character →</span>
+            </div>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="card"&gt;
+  &lt;div class="card-top"&gt;
+    &lt;span class="card-name"&gt;The Broken Coast&lt;/span&gt;
+    &lt;span class="card-badge"&gt;2 characters&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="card-desc"&gt;A salt-bleached crime drama...&lt;/p&gt;
+  &lt;span class="card-cta"&gt;Enter →&lt;/span&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage">
+          <strong>Parts:</strong> <code>.card-top</code> (name + badge row) · <code>.card-name</code> · <code>.card-badge</code> · <code>.card-role-line</code> · <code>.card-desc</code> · <code>.card-quote</code> · <code>.card-cta</code><br>
+          <strong class="sg-dont">✕ Don't</strong> — nest interactive elements inside cards. The whole card is the click target.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── FORM ELEMENTS ────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Form Elements</h2>
+        <p class="sg-section-desc">Labels above inputs, always. Inputs use <code style="font-size:.82em">--r-md</code> (10px). Stack with <code style="font-size:.82em">.form-stack</code>.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-col" style="gap:1.1rem;max-width:400px">
+          <div>
+            <label class="f-label">World name</label>
+            <input class="f-input" type="text" placeholder="The Broken Coast, Neo-Tokyo 2187…" />
+          </div>
+          <div>
+            <label class="f-label">Description</label>
+            <textarea class="f-area" rows="3" placeholder="Genre, tone, rules, history, feel…"></textarea>
+            <span class="t-hint" style="display:block;margin-top:.3rem">0 / 600</span>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="form-stack"&gt;
+  &lt;div&gt;
+    &lt;label class="f-label"&gt;World name&lt;/label&gt;
+    &lt;input class="f-input" type="text" placeholder="…" /&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;label class="f-label"&gt;Description&lt;/label&gt;
+    &lt;textarea class="f-area" rows="4" /&gt;
+    &lt;span class="t-hint"&gt;0 / 600&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage">
+          <strong>.f-label</strong> — uppercase sans, always above.<br>
+          <strong>.f-input</strong> — text, email, password. <strong>.f-area</strong> — textarea.<br>
+          <strong>.form-stack</strong> — vertical column with 1.1rem gap.
+        </div>
+      </div>
+
+      <!-- Mode toggle -->
+      <div class="sg-frame" style="margin-top:1rem">
+        <div class="sg-preview">
+          <div class="mode-toggle" style="max-width:320px;width:100%">
+            <button class="mode-btn active">Simple</button>
+            <button class="mode-btn">Advanced — AI interview</button>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="mode-toggle"&gt;
+  &lt;button class="mode-btn active"&gt;Simple&lt;/button&gt;
+  &lt;button class="mode-btn"&gt;Advanced — AI interview&lt;/button&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage"><strong>.mode-toggle</strong> — segmented control. Active segment gets dark fill. Used for binary mode selection inside a screen, not global navigation.</div>
+      </div>
+
+      <!-- Pills -->
+      <div class="sg-frame" style="margin-top:1rem">
+        <div class="sg-preview sg-preview-col" style="gap:.75rem">
+          <div class="sg-pill-row">
+            <button class="pill active">Lead</button>
+            <button class="pill">Deuteragonist</button>
+            <button class="pill">Supporting</button>
+            <button class="pill">Minor</button>
+            <button class="pill">Ensemble</button>
+          </div>
+          <p class="pill-desc">Drives the central reversal</p>
+        </div>
+        <div class="sg-code">&lt;div class="pill-group"&gt;
+  &lt;button class="pill active"&gt;Lead&lt;/button&gt;
+  &lt;button class="pill"&gt;Deuteragonist&lt;/button&gt;
+&lt;/div&gt;
+&lt;p class="pill-desc"&gt;Drives the central reversal&lt;/p&gt;</div>
+        <div class="sg-usage"><strong>.pill-group</strong> — wrapping flex row. <strong>.pill</strong> — individual option. <strong>.pill.active</strong> — dark fill. <strong>.pill-desc</strong> — italic serif description below the group.</div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── TAB BAR ───────────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Tab Bar</h2>
+        <p class="sg-section-desc">Bottom-border underline indicator. Scrolls horizontally on mobile. Active tab uses <code style="font-size:.82em">--dark</code> underline — not amber.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-col" style="padding:1.5rem 2rem 0;gap:0">
+          <div class="tab-bar" style="margin-bottom:0">
+            <button class="tab-btn active">Overview</button>
+            <button class="tab-btn">Identity</button>
+            <button class="tab-btn">Psychology</button>
+            <button class="tab-btn">Dialogue</button>
+            <button class="tab-btn">Aristotelian</button>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="tab-bar" role="tablist"&gt;
+  &lt;button class="tab-btn active" role="tab" aria-selected="true"&gt;Overview&lt;/button&gt;
+  &lt;button class="tab-btn" role="tab" aria-selected="false"&gt;Identity&lt;/button&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage"><strong>Always</strong> include <code>role="tablist"</code> and <code>role="tab"</code> with <code>aria-selected</code>. Sits directly above the content it controls, with a matching 1px bottom border on the container.</div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── CHARACTER SHEET FIELDS ─────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Character Sheet Fields</h2>
+        <p class="sg-section-desc">Each field has a label row (with optional regen + philosophy buttons) and a body. Group fields inside <code style="font-size:.82em">.cs-section</code>.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-col" style="gap:0;padding:1.5rem 2rem">
+          <div class="cs-section" style="max-width:480px">
+            <div class="cs-section-title">Aristotelian Core</div>
+            <div class="cs-field">
+              <div class="cs-field-head">
+                <span class="cs-field-label">Hamartia</span>
+                <div class="cs-field-actions">
+                  <button class="icon-btn" aria-label="Philosophy note">?</button>
+                  <button class="icon-btn" aria-label="Regenerate">↻</button>
+                </div>
+              </div>
+              <p class="cs-field-body">Her unshakeable loyalty — the reason people trust her — is also the reason she cannot investigate the only people capable of the crime.</p>
+            </div>
+            <div class="cs-field">
+              <div class="cs-field-head">
+                <span class="cs-field-label">Moral Core</span>
+                <div class="cs-field-actions">
+                  <button class="icon-btn">↻</button>
+                </div>
+              </div>
+              <p class="cs-field-empty">Not yet written.</p>
+            </div>
+            <div class="cs-field">
+              <div class="cs-field-head">
+                <span class="cs-field-label">Speech Mode</span>
+              </div>
+              <span class="cs-speech-tag">Ethos</span>
+            </div>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="cs-section"&gt;
+  &lt;div class="cs-section-title"&gt;Aristotelian Core&lt;/div&gt;
+
+  &lt;div class="cs-field"&gt;
+    &lt;div class="cs-field-head"&gt;
+      &lt;span class="cs-field-label"&gt;Hamartia&lt;/span&gt;
+      &lt;div class="cs-field-actions"&gt;
+        &lt;button class="icon-btn"&gt;?&lt;/button&gt;
+        &lt;button class="icon-btn"&gt;↻&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class="cs-field-body"&gt;Her unshakeable loyalty…&lt;/p&gt;
+    &lt;!-- or if empty: --&gt;
+    &lt;p class="cs-field-empty"&gt;Not yet written.&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Speech mode tag --&gt;
+  &lt;span class="cs-speech-tag"&gt;Ethos&lt;/span&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage">
+          <strong>.cs-section</strong> — groups fields with 1rem gap. <strong>.cs-section-title</strong> — optional group header.<br>
+          <strong>.cs-field-body</strong> — populated value. <strong>.cs-field-empty</strong> — italic serif placeholder.<br>
+          <strong>.icon-btn</strong> — small square button for field-level actions (regen ↻, philosophy ?).<br>
+          <strong>.cs-speech-tag</strong> — inline tag for enumerated values like speech mode.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── EMPTY STATE ──────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Empty State</h2>
+        <p class="sg-section-desc">Used when a list has no items. Centred column with a Cormorant italic quote, body copy, and optional CTA.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview" style="justify-content:center">
+          <div class="empty" style="padding:3rem 1rem">
+            <div class="empty-rule"></div>
+            <p class="t-quote" style="max-width:320px">"Without action there cannot be a tragedy; there may be one without character."</p>
+            <p class="t-body" style="max-width:300px;text-align:center">No characters yet. Give the LLM a pitch, a name, or nothing at all.</p>
+            <div class="empty-rule"></div>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="empty"&gt;
+  &lt;div class="empty-rule"&gt;&lt;/div&gt;
+  &lt;p class="t-quote"&gt;"Without action..."&lt;/p&gt;
+  &lt;p class="t-body"&gt;No characters yet.&lt;/p&gt;
+  &lt;div class="empty-rule"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── BOTTOM BAR ───────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">04 — Components</p>
+        <h2 class="sg-section-title">Bottom Bar</h2>
+        <p class="sg-section-desc">Fixed to viewport bottom. Contains the primary action for the current screen. Buttons here always use <code style="font-size:.82em">.btn-block</code>.</p>
+      </div>
+      <div class="sg-frame">
+        <div class="sg-preview sg-preview-col" style="background:rgba(244,237,228,.96);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem 1.25rem">
+          <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:.55rem">
+            <button class="btn btn-primary btn-block">+ New World</button>
+          </div>
+        </div>
+        <div class="sg-preview sg-preview-col" style="background:rgba(244,237,228,.96);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem 1.25rem;margin-top:.75rem">
+          <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:.55rem">
+            <button class="btn btn-primary btn-block">Create World</button>
+            <button class="btn btn-ghost btn-block">Cancel</button>
+          </div>
+        </div>
+        <div class="sg-code">&lt;div class="bottom-bar"&gt;
+  &lt;div class="bottom-bar-inner"&gt;
+    &lt;button class="btn btn-primary btn-block"&gt;+ New World&lt;/button&gt;
+    &lt;!-- optional secondary: --&gt;
+    &lt;button class="btn btn-ghost btn-block"&gt;Cancel&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+        <div class="sg-usage">
+          Max two buttons in a bottom bar: primary on top, ghost Cancel below. Never more.<br>
+          <strong class="sg-dont">✕ Don't</strong> — use full-width buttons outside of bottom-bar or modal contexts.
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-divider"></div>
+
+    <!-- ── PRINCIPLES ───────────────────────────────────────────────────── -->
+    <div class="sg-section">
+      <div class="sg-section-head">
+        <p class="sg-section-label">05 — Principles</p>
+        <h2 class="sg-section-title">Design Rules</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-top:.5rem">
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">No gradients</p>
+          <p class="t-body">Background fills are flat colours only. No <code>linear-gradient</code>, no <code>radial-gradient</code>. Depth is achieved with border, shadow, and layered surface colours.</p>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">Amber is precious</p>
+          <p class="t-body">Gold/amber appears in two places: the small brand dot in the nav mark, and all quote text (<code>.t-quote</code>, <code>.char-quote</code>, <code>.card-quote</code>). Everywhere else it is off-limits. Don't use it for labels, badges, or UI chrome.</p>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">No pill shapes</p>
+          <p class="t-body">Interactive elements (buttons, tags, inputs) use <code>--r-sm</code> (4px). Pill radii (<code>50px</code>) are forbidden. Cards use <code>--r-lg</code>; modals use <code>--r-xl</code>.</p>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">No animations on buttons</p>
+          <p class="t-body">Buttons do not breathe, pulse, or glow. The only motion is <code>translateY(-3px)</code> on hover and <code>scale(.97)</code> on press. Shadows are dark, never coloured.</p>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">Light by default</p>
+          <p class="t-body">The app ships in light mode. Dark mode is opt-in via a nav toggle and is persisted in <code>localStorage</code>. The body class (<code>theme-dark</code>) drives all dark overrides.</p>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem 1.4rem">
+          <p style="font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:.6rem">One primary per screen</p>
+          <p class="t-body">Only one <code>.btn-primary</code> per view. All other actions are ghost, text-only, or icon buttons. This keeps the visual hierarchy unambiguous.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin-top:var(--sg-gap)"></div>
+    <p style="font-family:var(--sans);font-size:.62rem;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);text-align:center;padding:2.5rem 0">Aristotelian Design System · Built with Claude</p>
+
+  </div><!-- /sg-wrap -->
+
+  <script>
+    // Theme toggle
+    var THEME_KEY = "aristotelian-theme";
+    var theme = localStorage.getItem(THEME_KEY) || "light";
+    document.body.className = "sg-body theme-" + theme;
+    updateIcons();
+
+    document.getElementById("themeToggle").addEventListener("click", function() {
+      theme = theme === "dark" ? "light" : "dark";
+      document.body.className = "sg-body theme-" + theme;
+      localStorage.setItem(THEME_KEY, theme);
+      updateIcons();
+    });
+
+    function updateIcons() {
+      document.getElementById("iconSun").style.display = theme === "dark" ? "block" : "none";
+      document.getElementById("iconMoon").style.display = theme === "dark" ? "none" : "block";
+    }
+  </script>
+</body>
+</html>
