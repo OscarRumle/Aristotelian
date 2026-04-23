@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { uid } from "../util.js";
 import { DEFAULT_WORLD_NAME, DEFAULT_WORLD_DESC } from "../constants.js";
+import { callClaude } from "../api/claude.js";
+import { buildTaglinePrompt } from "../prompts/buildTaglinePrompt.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { CreateWorldAdvanced } from "./CreateWorldAdvanced.jsx";
 
@@ -9,16 +11,25 @@ export function CreateWorldScreen({ onBack, onCreate }) {
   const [name, setName] = useState(DEFAULT_WORLD_NAME);
   const [desc, setDesc] = useState(DEFAULT_WORLD_DESC);
   const [errors, setErrors] = useState({});
+  const [creating, setCreating] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     const e = {};
     if (!name.trim()) e.name = "A world needs a name.";
     if (!desc.trim()) e.desc = "Describe the tone, genre, feel.";
     if (Object.keys(e).length) { setErrors(e); return; }
+    setCreating(true);
+    let tagline = "";
+    try {
+      tagline = (await callClaude(buildTaglinePrompt(name.trim(), desc.trim()), "Generate tagline.")).trim();
+    } catch {
+      // tagline stays empty — not a blocking failure
+    }
     onCreate({
       id: uid(),
       name: name.trim(),
       description: desc.trim(),
+      tagline,
       characters: [],
       mode: "simple",
       extendedInputs: null,
@@ -97,8 +108,10 @@ export function CreateWorldScreen({ onBack, onCreate }) {
         </div>
       </div>
       <BottomBar>
-        <button type="button" className="btn btn-primary" onClick={submit}>Create World</button>
-        <button type="button" className="btn btn-ghost" onClick={onBack}>Cancel</button>
+        <button type="button" className="btn btn-primary" onClick={submit} disabled={creating}>
+          {creating ? "Creating…" : "Create World"}
+        </button>
+        <button type="button" className="btn btn-ghost" onClick={onBack} disabled={creating}>Cancel</button>
       </BottomBar>
     </div>
   );

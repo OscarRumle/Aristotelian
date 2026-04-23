@@ -44,6 +44,18 @@ function migrate(parsed) {
     version = 5;
   }
 
+  // v5 → v6: add tagline field to worlds.
+  if (version < 6) {
+    worlds = worlds.map((w) => ({ tagline: "", ...w }));
+    version = 6;
+  }
+
+  // v6 → v7: add objects array to each world.
+  if (version < 7) {
+    worlds = worlds.map((w) => ({ ...w, objects: w.objects ?? [] }));
+    version = 7;
+  }
+
   return { __version: version, worlds };
 }
 

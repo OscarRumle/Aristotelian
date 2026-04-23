@@ -27,7 +27,7 @@ export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
                       : `${w.characters.length} character${w.characters.length !== 1 ? "s" : ""}`}
                   </span>
                 </div>
-                <p className="card-desc">{w.description}</p>
+                <p className="card-desc">{w.tagline || w.description}</p>
                 <span className="card-cta">Enter →</span>
               </div>
             </div>

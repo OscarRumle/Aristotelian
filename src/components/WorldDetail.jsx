@@ -3,8 +3,11 @@ import { metaLine } from "../util.js";
 import { ROLE_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { EmptyState } from "./EmptyState.jsx";
-import { DocumentLibrary } from "./DocumentLibrary.jsx";
 import { ScenesTab } from "./ScenesTab.jsx";
+import { WorldLibrary } from "./WorldLibrary.jsx";
+import { DocumentViewer } from "./DocumentViewer.jsx";
+import { EditableText } from "./EditableText.jsx";
+import { ObjectsTab } from "./ObjectsTab.jsx";
 
 function CharactersPanel({ world, onSelectCharacter }) {
   const [roleTab, setRoleTab] = useState("Recent");
@@ -67,8 +70,74 @@ function CharactersPanel({ world, onSelectCharacter }) {
   );
 }
 
+function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc }) {
+  const [activeDoc, setActiveDoc] = useState(null);
+  const docs = world.documents ?? [];
+
+  if (activeDoc) {
+    return (
+      <DocumentViewer
+        doc={activeDoc}
+        onClose={() => setActiveDoc(null)}
+        onUpdate={(updated) => { onUpdateDoc(updated); setActiveDoc(updated); }}
+      />
+    );
+  }
+
+  return (
+    <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="tool-view-header">
+        <button type="button" className="back-btn" onClick={onBack}>
+          ← {world.name}
+        </button>
+        <h2 className="tool-view-title">Lore</h2>
+      </div>
+
+      <div style={{ marginTop: "1.25rem", marginBottom: "1rem" }}>
+        <button type="button" className="btn btn-ghost" onClick={onContinueInterview}>
+          + World Interview
+        </button>
+      </div>
+
+      {docs.length === 0 ? (
+        <EmptyState
+          quote='"Every world has a history. Most of it is forgotten."'
+          body="Run a World Interview to generate lore documents for this world."
+        />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: ".75rem" }}>
+          {docs.map((doc, i) => (
+            <div key={doc.id} style={{ animation: `fadeUp .3s ${i * 0.04}s ease both` }}>
+              <div className="lore-card">
+                <div className="lore-card-body" onClick={() => setActiveDoc(doc)}>
+                  <span className="card-name">{doc.title}</span>
+                  {doc.summary && <p className="card-desc">{doc.summary}</p>}
+                </div>
+                <div className="lore-card-actions">
+                  <button type="button" className="btn btn-ghost lore-card-btn" onClick={() => setActiveDoc(doc)}>
+                    Read →
+                  </button>
+                  <button type="button" className="btn btn-ghost lore-card-btn" onClick={() => onExpandDoc(doc.id)}>
+                    Expand
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const COMING_SOON = [
+  { id: "factions", name: "Factions", description: "Groups, allegiances, and power structures" },
+];
+
 export function WorldDetail({
   world,
+  toolView,
+  onSetToolView,
   onBack,
   onSelectCharacter,
   onNewCharacter,
@@ -77,59 +146,186 @@ export function WorldDetail({
   onSelectScene,
   onAddScene,
   onAnalyseCast,
+  onUpdateWorld,
+  onUpdateDoc,
+  onExpandDoc,
+  onNewObject,
+  onSelectObject,
 }) {
-  const [topTab, setTopTab] = useState("Characters");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const isAdvanced = world.mode === "advanced";
+  const scenes = world.scenes ?? [];
+  const docs = world.documents ?? [];
+
+  // ── Characters tool sub-view ──────────────────────────────────────────────
+  if (toolView === "characters") {
+    return (
+      <div className="screen" style={{ paddingBottom: "5rem" }}>
+        <div className="tool-view-header">
+          <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
+            ← {world.name}
+          </button>
+          <h2 className="tool-view-title">Characters</h2>
+        </div>
+        <CharactersPanel world={world} onSelectCharacter={onSelectCharacter} />
+        <BottomBar>
+          <button type="button" className="btn btn-primary" onClick={onNewCharacter}>
+            + New Character
+          </button>
+          {world.characters.length >= 2 && onAnalyseCast && (
+            <button type="button" className="btn-analyse-cast" onClick={onAnalyseCast}>
+              Analyse Cast
+            </button>
+          )}
+        </BottomBar>
+      </div>
+    );
+  }
+
+  // ── Scenes tool sub-view ──────────────────────────────────────────────────
+  if (toolView === "scenes") {
+    return (
+      <div className="screen" style={{ paddingBottom: "5rem" }}>
+        <div className="tool-view-header">
+          <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
+            ← {world.name}
+          </button>
+          <h2 className="tool-view-title">Scenes</h2>
+        </div>
+        <ScenesTab
+          scenes={scenes}
+          onSelectScene={onSelectScene}
+          onAddScene={onAddScene}
+        />
+      </div>
+    );
+  }
+
+  // ── Lore tool sub-view ────────────────────────────────────────────────────
+  if (toolView === "lore") {
+    return (
+      <LoreView
+        world={world}
+        onBack={() => onSetToolView(null)}
+        onContinueInterview={onContinueInterview}
+        onExpandDoc={onExpandDoc}
+        onUpdateDoc={onUpdateDoc}
+      />
+    );
+  }
+
+  // ── Objects tool sub-view ─────────────────────────────────────────────────
+  if (toolView === "objects") {
+    return (
+      <div className="screen" style={{ paddingBottom: "5rem" }}>
+        <div className="tool-view-header">
+          <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
+            ← {world.name}
+          </button>
+          <h2 className="tool-view-title">Objects</h2>
+        </div>
+        <ObjectsTab
+          objects={world.objects ?? []}
+          onSelectObject={onSelectObject}
+          onNewObject={onNewObject}
+        />
+      </div>
+    );
+  }
+
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  const tools = [
+    {
+      id: "characters",
+      name: "Characters",
+      description: "Build your cast using the Aristotelian framework",
+      count: world.characters.length,
+      unit: world.characters.length === 1 ? "character" : "characters",
+      onClick: () => onSetToolView("characters"),
+    },
+    {
+      id: "scenes",
+      name: "Scenes",
+      description: "Write dramatic scenes with characters in conflict",
+      count: scenes.length,
+      unit: scenes.length === 1 ? "scene" : "scenes",
+      onClick: () => onSetToolView("scenes"),
+    },
+    {
+      id: "lore",
+      name: "Lore",
+      description: "World documents, history, and interview-driven world-building",
+      count: docs.length,
+      unit: docs.length === 1 ? "document" : "documents",
+      onClick: () => onSetToolView("lore"),
+    },
+    {
+      id: "objects",
+      name: "Objects",
+      description: "Artifacts, weapons, documents, and significant things",
+      count: (world.objects ?? []).length,
+      unit: (world.objects ?? []).length === 1 ? "object" : "objects",
+      onClick: () => onSetToolView("objects"),
+    },
+  ];
 
   return (
     <div className="screen" style={{ paddingBottom: "5rem" }}>
+      {/* Header */}
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Aristotelian</button>
         </div>
         <h1 className="t-heading">{world.name}</h1>
-        <p className="t-body">{world.description}</p>
+        {onUpdateWorld ? (
+          <EditableText
+            value={world.description}
+            onSave={(v) => onUpdateWorld({ ...world, description: v })}
+            multiline
+            className="t-body world-desc-editable"
+          />
+        ) : (
+          <p className="t-body">{world.description}</p>
+        )}
       </div>
       <div className="divider" />
 
-      {isAdvanced && <DocumentLibrary documents={world.documents} />}
-      {isAdvanced && world.documents?.length > 0 && <div className="divider" style={{ marginBottom: "1rem" }} />}
-
-      {/* Top-level Characters | Scenes tab switcher */}
-      <div className="top-tab-bar" role="tablist" style={{ marginTop: "1rem" }}>
-        {["Characters", "Scenes"].map((t) => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={topTab === t}
-            className={`top-tab-btn ${topTab === t ? "active" : ""}`}
-            onClick={() => setTopTab(t)}
-          >
-            {t}
-            {t === "Characters" && world.characters.length > 0 && (
-              <span className="top-tab-count">{world.characters.length}</span>
-            )}
-            {t === "Scenes" && (world.scenes ?? []).length > 0 && (
-              <span className="top-tab-count">{(world.scenes ?? []).length}</span>
-            )}
-          </button>
-        ))}
+      {/* Tools grid */}
+      <div className="tools-section">
+        <p className="tools-section-label">Tools</p>
+        <div className="tools-grid">
+          {tools.map((tool) => (
+            <button key={tool.id} type="button" className="tool-card" onClick={tool.onClick}>
+              <div className="tool-card-header">
+                <span className="tool-card-name">{tool.name}</span>
+                {tool.count !== null && tool.count > 0 && (
+                  <span className="tool-card-count">{tool.count} {tool.unit}</span>
+                )}
+              </div>
+              <p className="tool-card-desc">{tool.description}</p>
+            </button>
+          ))}
+          {COMING_SOON.map((tool) => (
+            <div key={tool.id} className="tool-card tool-card--disabled" aria-disabled="true">
+              <div className="tool-card-header">
+                <span className="tool-card-name">{tool.name}</span>
+                <span className="tool-card-coming">Soon</span>
+              </div>
+              <p className="tool-card-desc">{tool.description}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {topTab === "Characters" && (
-        <CharactersPanel world={world} onSelectCharacter={onSelectCharacter} />
-      )}
+      {/* Library */}
+      <WorldLibrary
+        characters={world.characters}
+        scenes={scenes}
+        onSelectCharacter={onSelectCharacter}
+        onSelectScene={onSelectScene}
+      />
 
-      {topTab === "Scenes" && (
-        <ScenesTab
-          scenes={world.scenes ?? []}
-          onSelectScene={onSelectScene}
-          onAddScene={onAddScene}
-        />
-      )}
-
+      {/* Bottom bar */}
       <BottomBar>
         {confirmDelete ? (
           <div className="delete-confirm">
@@ -145,25 +341,6 @@ export function WorldDetail({
               </button>
             </div>
           </div>
-        ) : topTab === "Characters" ? (
-          <>
-            <button type="button" className="btn btn-primary" onClick={onNewCharacter}>
-              + New Character
-            </button>
-            {isAdvanced && onContinueInterview && (
-              <button type="button" className="btn-continue-interview" onClick={onContinueInterview}>
-                Continue Interview
-              </button>
-            )}
-            {world.characters.length >= 2 && onAnalyseCast && (
-              <button type="button" className="btn-analyse-cast" onClick={onAnalyseCast}>
-                Analyse Cast
-              </button>
-            )}
-            <button type="button" className="btn-delete-world" onClick={() => setConfirmDelete(true)}>
-              Delete world
-            </button>
-          </>
         ) : (
           <button type="button" className="btn-delete-world" onClick={() => setConfirmDelete(true)}>
             Delete world

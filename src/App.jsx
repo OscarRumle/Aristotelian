@@ -16,6 +16,9 @@ import { TokenCounter } from "./components/TokenCounter.jsx";
 import { SceneDetail } from "./components/SceneDetail.jsx";
 import { DialogueWriter } from "./components/DialogueWriter.jsx";
 import { CastAnalysis } from "./components/CastAnalysis.jsx";
+import { LoreExpandInterview } from "./components/LoreExpandInterview.jsx";
+import { CreateObjectScreen } from "./components/CreateObjectScreen.jsx";
+import { ObjectDetail } from "./components/ObjectDetail.jsx";
 
 export default function App() {
   const [view, setView] = useState("hub");
@@ -23,6 +26,7 @@ export default function App() {
   const [activeCharId, setActiveCharId] = useState(null);
   const [activeSceneId, setActiveSceneId] = useState(null);
   const [activeDialogueId, setActiveDialogueId] = useState(null);
+  const [activeObjectId, setActiveObjectId] = useState(null);
   const [worlds, setWorlds] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [storageCorrupted, setStorageCorrupted] = useState(false);
@@ -34,6 +38,8 @@ export default function App() {
   const [castAnalysisOpen, setCastAnalysisOpen] = useState(false);
   const [castAnalysisText, setCastAnalysisText] = useState(null);
   const [createCharInitialPitch, setCreateCharInitialPitch] = useState("");
+  const [worldToolView, setWorldToolView] = useState(null);
+  const [activeLoreDocId, setActiveLoreDocId] = useState(null);
 
   const abortRef = useRef(null);
 
@@ -92,6 +98,15 @@ export default function App() {
       )
     );
 
+  const updateDocument = (doc) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, documents: (w.documents ?? []).map((d) => (d.id === doc.id ? doc : d)) }
+          : w
+      )
+    );
+
   const addScene = (scene) =>
     setWorlds((p) =>
       p.map((w) =>
@@ -104,6 +119,22 @@ export default function App() {
       p.map((w) =>
         w.id === activeWorldId
           ? { ...w, scenes: (w.scenes ?? []).map((s) => (s.id === scene.id ? scene : s)) }
+          : w
+      )
+    );
+
+  const addObject = (o) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId ? { ...w, objects: [...(w.objects ?? []), o] } : w
+      )
+    );
+
+  const updateObject = (o) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, objects: (w.objects ?? []).map((x) => (x.id === o.id ? o : x)) }
           : w
       )
     );
@@ -246,18 +277,21 @@ export default function App() {
         {view === "world" && activeWorld && (
           <WorldDetail
             world={activeWorld}
-            onBack={() => setView("hub")}
+            toolView={worldToolView}
+            onSetToolView={setWorldToolView}
+            onBack={() => { setWorldToolView(null); setView("hub"); }}
             onSelectCharacter={(id) => { setActiveCharId(id); setView("character"); }}
             onNewCharacter={() => { setGenError(null); setView("createCharacter"); }}
-            onDelete={(id) => { deleteWorld(id); setView("hub"); }}
-            onContinueInterview={
-              activeWorld.mode === "advanced"
-                ? () => setView("continueInterview")
-                : undefined
-            }
+            onDelete={(id) => { deleteWorld(id); setWorldToolView(null); setView("hub"); }}
+            onContinueInterview={() => setView("continueInterview")}
             onSelectScene={(id) => { setActiveSceneId(id); setView("scene"); }}
             onAddScene={(scene) => { addScene(scene); setActiveSceneId(scene.id); setView("scene"); }}
             onAnalyseCast={() => setCastAnalysisOpen(true)}
+            onUpdateWorld={updateWorld}
+            onUpdateDoc={updateDocument}
+            onExpandDoc={(id) => { setActiveLoreDocId(id); setView("loreExpand"); }}
+            onNewObject={() => setView("createObject")}
+            onSelectObject={(id) => { setActiveObjectId(id); setView("object"); }}
           />
         )}
 
@@ -307,6 +341,7 @@ export default function App() {
             onBack={() => setView("world")}
             onNewDialogue={() => { setActiveDialogueId(null); setView("dialogue"); }}
             onSelectDialogue={(id) => { setActiveDialogueId(id); setView("dialogue"); }}
+            onUpdateScene={updateScene}
           />
         )}
 
@@ -320,6 +355,39 @@ export default function App() {
             onUpdateCharacter={updateWorldCharacter}
           />
         )}
+
+        {view === "loreExpand" && activeLoreDocId && activeWorld && (
+          <LoreExpandInterview
+            world={activeWorld}
+            doc={(activeWorld.documents ?? []).find((d) => d.id === activeLoreDocId)}
+            onDone={(updatedDoc) => {
+              updateDocument(updatedDoc);
+              setWorldToolView("lore");
+              setView("world");
+            }}
+            onBack={() => { setWorldToolView("lore"); setView("world"); }}
+          />
+        )}
+
+        {view === "createObject" && activeWorld && (
+          <CreateObjectScreen
+            world={activeWorld}
+            onBack={() => setView("world")}
+            onSave={(o) => { addObject(o); setActiveObjectId(o.id); setView("object"); }}
+          />
+        )}
+
+        {view === "object" && activeObjectId && activeWorld && (() => {
+          const activeObject = (activeWorld.objects ?? []).find((o) => o.id === activeObjectId);
+          return activeObject ? (
+            <ObjectDetail
+              object={activeObject}
+              world={activeWorld}
+              onBack={() => { setWorldToolView("objects"); setView("world"); }}
+              onUpdate={updateObject}
+            />
+          ) : null;
+        })()}
       </div>
     </>
   );

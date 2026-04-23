@@ -158,9 +158,12 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
         generatedAt: Date.now(),
       }));
 
+      const tagline = (parsed.tagline ?? "").trim();
+
       if (continueMode) {
         onDone({
           ...existingWorld,
+          tagline: tagline || existingWorld.tagline || "",
           extendedInputs,
           documents: docs,
           interviews: allInterviews,
@@ -170,6 +173,7 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
           id: uid(),
           name: name.trim(),
           description: pitch.trim(),
+          tagline,
           characters: [],
           mode: "advanced",
           extendedInputs,

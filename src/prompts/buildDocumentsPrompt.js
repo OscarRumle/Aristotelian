@@ -50,6 +50,8 @@ For each document:
 - "summary": 1–2 sentences describing what this document contains (shown as preview text on the card)
 - "content": the full document text
 
+Also include a top-level "tagline" field: 1–2 sentences capturing the world's tone, setting, and atmosphere. Specific — uses the actual details, not generic phrases.
+
 Return ONLY valid JSON. No preamble. No markdown fences.
-{"documents":[{"title":"","summary":"","content":""}]}`;
+{"tagline":"","documents":[{"title":"","summary":"","content":""}]}`;
 }

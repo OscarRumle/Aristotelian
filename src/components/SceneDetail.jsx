@@ -1,5 +1,6 @@
 import { BottomBar } from "./BottomBar.jsx";
 import { EmptyState } from "./EmptyState.jsx";
+import { EditableText } from "./EditableText.jsx";
 
 const MOOD_COLORS = {
   Tense: "var(--dust)",
@@ -48,15 +49,27 @@ function DialogueCard({ dialogue, world, onClick }) {
   );
 }
 
-export function SceneDetail({ scene, world, onBack, onNewDialogue, onSelectDialogue }) {
+export function SceneDetail({ scene, world, onBack, onNewDialogue, onSelectDialogue, onUpdateScene }) {
+  const update = (field) => (val) => onUpdateScene?.({ ...scene, [field]: val });
+
   return (
     <div className="screen" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
         </div>
-        <h1 className="t-heading">{scene.name}</h1>
-        {scene.description && <p className="t-body">{scene.description}</p>}
+        {onUpdateScene ? (
+          <EditableText value={scene.name} onSave={update("name")} className="t-heading scene-name-editable" />
+        ) : (
+          <h1 className="t-heading">{scene.name}</h1>
+        )}
+        {scene.description && (
+          onUpdateScene ? (
+            <EditableText value={scene.description} onSave={update("description")} multiline className="t-body scene-desc-editable" />
+          ) : (
+            <p className="t-body">{scene.description}</p>
+          )
+        )}
       </div>
       <div className="divider" />
 

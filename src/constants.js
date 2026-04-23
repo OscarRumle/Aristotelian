@@ -1,5 +1,5 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 5;
+export const STORAGE_VERSION = 7;
 
 export const CHAR_COLORS = [
   "#C87941",
@@ -193,4 +193,79 @@ export const SCALE_OPTIONS = [
   { value: "Nation", label: "A nation" },
   { value: "World", label: "A world" },
   { value: "Cosmos", label: "A cosmos" },
+];
+
+export const OBJECT_TYPES = [
+  "Weapon",
+  "Artifact",
+  "Garment/Regalia",
+  "Document",
+  "Symbol",
+  "Structure",
+  "Custom",
+];
+
+export const RARITY_OPTIONS = ["Common", "Rare", "Unique", "Legendary"];
+export const ERA_OPTIONS = ["Ancient", "Historical", "Contemporary", "Recent"];
+export const CONDITION_OPTIONS = ["Pristine", "Worn", "Damaged", "Destroyed", "Lost"];
+
+export const OBJECT_TYPE_FIELDS = {
+  Weapon: [
+    { key: "form",  label: "Form",  opts: ["Blade", "Ranged", "Blunt", "Polearm", "Magical"] },
+    { key: "scale", label: "Scale", opts: ["Personal", "Ceremonial", "War"] },
+  ],
+  Artifact: [
+    { key: "origin", label: "Origin", opts: ["Crafted", "Natural", "Divine", "Unknown"] },
+    { key: "nature", label: "Nature", opts: ["Mundane", "Enchanted", "Cursed"] },
+  ],
+  "Garment/Regalia": [
+    { key: "kind",    label: "Kind",    opts: ["Armor", "Robe", "Crown", "Seal", "Jewelry", "Standard"] },
+    { key: "context", label: "Context", opts: ["Everyday", "Ceremonial", "Battle"] },
+  ],
+  Document: [
+    { key: "form",    label: "Form",    opts: ["Letter", "Map", "Contract", "Prophecy", "Tome", "Decree"] },
+    { key: "secrecy", label: "Secrecy", opts: ["Public", "Private", "Secret", "Forbidden"] },
+  ],
+  Symbol: [
+    { key: "form",  label: "Form",        opts: ["Sigil", "Seal", "Banner", "Mark", "Crest"] },
+    { key: "affil", label: "Affiliation", opts: ["Character", "Faction", "Religion", "Place"] },
+  ],
+  Structure: [
+    { key: "kind",   label: "Kind",   opts: ["Tower", "Ruin", "Chamber", "Settlement", "Shrine"] },
+    { key: "status", label: "Status", opts: ["Standing", "Ruined", "Abandoned", "Lost"] },
+  ],
+};
+
+export const OBJECT_PHASES = [
+  {
+    id: "describing",
+    streamMarker: '"provenance"',
+    verbs: [
+      "Naming the thing…",
+      "Giving it a form…",
+      "Finding the right material…",
+      "Sketching the object…",
+      "Placing it in the world…",
+    ],
+  },
+  {
+    id: "contextualising",
+    streamMarker: '"dramatic_weight"',
+    verbs: [
+      "Reading the history…",
+      "Tracing the ownership…",
+      "Following the object through time…",
+      "Weighing its significance…",
+    ],
+  },
+  {
+    id: "finishing",
+    streamMarker: null,
+    verbs: [
+      "Almost there…",
+      "Final touches…",
+      "Sealing the provenance…",
+      "Finishing the record…",
+    ],
+  },
 ];

@@ -6,6 +6,7 @@ import { ROLE_OPTIONS, CHAR_COLORS, MOOD_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { ConfirmModal } from "./ConfirmModal.jsx";
 import { Typewriter } from "./Typewriter.jsx";
+import { EditableText } from "./EditableText.jsx";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ function autoName(lines) {
 
 // ── Script-line components ─────────────────────────────────────────────────
 
-function ScriptLine({ line, color, animating, onDone }) {
+function ScriptLine({ line, color, animating, onDone, onEdit }) {
   return (
     <div className="script-block">
       <span className="script-speaker" style={{ color: color ?? "var(--muted)" }}>
@@ -56,7 +57,9 @@ function ScriptLine({ line, color, animating, onDone }) {
       <p className="script-text" style={{ color: color ?? "var(--dark)" }}>
         {animating
           ? <Typewriter text={line.text} onDone={onDone} speed={18} />
-          : line.text
+          : onEdit
+            ? <EditableText value={line.text} onSave={onEdit} multiline className="script-line-editable" />
+            : line.text
         }
       </p>
     </div>
@@ -465,6 +468,7 @@ function DialogueViewScreen({
                 color={colorMap[line.speaker]}
                 animating={isAnimating}
                 onDone={isAnimating ? () => setAnimatedUpTo((p) => p + 1) : undefined}
+                onEdit={!streaming && !isAnimating ? (text) => setLines((prev) => prev.map((l, j) => j === i ? { ...l, text } : l)) : undefined}
               />
             );
           })}
@@ -489,7 +493,7 @@ function DialogueViewScreen({
           )}
           {analysis && !analysisLoading && (
             <div className="analysis-prose">
-              <p className="t-body" style={{ lineHeight: 1.7 }}>{analysis}</p>
+              <EditableText value={analysis} onSave={setAnalysis} multiline className="analysis-prose-editable" />
             </div>
           )}
           {!analysis && !analysisLoading && (
