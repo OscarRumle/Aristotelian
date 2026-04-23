@@ -4,6 +4,7 @@ import { buildDialoguePrompt } from "../prompts/buildDialoguePrompt.js";
 import { buildAnalysisPrompt } from "../prompts/buildAnalysisPrompt.js";
 import { ROLE_OPTIONS, CHAR_COLORS, MOOD_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
+import { ConfirmModal } from "./ConfirmModal.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -267,6 +268,7 @@ function DialogueViewScreen({
   const [directionTarget, setDirectionTarget] = useState("@everyone");
   const [savedName, setSavedName] = useState(initialName ?? null);
   const [saved, setSaved] = useState(false);
+  const [modal, setModal] = useState(null); // null | "clear" | "overwrite"
   const [error, setError] = useState(null);
   const [animatedUpTo, setAnimatedUpTo] = useState(
     initialLines?.length ?? 0
@@ -366,15 +368,21 @@ function DialogueViewScreen({
     generate({ append: true, extraDirection: direction, extraTarget: directionTarget });
   }
 
-  function handleClear() {
+  function executeClear() {
     abortRef.current?.abort();
     setLines([]);
     setAnalysis(null);
     setStreaming(false);
     setAnimatedUpTo(0);
+    setModal(null);
   }
 
-  function handleSave() {
+  function handleClear() {
+    if (lines.length === 0) return;
+    setModal("clear");
+  }
+
+  function executeSave() {
     const name = savedName ?? autoName(lines);
     const dialogue = {
       id: dialogueId ?? crypto.randomUUID(),
@@ -391,7 +399,16 @@ function DialogueViewScreen({
     onSaveDialogue(dialogue);
     setSavedName(name);
     setSaved(true);
+    setModal(null);
     setTimeout(() => setSaved(false), 1800);
+  }
+
+  function handleSave() {
+    if (savedName !== null) {
+      setModal("overwrite");
+    } else {
+      executeSave();
+    }
   }
 
   return (
@@ -540,6 +557,30 @@ function DialogueViewScreen({
           </div>
         </div>
       </BottomBar>
+
+      {modal === "clear" && (
+        <ConfirmModal
+          title="Clear this dialogue?"
+          message="All lines and analysis will be removed. This can't be undone."
+          onClose={() => setModal(null)}
+          actions={[
+            { label: "Cancel", variant: "btn-ghost", onClick: () => setModal(null) },
+            { label: "Clear", variant: "btn-destroy", onClick: executeClear },
+          ]}
+        />
+      )}
+
+      {modal === "overwrite" && (
+        <ConfirmModal
+          title={`Overwrite "${savedName}"?`}
+          message="You've already saved a version of this dialogue. Saving again will replace it."
+          onClose={() => setModal(null)}
+          actions={[
+            { label: "Go back", variant: "btn-ghost", onClick: () => setModal(null) },
+            { label: "Overwrite", variant: "btn-primary", onClick: executeSave },
+          ]}
+        />
+      )}
     </div>
   );
 }

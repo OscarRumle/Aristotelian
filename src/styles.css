@@ -91,6 +91,8 @@ main{padding-top:var(--nav-h);position:relative;z-index:1;}
 
 /* ─────────────────────────── ANIMATIONS ────────────────────────────────── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96) translateY(6px);}to{opacity:1;transform:scale(1) translateY(0);}}
 @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
 @keyframes verbIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 @keyframes checkIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
@@ -190,6 +192,9 @@ body.theme-dark .toggle-btn{border-color:var(--dk-border);color:var(--dk-faint);
 body.theme-dark .toggle-btn:hover{border-color:var(--dk-border-hover);color:var(--dk-muted);}
 
 /* ─────────────────────────── BOTTOM BAR ────────────────────────────────── */
+/* ─────────────────────────── CONFIRM MODAL ─────────────────────────────── */
+.modal-actions{display:flex;gap:.55rem;justify-content:flex-end;margin-top:.25rem;}
+
 .bottom-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:center;padding:.9rem 1.25rem 1.6rem;background:rgba(244,237,228,.95);border-top:1px solid var(--border);transform:translateZ(0);will-change:transform;}
 body.theme-dark .bottom-bar{background:rgba(14,10,6,.95);border-top:1px solid var(--dk-border);}
 .bottom-bar-inner{width:100%;max-width:520px;display:flex;flex-direction:column;gap:.55rem;}
