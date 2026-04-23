@@ -19,6 +19,10 @@ import { CastAnalysis } from "./components/CastAnalysis.jsx";
 import { LoreExpandInterview } from "./components/LoreExpandInterview.jsx";
 import { CreateObjectScreen } from "./components/CreateObjectScreen.jsx";
 import { ObjectDetail } from "./components/ObjectDetail.jsx";
+import { CreateFactionScreen } from "./components/CreateFactionScreen.jsx";
+import { FactionDetail } from "./components/FactionDetail.jsx";
+import { CreateLocationScreen } from "./components/CreateLocationScreen.jsx";
+import { LocationDetail } from "./components/LocationDetail.jsx";
 
 export default function App() {
   const [view, setView] = useState("hub");
@@ -27,6 +31,8 @@ export default function App() {
   const [activeSceneId, setActiveSceneId] = useState(null);
   const [activeDialogueId, setActiveDialogueId] = useState(null);
   const [activeObjectId, setActiveObjectId] = useState(null);
+  const [activeFactionId, setActiveFactionId] = useState(null);
+  const [activeLocationId, setActiveLocationId] = useState(null);
   const [worlds, setWorlds] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [storageCorrupted, setStorageCorrupted] = useState(false);
@@ -135,6 +141,38 @@ export default function App() {
       p.map((w) =>
         w.id === activeWorldId
           ? { ...w, objects: (w.objects ?? []).map((x) => (x.id === o.id ? o : x)) }
+          : w
+      )
+    );
+
+  const addFaction = (f) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId ? { ...w, factions: [...(w.factions ?? []), f] } : w
+      )
+    );
+
+  const updateFaction = (f) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, factions: (w.factions ?? []).map((x) => (x.id === f.id ? f : x)) }
+          : w
+      )
+    );
+
+  const addLocation = (l) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId ? { ...w, locations: [...(w.locations ?? []), l] } : w
+      )
+    );
+
+  const updateLocation = (l) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, locations: (w.locations ?? []).map((x) => (x.id === l.id ? l : x)) }
           : w
       )
     );
@@ -292,6 +330,10 @@ export default function App() {
             onExpandDoc={(id) => { setActiveLoreDocId(id); setView("loreExpand"); }}
             onNewObject={() => setView("createObject")}
             onSelectObject={(id) => { setActiveObjectId(id); setView("object"); }}
+            onNewFaction={() => setView("createFaction")}
+            onSelectFaction={(id) => { setActiveFactionId(id); setView("faction"); }}
+            onNewLocation={() => setView("createLocation")}
+            onSelectLocation={(id) => { setActiveLocationId(id); setView("location"); }}
           />
         )}
 
@@ -385,6 +427,46 @@ export default function App() {
               world={activeWorld}
               onBack={() => { setWorldToolView("objects"); setView("world"); }}
               onUpdate={updateObject}
+            />
+          ) : null;
+        })()}
+
+        {view === "createFaction" && activeWorld && (
+          <CreateFactionScreen
+            world={activeWorld}
+            onBack={() => setView("world")}
+            onSave={(f) => { addFaction(f); setActiveFactionId(f.id); setView("faction"); }}
+          />
+        )}
+
+        {view === "faction" && activeFactionId && activeWorld && (() => {
+          const activeFaction = (activeWorld.factions ?? []).find((f) => f.id === activeFactionId);
+          return activeFaction ? (
+            <FactionDetail
+              faction={activeFaction}
+              world={activeWorld}
+              onBack={() => { setWorldToolView("factions"); setView("world"); }}
+              onUpdate={updateFaction}
+            />
+          ) : null;
+        })()}
+
+        {view === "createLocation" && activeWorld && (
+          <CreateLocationScreen
+            world={activeWorld}
+            onBack={() => setView("world")}
+            onSave={(l) => { addLocation(l); setActiveLocationId(l.id); setView("location"); }}
+          />
+        )}
+
+        {view === "location" && activeLocationId && activeWorld && (() => {
+          const activeLocation = (activeWorld.locations ?? []).find((l) => l.id === activeLocationId);
+          return activeLocation ? (
+            <LocationDetail
+              location={activeLocation}
+              world={activeWorld}
+              onBack={() => { setWorldToolView("locations"); setView("world"); }}
+              onUpdate={updateLocation}
             />
           ) : null;
         })()}

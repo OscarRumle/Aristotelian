@@ -8,6 +8,8 @@ import { WorldLibrary } from "./WorldLibrary.jsx";
 import { DocumentViewer } from "./DocumentViewer.jsx";
 import { EditableText } from "./EditableText.jsx";
 import { ObjectsTab } from "./ObjectsTab.jsx";
+import { FactionsTab } from "./FactionsTab.jsx";
+import { LocationsTab } from "./LocationsTab.jsx";
 
 function CharactersPanel({ world, onSelectCharacter }) {
   const [roleTab, setRoleTab] = useState("Recent");
@@ -130,10 +132,6 @@ function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc
   );
 }
 
-const COMING_SOON = [
-  { id: "factions", name: "Factions", description: "Groups, allegiances, and power structures" },
-];
-
 export function WorldDetail({
   world,
   toolView,
@@ -151,6 +149,10 @@ export function WorldDetail({
   onExpandDoc,
   onNewObject,
   onSelectObject,
+  onNewFaction,
+  onSelectFaction,
+  onNewLocation,
+  onSelectLocation,
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -233,6 +235,44 @@ export function WorldDetail({
     );
   }
 
+  // ── Factions tool sub-view ────────────────────────────────────────────────
+  if (toolView === "factions") {
+    return (
+      <div className="screen" style={{ paddingBottom: "5rem" }}>
+        <div className="tool-view-header">
+          <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
+            ← {world.name}
+          </button>
+          <h2 className="tool-view-title">Factions</h2>
+        </div>
+        <FactionsTab
+          factions={world.factions ?? []}
+          onSelectFaction={onSelectFaction}
+          onNewFaction={onNewFaction}
+        />
+      </div>
+    );
+  }
+
+  // ── Locations tool sub-view ───────────────────────────────────────────────
+  if (toolView === "locations") {
+    return (
+      <div className="screen" style={{ paddingBottom: "5rem" }}>
+        <div className="tool-view-header">
+          <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
+            ← {world.name}
+          </button>
+          <h2 className="tool-view-title">Locations</h2>
+        </div>
+        <LocationsTab
+          locations={world.locations ?? []}
+          onSelectLocation={onSelectLocation}
+          onNewLocation={onNewLocation}
+        />
+      </div>
+    );
+  }
+
   // ── Dashboard ─────────────────────────────────────────────────────────────
   const tools = [
     {
@@ -266,6 +306,22 @@ export function WorldDetail({
       count: (world.objects ?? []).length,
       unit: (world.objects ?? []).length === 1 ? "object" : "objects",
       onClick: () => onSetToolView("objects"),
+    },
+    {
+      id: "factions",
+      name: "Factions",
+      description: "Noble houses, guilds, secret societies, and power structures",
+      count: (world.factions ?? []).length,
+      unit: (world.factions ?? []).length === 1 ? "faction" : "factions",
+      onClick: () => onSetToolView("factions"),
+    },
+    {
+      id: "locations",
+      name: "Locations",
+      description: "Places that carry atmosphere, history, and dramatic weight",
+      count: (world.locations ?? []).length,
+      unit: (world.locations ?? []).length === 1 ? "location" : "locations",
+      onClick: () => onSetToolView("locations"),
     },
   ];
 
@@ -304,15 +360,6 @@ export function WorldDetail({
               </div>
               <p className="tool-card-desc">{tool.description}</p>
             </button>
-          ))}
-          {COMING_SOON.map((tool) => (
-            <div key={tool.id} className="tool-card tool-card--disabled" aria-disabled="true">
-              <div className="tool-card-header">
-                <span className="tool-card-name">{tool.name}</span>
-                <span className="tool-card-coming">Soon</span>
-              </div>
-              <p className="tool-card-desc">{tool.description}</p>
-            </div>
           ))}
         </div>
       </div>

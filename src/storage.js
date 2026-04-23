@@ -56,6 +56,12 @@ function migrate(parsed) {
     version = 7;
   }
 
+  // v7 → v8: add factions and locations arrays to each world.
+  if (version < 8) {
+    worlds = worlds.map((w) => ({ ...w, factions: w.factions ?? [], locations: w.locations ?? [] }));
+    version = 8;
+  }
+
   return { __version: version, worlds };
 }
 

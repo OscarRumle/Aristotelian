@@ -1,5 +1,5 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 7;
+export const STORAGE_VERSION = 8;
 
 export const CHAR_COLORS = [
   "#C87941",
@@ -265,6 +265,168 @@ export const OBJECT_PHASES = [
       "Almost there…",
       "Final touches…",
       "Sealing the provenance…",
+      "Finishing the record…",
+    ],
+  },
+];
+
+// ── Faction constants ──────────────────────────────────────────────────────
+
+export const FACTION_TYPES = [
+  "Noble House",
+  "Guild",
+  "Military Order",
+  "Religious/Cult",
+  "Political",
+  "Criminal/Underground",
+  "Secret Society",
+  "Rebel/Revolutionary",
+  "Custom",
+];
+
+export const FACTION_SIZE_OPTIONS   = ["Cell (a handful)", "Small (dozens)", "Established (hundreds)", "Vast (thousands+)"];
+export const FACTION_STATUS_OPTIONS = ["Rising", "Stable", "Declining", "Fractured", "Secret", "Disbanded"];
+export const FACTION_AGE_OPTIONS    = ["Ancient", "Old", "Established", "Recent", "New"];
+
+export const FACTION_TYPE_FIELDS = {
+  "Noble House": [
+    { key: "seat",      label: "Seat",      opts: ["Capital", "Provincial", "Frontier", "Exiled"] },
+    { key: "standing",  label: "Standing",  opts: ["Ruling", "Noble", "Minor", "Fallen"] },
+  ],
+  "Guild": [
+    { key: "trade", label: "Trade", opts: ["Merchant", "Craft", "Information", "Magic", "Labour"] },
+    { key: "reach", label: "Reach", opts: ["Local", "Regional", "Empire-wide"] },
+  ],
+  "Military Order": [
+    { key: "loyalty",    label: "Loyalty",    opts: ["Crown", "Independent", "Mercenary", "Church"] },
+    { key: "speciality", label: "Speciality", opts: ["Infantry", "Cavalry", "Naval", "Arcane", "Assassins"] },
+  ],
+  "Religious/Cult": [
+    { key: "practice",  label: "Practice",  opts: ["Public worship", "Mystery cult", "Forbidden", "Heretical"] },
+    { key: "orthodoxy", label: "Orthodoxy", opts: ["Mainstream", "Reformed", "Splinter", "Outlawed"] },
+  ],
+  "Political": [
+    { key: "allegiance", label: "Allegiance", opts: ["Throne", "Reform", "Independence", "Oligarchy"] },
+    { key: "method",     label: "Method",     opts: ["Diplomacy", "Intrigue", "Propaganda", "Force"] },
+  ],
+  "Criminal/Underground": [
+    { key: "territory", label: "Territory", opts: ["City-wide", "Regional", "Cross-border", "Nomadic"] },
+    { key: "trade",     label: "Trade",     opts: ["Smuggling", "Information", "Assassination", "Extortion"] },
+  ],
+  "Secret Society": [
+    { key: "visibility", label: "Visibility", opts: ["Open secret", "Rumoured", "Truly hidden"] },
+    { key: "goal",       label: "Goal",       opts: ["Known", "Partially known", "Unknown"] },
+  ],
+  "Rebel/Revolutionary": [
+    { key: "cause",   label: "Cause",   opts: ["Political", "Religious", "Economic", "Ethnic", "Ideological"] },
+    { key: "tactics", label: "Tactics", opts: ["Guerrilla", "Propaganda", "Assassination", "Open warfare"] },
+  ],
+};
+
+export const FACTION_PHASES = [
+  {
+    id: "describing",
+    streamMarker: '"history"',
+    verbs: [
+      "Naming the faction…",
+      "Sketching the organisation…",
+      "Finding the structure…",
+      "Placing them in the world…",
+    ],
+  },
+  {
+    id: "contextualising",
+    streamMarker: '"dramatic_role"',
+    verbs: [
+      "Reading the history…",
+      "Tracing the rivalries…",
+      "Following the power…",
+      "Weighing their influence…",
+    ],
+  },
+  {
+    id: "finishing",
+    streamMarker: null,
+    verbs: [
+      "Almost there…",
+      "Final touches…",
+      "Finding the contradiction…",
+      "Finishing the record…",
+    ],
+  },
+];
+
+// ── Location constants ─────────────────────────────────────────────────────
+
+export const LOCATION_TYPES = [
+  "Settlement",
+  "Structure",
+  "Landscape",
+  "Region",
+  "Ruin",
+  "Hidden/Secret",
+  "Custom",
+];
+
+export const LOCATION_SCALE_OPTIONS  = ["Room or chamber", "Building", "District or landmark", "Settlement", "Region", "Vast territory"];
+export const LOCATION_STATUS_OPTIONS = ["Thriving", "Struggling", "Abandoned", "Ruined", "Mythic", "Unknown"];
+export const LOCATION_ACCESS_OPTIONS = ["Open", "Restricted", "Guarded", "Secret", "Lost"];
+
+export const LOCATION_TYPE_FIELDS = {
+  "Settlement": [
+    { key: "size",       label: "Size",       opts: ["Hamlet", "Town", "City", "Capital", "Sprawling"] },
+    { key: "governance", label: "Governance", opts: ["Monarchy", "Republic", "Guild-run", "Theocracy", "Lawless"] },
+  ],
+  "Structure": [
+    { key: "purpose",   label: "Purpose",   opts: ["Military", "Religious", "Civic", "Private", "Arcane"] },
+    { key: "condition", label: "Condition", opts: ["Intact", "Damaged", "Derelict", "Ruined"] },
+  ],
+  "Landscape": [
+    { key: "terrain", label: "Terrain", opts: ["Forest", "Mountain", "Coast", "Wetland", "Desert", "Plains", "Underground"] },
+    { key: "danger",  label: "Danger",  opts: ["Safe", "Hazardous", "Deadly", "Unknown"] },
+  ],
+  "Region": [
+    { key: "climate",  label: "Climate",  opts: ["Temperate", "Arid", "Arctic", "Tropical", "Blighted"] },
+    { key: "control",  label: "Control",  opts: ["Unified", "Contested", "Fractured", "Ungoverned"] },
+  ],
+  "Ruin": [
+    { key: "was",  label: "What it was",  opts: ["City", "Fortress", "Temple", "Estate", "Settlement"] },
+    { key: "fall", label: "Cause of fall", opts: ["War", "Disaster", "Plague", "Abandonment", "Unknown"] },
+  ],
+  "Hidden/Secret": [
+    { key: "concealment", label: "Concealment", opts: ["Physically hidden", "Magically hidden", "Unknown to most", "Known but unreachable"] },
+    { key: "who_knows",   label: "Who knows",   opts: ["One person", "A few", "A faction", "A legend"] },
+  ],
+};
+
+export const LOCATION_PHASES = [
+  {
+    id: "describing",
+    streamMarker: '"history"',
+    verbs: [
+      "Mapping the place…",
+      "Sketching the landscape…",
+      "Finding the atmosphere…",
+      "Placing it in the world…",
+    ],
+  },
+  {
+    id: "contextualising",
+    streamMarker: '"dramatic_role"',
+    verbs: [
+      "Reading the history…",
+      "Tracing what happened here…",
+      "Following the memory…",
+      "Weighing its significance…",
+    ],
+  },
+  {
+    id: "finishing",
+    streamMarker: null,
+    verbs: [
+      "Almost there…",
+      "Final touches…",
+      "Finding the right line…",
       "Finishing the record…",
     ],
   },
