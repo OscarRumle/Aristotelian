@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { uid } from "../util.js";
-import { PLACEHOLDER_DESC } from "../constants.js";
+import { DEFAULT_WORLD_NAME, DEFAULT_WORLD_DESC } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { CreateWorldAdvanced } from "./CreateWorldAdvanced.jsx";
 
 export function CreateWorldScreen({ onBack, onCreate }) {
   const [mode, setMode] = useState("simple");
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState(PLACEHOLDER_DESC);
+  const [name, setName] = useState(DEFAULT_WORLD_NAME);
+  const [desc, setDesc] = useState(DEFAULT_WORLD_DESC);
   const [errors, setErrors] = useState({});
 
   const submit = () => {
@@ -90,16 +90,10 @@ export function CreateWorldScreen({ onBack, onCreate }) {
             placeholder="Genre, tone, rules, history, feel…"
             value={desc}
             onChange={(e) => { setDesc(e.target.value); setErrors((p) => ({ ...p, desc: null })); }}
-            maxLength={600}
           />
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
-            {errors.desc ? (
-              <p style={{ fontSize: ".75rem", color: "var(--dust)" }}>{errors.desc}</p>
-            ) : (
-              <span />
-            )}
-            <span className="t-hint">{desc.length} / 600</span>
-          </div>
+          {errors.desc && (
+            <p style={{ fontSize: ".75rem", color: "var(--dust)", marginTop: ".3rem" }}>{errors.desc}</p>
+          )}
         </div>
       </div>
       <BottomBar>

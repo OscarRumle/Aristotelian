@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { uid } from "../util.js";
-import { GENRE_OPTIONS, SCALE_OPTIONS, STYLE_OPTIONS } from "../constants.js";
+import { GENRE_OPTIONS, SCALE_OPTIONS, STYLE_OPTIONS, DEFAULT_WORLD_NAME, DEFAULT_WORLD_DESC, DEFAULT_WORLD_INSPIRATION } from "../constants.js";
 import { callClaude } from "../api/claude.js";
 import { buildInterviewPrompt } from "../prompts/buildInterviewPrompt.js";
 import { buildDocumentsPrompt } from "../prompts/buildDocumentsPrompt.js";
@@ -28,15 +28,15 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
   const continueMode = !!existingWorld;
 
   // Basic info
-  const [name, setName] = useState(existingWorld?.name ?? "");
-  const [pitch, setPitch] = useState(existingWorld?.description ?? "");
+  const [name, setName] = useState(existingWorld?.name ?? DEFAULT_WORLD_NAME);
+  const [pitch, setPitch] = useState(existingWorld?.description ?? DEFAULT_WORLD_DESC);
 
   // Extended inputs
   const [genre, setGenre] = useState(existingWorld?.extendedInputs?.genre ?? "");
   const [tone, setTone] = useState(existingWorld?.extendedInputs?.tone ?? "");
   const [era, setEra] = useState(existingWorld?.extendedInputs?.era ?? "");
   const [scale, setScale] = useState(existingWorld?.extendedInputs?.scale ?? "");
-  const [inspiration, setInspiration] = useState(existingWorld?.extendedInputs?.inspiration ?? "");
+  const [inspiration, setInspiration] = useState(existingWorld?.extendedInputs?.inspiration ?? DEFAULT_WORLD_INSPIRATION);
   const [distinctive, setDistinctive] = useState(existingWorld?.extendedInputs?.distinctive ?? "");
 
   // Wizard state
@@ -95,11 +95,12 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
     }
   };
 
-  const advanceQuestion = async () => {
+  const advanceQuestion = async (optionKey = null) => {
     const q = questions[currentQIndex];
+    const pickedKey = optionKey ?? selectedOption;
     const answerText =
       freeText.trim() ||
-      questions[currentQIndex].options.find((o) => o.key === selectedOption)?.text ||
+      (pickedKey ? questions[currentQIndex].options.find((o) => o.key === pickedKey)?.text : "") ||
       "";
     if (!answerText) return;
 
@@ -437,7 +438,7 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
                 key={opt.key}
                 type="button"
                 className={`interview-option ${selectedOption === opt.key ? "selected" : ""}`}
-                onClick={() => { setSelectedOption(opt.key); setFreeText(""); }}
+                onClick={() => { setSelectedOption(opt.key); setFreeText(""); advanceQuestion(opt.key); }}
               >
                 <div className="interview-option-header">
                   <span className="interview-option-key">{opt.key}</span>
@@ -498,12 +499,11 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
           <button type="button" className="btn btn-ghost" onClick={onBack}>Cancel</button>
         )}
 
-        {step === "interview" && (
+        {step === "interview" && freeText.trim() && (
           <button
             type="button"
             className="btn btn-primary"
-            disabled={!canAdvanceQuestion}
-            onClick={advanceQuestion}
+            onClick={() => advanceQuestion()}
           >
             {currentQIndex < (questions?.length ?? 0) - 1 ? "Next Question →" : "Finish Interview →"}
           </button>

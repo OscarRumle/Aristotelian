@@ -137,7 +137,29 @@ export const STYLE_OPTIONS = [
   { value: "Mixed", label: "Mixed", desc: "Comic surface, tragic core" },
 ];
 
-export const PLACEHOLDER_DESC = `Grand theft auto and Guy Ritchie's "the Gentlemen" inspired world. Set in New York in 1991. Dark Comedy, Drama.`;
+export const DEFAULT_WORLD_NAME = "Broken State";
+
+export const DEFAULT_WORLD_INSPIRATION = "Civil War (Alex Garland) · The Gentlemen (Ritchie) · Barry · No Country for Old Men · Fargo · True Detective S1 · Banshee · Grand Theft Auto · Cyberpunk 2077";
+
+export const DEFAULT_WORLD_DESC = `America, 1991 — but not the one that happened. Twenty-two years ago the federal government collapsed. The two-party system didn't break — it dissolved. What replaced it wasn't revolution. It was a slow, quiet unraveling.
+
+A civil war is technically still active, but most people have stopped paying attention. The political class persists — committees, manifestos, press releases — but with no tax base and no enforcement, it's theater. An intellectual hobby for people who can afford one.
+
+Power lives elsewhere. In gangs, which are racially and culturally exclusive by design — Haitian networks in Florida and New York, Italian syndicates in the northeast, Korean operators on the west coast, Black organizations with deep roots in the south and midwest. Each with their own codes, aesthetics, economies, and territory. Some work both sides of the law — or rather, there is no law, so the distinction barely registers.
+
+Then there are the independents: hackers, private detectives, hitmen, scientists, fixers, garbage collectors who double as informants. People who carved out a function and protect it.
+
+And then there are civilians — about 85% of the country. They work, raise families, navigate the world without allegiances. Most of them just want to be left alone.
+
+Gasoline is rare. Cars are a luxury. The country is quieter than it's been in a century. Nature has come back — overgrown highways, ivy on storefronts, deer in suburbs. There's a strange beauty to the decay.
+
+Every state has its own texture. Texas is its own republic in all but name. New York is a city-state run by competing organizations. California is fragmented into coastal enclaves and inland territory. Minnesota is cold, Lutheran, and deeply suspicious of outsiders. New Mexico is old violence and new money.
+
+Violence here is not heroic. It is mundane, specific, and has consequences that last. People make choices that seem rational in the moment and catastrophic in retrospect. Fate operates with dark, almost comedic precision — the wrong person sees the wrong thing at the wrong time, and everything unravels from there.
+
+This is not a world without hope. It's a world where the old systems failed and something new is growing in the wreckage — not better, necessarily, but real.`;
+
+export const PLACEHOLDER_DESC = DEFAULT_WORLD_DESC;
 
 export const GENRE_OPTIONS = [
   { value: "Fantasy", label: "Fantasy" },
