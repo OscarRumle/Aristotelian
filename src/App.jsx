@@ -32,6 +32,8 @@ export default function App() {
   const [genError, setGenError] = useState(null);
   const [genAccumulated, setGenAccumulated] = useState("");
   const [castAnalysisOpen, setCastAnalysisOpen] = useState(false);
+  const [castAnalysisText, setCastAnalysisText] = useState(null);
+  const [createCharInitialPitch, setCreateCharInitialPitch] = useState("");
 
   const abortRef = useRef(null);
 
@@ -210,7 +212,18 @@ export default function App() {
       )}
 
       {castAnalysisOpen && activeWorld && (
-        <CastAnalysis world={activeWorld} onClose={() => setCastAnalysisOpen(false)} />
+        <CastAnalysis
+          world={activeWorld}
+          onClose={() => setCastAnalysisOpen(false)}
+          cachedText={castAnalysisText}
+          onCacheText={setCastAnalysisText}
+          onCreateCharacter={(pitch) => {
+            setCastAnalysisOpen(false);
+            setCreateCharInitialPitch(pitch);
+            setGenError(null);
+            setView("createCharacter");
+          }}
+        />
       )}
 
       <TokenCounter />
@@ -260,12 +273,13 @@ export default function App() {
           <>
             <CreateCharacterScreen
               world={activeWorld}
-              onBack={() => { handleNavigateAway(); setView("world"); }}
+              onBack={() => { handleNavigateAway(); setCreateCharInitialPitch(""); setView("world"); }}
               onStartGenerating={handleStartGenerating}
               onGenerated={handleGenerated}
               onError={handleGenError}
               onChunk={setGenAccumulated}
               signal={abortRef.current?.signal}
+              initialPitch={createCharInitialPitch}
             />
             {genError && (
               <div style={{ position: "fixed", bottom: "7rem", left: "1.25rem", right: "1.25rem", zIndex: 500, maxWidth: "420px", margin: "0 auto" }}>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export function Typewriter({ text, onDone }) {
+export function Typewriter({ text, onDone, speed = 32 }) {
   const [n, setN] = useState(0);
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -16,7 +16,7 @@ export function Typewriter({ text, onDone }) {
       onDoneRef.current?.();
       return;
     }
-    const id = setTimeout(() => setN((p) => p + 1), 32);
+    const id = setTimeout(() => setN((p) => p + 1), speed);
     return () => clearTimeout(id);
   }, [n, text]);
 

@@ -14,8 +14,9 @@ export function CreateCharacterScreen({
   onError,
   onChunk,
   signal,
+  initialPitch = "",
 }) {
-  const [pitch, setPitch] = useState("");
+  const [pitch, setPitch] = useState(initialPitch);
   const [role, setRole] = useState("");
   const [style, setStyle] = useState("");
   const [targetLeadId, setTargetLeadId] = useState("");

@@ -4,6 +4,7 @@ import { buildDialoguePrompt } from "../prompts/buildDialoguePrompt.js";
 import { buildAnalysisPrompt } from "../prompts/buildAnalysisPrompt.js";
 import { ROLE_OPTIONS, CHAR_COLORS, MOOD_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
+import { Typewriter } from "./Typewriter.jsx";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ function assignColors(participants, onUpdateCharacter) {
     if (!c.color) {
       const col = available[idx % available.length] ?? CHAR_COLORS[idx % CHAR_COLORS.length];
       onUpdateCharacter({ ...c, color: col });
-      c.color = col; // mutate local ref so subsequent code sees the color
+      c.color = col;
       idx++;
     }
   });
@@ -43,6 +44,34 @@ function autoName(lines) {
   return first.text.length > 45 ? first.text.slice(0, 42) + "…" : first.text;
 }
 
+// ── Script-line components ─────────────────────────────────────────────────
+
+function ScriptLine({ line, color, animating, onDone }) {
+  return (
+    <div className="script-block">
+      <span className="script-speaker" style={{ color: color ?? "var(--muted)" }}>
+        {line.speaker}
+      </span>
+      <p className="script-text" style={{ color: color ?? "var(--dark)" }}>
+        {animating
+          ? <Typewriter text={line.text} onDone={onDone} speed={18} />
+          : line.text
+        }
+      </p>
+    </div>
+  );
+}
+
+function StageDirection({ text, onAutoAdvance }) {
+  const clean = text.replace(/^\*|\*$/g, "").trim();
+  useEffect(() => {
+    if (!onAutoAdvance) return;
+    const t = setTimeout(onAutoAdvance, 80);
+    return () => clearTimeout(t);
+  }, []);
+  return <p className="stage-direction">{clean}</p>;
+}
+
 // ── Setup screen ───────────────────────────────────────────────────────────
 
 function SetupScreen({ world, onGenerate, onBack }) {
@@ -64,7 +93,6 @@ function SetupScreen({ world, onGenerate, onBack }) {
     });
   }
 
-  // Group by role order
   const groups = ROLE_OPTIONS
     .map((opt) => ({
       role: opt.value,
@@ -76,7 +104,7 @@ function SetupScreen({ world, onGenerate, onBack }) {
   if (ungrouped.length > 0) groups.push({ role: "Other", chars: ungrouped });
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen" style={{ paddingBottom: "8rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Scene</button>
@@ -140,9 +168,7 @@ function SetupScreen({ world, onGenerate, onBack }) {
 
       {/* Pitch */}
       <div className="f-group">
-        <label className="f-label" htmlFor="dialogue-pitch">
-          Pitch
-        </label>
+        <label className="f-label" htmlFor="dialogue-pitch">Pitch</label>
         <textarea
           id="dialogue-pitch"
           className="f-input"
@@ -213,32 +239,13 @@ function SetupScreen({ world, onGenerate, onBack }) {
 
 // ── Dialogue View ──────────────────────────────────────────────────────────
 
-function BubbleRow({ line, isRight, color }) {
-  return (
-    <div className={`bubble-row ${isRight ? "right" : "left"}`}>
-      <div className="bubble-meta">
-        <span className="bubble-color-chip" style={{ background: color ?? "var(--muted)" }} />
-        <span className="bubble-speaker">{line.speaker}</span>
-      </div>
-      <div className={`bubble ${isRight ? "bubble-right" : "bubble-left"}`} style={{ "--bcolor": color ?? "var(--muted)" }}>
-        {line.text}
-      </div>
-    </div>
-  );
-}
-
-function StageDirection({ text }) {
-  const clean = text.replace(/^\*|\*$/g, "").trim();
-  return <p className="stage-direction">{clean}</p>;
-}
-
 function DialogueViewScreen({
   world,
-  setup,        // { participantIds, mentionIds, pitch, mood, hamartiaOn }
+  setup,
   initialLines,
   initialAnalysis,
   initialName,
-  dialogueId,   // null if unsaved
+  dialogueId,
   onBack,
   onSaveDialogue,
   onUpdateCharacter,
@@ -261,9 +268,11 @@ function DialogueViewScreen({
   const [savedName, setSavedName] = useState(initialName ?? null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
+  const [animatedUpTo, setAnimatedUpTo] = useState(
+    initialLines?.length ?? 0
+  );
 
   const abortRef = useRef(null);
-  const preContinueRef = useRef(null);
   const bottomRef = useRef(null);
 
   // Assign colors on mount
@@ -271,10 +280,10 @@ function DialogueViewScreen({
     assignColors(participants, onUpdateCharacter);
   }, []);
 
-  // Auto-scroll as lines arrive
+  // Auto-scroll as animation advances
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [lines.length]);
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
+  }, [animatedUpTo]);
 
   const colorMap = Object.fromEntries(participants.map((c) => [c.name, c.color]));
 
@@ -286,13 +295,15 @@ function DialogueViewScreen({
     abortRef.current = ctrl;
 
     const baseLines = append ? [...lines] : [];
-    preContinueRef.current = baseLines;
 
     setStreaming(true);
     setError(null);
     if (!append) {
       setLines([]);
       setAnalysis(null);
+      setAnimatedUpTo(0);
+    } else {
+      setAnimatedUpTo(baseLines.length);
     }
 
     const prompt = buildDialoguePrompt(world, participants, mentions, {
@@ -304,7 +315,6 @@ function DialogueViewScreen({
       directionTarget: extraTarget || directionTarget,
     });
 
-    // Track final lines locally to avoid stale closure in the analysis call
     let finalLines = [...baseLines];
 
     try {
@@ -324,7 +334,6 @@ function DialogueViewScreen({
       abortRef.current = null;
     }
 
-    // Fire analysis after streaming completes (uses finalLines, not stale state)
     if (finalLines.length > 0) {
       setAnalysisLoading(true);
       setAnalysis(null);
@@ -336,14 +345,13 @@ function DialogueViewScreen({
         );
         setAnalysis(analysisText);
       } catch {
-        // non-fatal — analysis just won't show
+        // non-fatal
       } finally {
         setAnalysisLoading(false);
       }
     }
   }
 
-  // Run generation on mount if no initial lines
   useEffect(() => {
     if (!initialLines || initialLines.length === 0) {
       generate();
@@ -363,6 +371,7 @@ function DialogueViewScreen({
     setLines([]);
     setAnalysis(null);
     setStreaming(false);
+    setAnimatedUpTo(0);
   }
 
   function handleSave() {
@@ -418,24 +427,30 @@ function DialogueViewScreen({
             </p>
           )}
 
-          {(() => {
-            let sideIndex = 0;
-            return lines.map((line, i) => {
-              if (line.type === "stage") {
-                return <StageDirection key={i} text={line.text} />;
-              }
-              const side = sideIndex % 2 === 0 ? "left" : "right";
-              sideIndex++;
+          {lines.map((line, i) => {
+            if (i > animatedUpTo) return null;
+
+            if (line.type === "stage") {
               return (
-                <BubbleRow
+                <StageDirection
                   key={i}
-                  line={line}
-                  isRight={side === "right"}
-                  color={colorMap[line.speaker]}
+                  text={line.text}
+                  onAutoAdvance={i === animatedUpTo ? () => setAnimatedUpTo((p) => p + 1) : undefined}
                 />
               );
-            });
-          })()}
+            }
+
+            const isAnimating = i === animatedUpTo;
+            return (
+              <ScriptLine
+                key={i}
+                line={line}
+                color={colorMap[line.speaker]}
+                animating={isAnimating}
+                onDone={isAnimating ? () => setAnimatedUpTo((p) => p + 1) : undefined}
+              />
+            );
+          })}
 
           {error && (
             <p className="t-body" style={{ color: "var(--dust)", marginTop: "1rem" }}>{error}</p>
