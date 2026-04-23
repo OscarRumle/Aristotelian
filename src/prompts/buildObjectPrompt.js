@@ -33,9 +33,11 @@ export function buildObjectPrompt(world, formState) {
     lines.push(``);
   }
 
-  const charAssocs = associations.filter((a) => a.kind === "character");
+  const charAssocs     = associations.filter((a) => a.kind === "character");
+  const factionAssocs  = associations.filter((a) => a.kind === "faction");
+  const locationAssocs = associations.filter((a) => a.kind === "location");
   lines.push(`ASSOCIATIONS:`);
-  if (charAssocs.length === 0) {
+  if (charAssocs.length === 0 && factionAssocs.length === 0 && locationAssocs.length === 0) {
     lines.push(`None specified.`);
   } else {
     for (const a of charAssocs) {
@@ -43,7 +45,19 @@ export function buildObjectPrompt(world, formState) {
       if (!char) continue;
       const summary = char.summary?.[0] ?? "";
       const notePart = a.note ? ` ${a.note}` : "";
-      lines.push(`${char.name}${summary ? ` — ${summary}` : ""}${notePart}`);
+      lines.push(`Character: ${char.name}${summary ? ` — ${summary}` : ""}${notePart}`);
+    }
+    for (const a of factionAssocs) {
+      const faction = (world.factions ?? []).find((f) => f.id === a.id);
+      if (!faction) continue;
+      const notePart = a.note ? ` ${a.note}` : "";
+      lines.push(`Faction: ${faction.name}${notePart}`);
+    }
+    for (const a of locationAssocs) {
+      const loc = (world.locations ?? []).find((l) => l.id === a.id);
+      if (!loc) continue;
+      const notePart = a.note ? ` ${a.note}` : "";
+      lines.push(`Location: ${loc.name}${notePart}`);
     }
   }
   lines.push(``);

@@ -883,3 +883,46 @@ body.theme-dark .obj-detail-pill-value{color:var(--dk-text);}
 /* ObjectDetail association row */
 .obj-assoc-row{padding:.6rem 0;border-bottom:1px solid var(--border);}
 body.theme-dark .obj-assoc-row{border-bottom-color:var(--dk-border);}
+
+/* ── Faction accent ──────────────────────────────────────────────────────── */
+:root{--fac-accent:#4a6741;--fac-accent-bg:#edf2ec;}
+
+.fac-type-chips{display:flex;flex-wrap:wrap;gap:.5rem;}
+.fac-type-chip{background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:.4rem .85rem;font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.06em;color:var(--muted);cursor:pointer;transition:all .15s;}
+.fac-type-chip:hover{border-color:var(--border-hover);color:var(--dark);}
+.fac-type-chip.selected{border-color:var(--fac-accent);color:var(--fac-accent);background:rgba(74,103,65,.07);}
+body.theme-dark .fac-type-chip{color:var(--dk-muted);border-color:var(--dk-border);}
+body.theme-dark .fac-type-chip:hover{color:var(--dk-text);border-color:var(--dk-border-hover);}
+body.theme-dark .fac-type-chip.selected{background:rgba(74,103,65,.12);}
+
+.fac-gen-progress{padding:.85rem 0 .5rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;border-top:1px solid var(--border);margin-top:1.25rem;}
+body.theme-dark .fac-gen-progress{border-top-color:var(--dk-border);}
+.fac-gen-verb{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--fac-accent);text-align:center;}
+.fac-gen-phase{font-family:var(--sans);font-size:.58rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);}
+body.theme-dark .fac-gen-phase{color:var(--dk-faint);}
+
+.fac-output-panel{margin-top:1.5rem;padding:1.25rem 1.4rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;flex-direction:column;gap:.85rem;animation:fadeUp .4s ease both;}
+body.theme-dark .fac-output-panel{background:var(--dk-card);border-color:var(--dk-border);}
+.fac-output-sig{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--fac-accent);line-height:1.6;padding:.3rem 0;}
+.fac-output-tension{font-style:italic;color:var(--fac-accent);}
+
+/* ── Location accent ─────────────────────────────────────────────────────── */
+:root{--loc-accent:#3a5f7a;--loc-accent-bg:#eaf1f6;}
+
+.loc-type-chips{display:flex;flex-wrap:wrap;gap:.5rem;}
+.loc-type-chip{background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:.4rem .85rem;font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.06em;color:var(--muted);cursor:pointer;transition:all .15s;}
+.loc-type-chip:hover{border-color:var(--border-hover);color:var(--dark);}
+.loc-type-chip.selected{border-color:var(--loc-accent);color:var(--loc-accent);background:rgba(58,95,122,.07);}
+body.theme-dark .loc-type-chip{color:var(--dk-muted);border-color:var(--dk-border);}
+body.theme-dark .loc-type-chip:hover{color:var(--dk-text);border-color:var(--dk-border-hover);}
+body.theme-dark .loc-type-chip.selected{background:rgba(58,95,122,.12);}
+
+.loc-gen-progress{padding:.85rem 0 .5rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;border-top:1px solid var(--border);margin-top:1.25rem;}
+body.theme-dark .loc-gen-progress{border-top-color:var(--dk-border);}
+.loc-gen-verb{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--loc-accent);text-align:center;}
+.loc-gen-phase{font-family:var(--sans);font-size:.58rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);}
+body.theme-dark .loc-gen-phase{color:var(--dk-faint);}
+
+.loc-output-panel{margin-top:1.5rem;padding:1.25rem 1.4rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;flex-direction:column;gap:.85rem;animation:fadeUp .4s ease both;}
+body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--dk-border);}
+.loc-output-sig{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--loc-accent);line-height:1.6;padding:.3rem 0;}

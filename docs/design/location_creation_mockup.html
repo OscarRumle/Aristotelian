@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Location — Aristotelian</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f2f0eb; --surface: #ffffff; --surface-2: #f7f5f1;
+    --border: rgba(0,0,0,0.1); --border-md: rgba(0,0,0,0.18);
+    --text-1: #1a1916; --text-2: #5a5750; --text-3: #9a9590;
+    --accent: #3a5f7a; --accent-bg: #eaf1f6;
+    --radius: 10px; --radius-sm: 6px; --radius-pill: 20px;
+  }
+  body { background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: var(--text-1); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px 60px; }
+  .page { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 620px; overflow: hidden; }
+  .page-header { padding: 16px 24px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .back-btn { font-size: 12px; color: var(--text-3); cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
+  .back-btn:hover { color: var(--text-2); }
+  .sep { color: var(--border-md); font-size: 12px; }
+  .page-title { font-size: 15px; font-weight: 500; }
+  .page-body { padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+  .field-group { display: flex; flex-direction: column; gap: 7px; }
+  .field-label { font-size: 10.5px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; display: flex; align-items: center; gap: 6px; }
+  .field-label .opt { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 10px; color: var(--text-3); }
+  .field-hint { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+  textarea.pitch { background: var(--surface-2); border: 0.5px solid var(--border-md); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; font-family: Georgia, serif; color: var(--text-1); line-height: 1.65; width: 100%; resize: vertical; min-height: 96px; outline: none; transition: border-color 0.15s; }
+  textarea.pitch:focus { border-color: var(--border-md); background: #fff; }
+  textarea.pitch::placeholder { color: var(--text-3); font-style: italic; }
+  .pitch-error { font-size: 11px; color: #c0392b; display: none; }
+  .pitch-error.show { display: block; }
+  input.text-input { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; font-family: inherit; color: var(--text-1); width: 100%; outline: none; }
+  input.text-input::placeholder { color: var(--text-3); }
+  .divider { height: 0.5px; background: var(--border); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { border: 0.5px solid var(--border-md); border-radius: var(--radius-pill); padding: 5px 13px; font-size: 12px; color: var(--text-2); cursor: pointer; background: transparent; user-select: none; transition: all 0.12s; font-family: inherit; }
+  .chip:hover { border-color: var(--text-3); color: var(--text-1); }
+  .chip.selected { background: var(--text-1); border-color: var(--text-1); color: #fff; }
+  .core-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .detail-select { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0; overflow: hidden; }
+  .detail-select-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px 4px; }
+  .detail-select select { width: 100%; background: transparent; border: none; font-size: 12px; color: var(--text-2); padding: 2px 10px 8px; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; font-family: inherit; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239a9590' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 26px; }
+  .type-fields { display: none; flex-direction: column; gap: 10px; }
+  .type-fields.visible { display: flex; }
+  .type-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .assoc-sections { display: flex; flex-direction: column; gap: 12px; }
+  .assoc-section-header { font-size: 11px; color: var(--text-3); margin-bottom: 7px; display: flex; align-items: center; justify-content: space-between; }
+  .assoc-section-name { font-weight: 500; }
+  .assoc-count { font-size: 10px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius-pill); padding: 1px 7px; color: var(--text-3); display: none; }
+  .assoc-count.show { display: inline; }
+  .assoc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .assoc-chip { border: 0.5px solid var(--border); border-radius: var(--radius-pill); padding: 4px 11px; font-size: 12px; color: var(--text-2); cursor: pointer; background: transparent; user-select: none; transition: all 0.12s; display: flex; align-items: center; gap: 5px; font-family: inherit; }
+  .assoc-chip:hover { border-color: var(--text-3); color: var(--text-1); }
+  .assoc-chip.selected { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+  .assoc-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.6; flex-shrink: 0; }
+  .assoc-empty { font-size: 12px; color: var(--text-3); font-style: italic; }
+  .assoc-notes { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .assoc-notes:empty { margin-top: 0; }
+  .assoc-note-row { display: flex; align-items: center; gap: 9px; animation: fadeUp 0.15s ease; }
+  .assoc-note-name { font-size: 12px; color: var(--accent); white-space: nowrap; min-width: 120px; display: flex; align-items: center; gap: 5px; }
+  .assoc-note-name .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.7; flex-shrink: 0; }
+  .assoc-note-input { flex: 1; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 12px; font-family: inherit; color: var(--text-1); outline: none; transition: border-color 0.12s; }
+  .assoc-note-input:focus { border-color: var(--border-md); background: #fff; }
+  .assoc-note-input::placeholder { color: var(--text-3); font-style: italic; }
+  .page-footer { padding: 14px 24px; border-top: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 58px; }
+  .footer-normal { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .footer-confirm { display: none; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
+  .footer-confirm.show { display: flex; }
+  .footer-normal.hide { display: none; }
+  .footer-main { display: flex; align-items: center; gap: 8px; }
+  .confirm-text { font-size: 12px; color: var(--text-2); }
+  .confirm-text strong { font-weight: 500; color: var(--text-1); }
+  .btn { border-radius: var(--radius-sm); padding: 8px 16px; font-size: 12.5px; font-family: inherit; cursor: pointer; border: 0.5px solid var(--border-md); transition: all 0.12s; font-weight: 400; white-space: nowrap; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--text-2); border-color: transparent; }
+  .btn-ghost:hover:not(:disabled) { color: var(--text-1); background: var(--surface-2); }
+  .btn-secondary { background: transparent; color: var(--text-2); border-color: var(--border-md); }
+  .btn-secondary:hover:not(:disabled) { background: var(--surface-2); color: var(--text-1); }
+  .btn-primary { background: var(--text-1); color: #fff; border-color: var(--text-1); font-weight: 500; }
+  .btn-primary:hover:not(:disabled) { background: #2e2c28; }
+  .btn-danger { background: transparent; color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .btn-danger:hover:not(:disabled) { background: rgba(192,57,43,0.06); }
+  .generating-state { display: none; align-items: center; gap: 10px; font-size: 12px; color: var(--text-2); }
+  .generating-state.show { display: flex; }
+  .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border-md); border-top-color: var(--text-2); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .output-panel { display: none; flex-direction: column; gap: 14px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px; animation: fadeUp 0.3s ease; }
+  .output-panel.show { display: flex; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .output-header { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  .output-section { display: flex; flex-direction: column; gap: 3px; }
+  .output-section-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .output-section-text { font-size: 13px; color: var(--text-1); line-height: 1.6; }
+  .output-section-text.serif { font-family: Georgia, serif; font-style: italic; color: var(--accent); }
+  .section-divider { height: 0.5px; background: var(--border); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <button class="back-btn">← The Shattered Reach</button>
+    <span class="sep">|</span>
+    <span class="page-title">New location</span>
+  </div>
+  <div class="page-body">
+
+    <div class="field-group">
+      <div class="field-label">Your idea</div>
+      <textarea id="pitch" class="pitch" rows="4" placeholder="Describe the location — what it is, what it feels like, why it matters to your world…"></textarea>
+      <div id="pitch-error" class="pitch-error">Write something first — the idea is what drives the generation.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="field-group">
+      <div class="field-label">What kind of place? <span class="opt">— optional</span></div>
+      <div class="chips" id="type-chips">
+        <button class="chip" data-type="settlement">Settlement</button>
+        <button class="chip" data-type="structure">Structure</button>
+        <button class="chip" data-type="landscape">Landscape</button>
+        <button class="chip" data-type="region">Region</button>
+        <button class="chip" data-type="ruin">Ruin</button>
+        <button class="chip" data-type="hidden">Hidden / Secret</button>
+        <button class="chip" data-type="custom">Custom</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Name <span class="opt">— optional</span></div>
+      <input type="text" class="text-input" id="obj-name" placeholder="Leave blank to let the world name it…">
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Details <span class="opt">— optional</span></div>
+      <div class="core-grid">
+        <div class="detail-select">
+          <div class="detail-select-label">Scale</div>
+          <select><option value="">None</option><option>Room / chamber</option><option>Building</option><option>District</option><option>Settlement</option><option>Region</option><option>Vast territory</option></select>
+        </div>
+        <div class="detail-select">
+          <div class="detail-select-label">Status</div>
+          <select><option value="">None</option><option>Thriving</option><option>Struggling</option><option>Abandoned</option><option>Ruined</option><option>Mythic</option><option>Unknown</option></select>
+        </div>
+        <div class="detail-select">
+          <div class="detail-select-label">Access</div>
+          <select><option value="">None</option><option>Open</option><option>Restricted</option><option>Guarded</option><option>Secret</option><option>Lost</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Type-specific fields -->
+    <div class="type-fields" id="type-fields-settlement">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Settlement details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">Size</div><select><option value="">None</option><option>Hamlet</option><option>Town</option><option>City</option><option>Capital</option><option>Sprawling</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Governance</div><select><option value="">None</option><option>Monarchy</option><option>Republic</option><option>Guild-run</option><option>Theocracy</option><option>Lawless</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-structure">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Structure details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">Purpose</div><select><option value="">None</option><option>Military</option><option>Religious</option><option>Civic</option><option>Private</option><option>Arcane</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Condition</div><select><option value="">None</option><option>Intact</option><option>Damaged</option><option>Derelict</option><option>Ruined</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-landscape">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Landscape details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">Terrain</div><select><option value="">None</option><option>Forest</option><option>Mountain</option><option>Coast</option><option>Wetland</option><option>Desert</option><option>Plains</option><option>Underground</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Danger</div><select><option value="">None</option><option>Safe</option><option>Hazardous</option><option>Deadly</option><option>Unknown</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-region">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Region details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">Climate</div><select><option value="">None</option><option>Temperate</option><option>Arid</option><option>Arctic</option><option>Tropical</option><option>Blighted</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Control</div><select><option value="">None</option><option>Unified</option><option>Contested</option><option>Fractured</option><option>Ungoverned</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-ruin">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Ruin details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">What it was</div><select><option value="">None</option><option>City</option><option>Fortress</option><option>Temple</option><option>Estate</option><option>Settlement</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Cause of fall</div><select><option value="">None</option><option>War</option><option>Disaster</option><option>Plague</option><option>Abandonment</option><option>Unknown</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-hidden">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Hidden / Secret details</div>
+      <div class="type-fields-grid">
+        <div class="detail-select"><div class="detail-select-label">Concealment</div><select><option value="">None</option><option>Physically hidden</option><option>Magically hidden</option><option>Unknown to most</option><option>Known but unreachable</option></select></div>
+        <div class="detail-select"><div class="detail-select-label">Who knows</div><select><option value="">None</option><option>One person</option><option>A few</option><option>A faction</option><option>A legend</option></select></div>
+      </div>
+    </div>
+    <div class="type-fields" id="type-fields-custom">
+      <div class="field-label" style="font-size:10px;color:var(--text-3)">Custom type</div>
+      <input type="text" class="text-input" placeholder="What kind of place is this?">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="field-group">
+      <div class="field-label">Associations <span class="opt">— optional</span></div>
+      <div class="field-hint">Link to existing world assets. The LLM will situate the location within their stories.</div>
+      <div style="height:8px"></div>
+      <div class="assoc-sections">
+        <div class="assoc-section">
+          <div class="assoc-section-header">
+            <span class="assoc-section-name">Characters</span>
+            <span class="assoc-count" id="char-count"></span>
+          </div>
+          <div class="assoc-chips">
+            <button class="assoc-chip" data-group="char" data-name="Caela Vorne"><span class="dot"></span>Caela Vorne</button>
+            <button class="assoc-chip" data-group="char" data-name="Meren Tal"><span class="dot"></span>Meren Tal</button>
+            <button class="assoc-chip" data-group="char" data-name="Duke Orvassen"><span class="dot"></span>Duke Orvassen</button>
+            <button class="assoc-chip" data-group="char" data-name="Lira of the Watch"><span class="dot"></span>Lira of the Watch</button>
+            <button class="assoc-chip" data-group="char" data-name="The Archivist"><span class="dot"></span>The Archivist</button>
+          </div>
+          <div class="assoc-notes" id="char-notes"></div>
+        </div>
+        <div class="assoc-section">
+          <div class="assoc-section-header">
+            <span class="assoc-section-name">Factions</span>
+            <span class="assoc-count" id="faction-count"></span>
+          </div>
+          <div class="assoc-chips" id="faction-chips">
+            <span class="assoc-empty">No factions yet — add them once the Factions tool is built.</span>
+          </div>
+          <div class="assoc-notes" id="faction-notes"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-panel" id="output-panel">
+      <div class="output-header">Generated location</div>
+      <div class="output-section">
+        <div class="output-section-label">Description</div>
+        <div class="output-section-text">The Tidal Vaults sit below the harbour district, cut into the limestone bedrock during the city's first expansion. Salt water seeps through the walls at high tide and pools in the lower chambers. The smell hits you before the stairs do — brine and old iron and something else, something that has been left in the dark for too long. The locks are pre-empire. No one has changed them because no one agrees on who holds the keys.</div>
+      </div>
+      <div class="section-divider"></div>
+      <div class="output-section">
+        <div class="output-section-label">History</div>
+        <div class="output-section-text">Built as grain storage and a treasury annex under the third merchant council, the Vaults were seized during the harbour riots and have changed hands eleven times since. They have been used as a prison, a mint, a meeting place for at least two conspiracies, and briefly as a temple to a god whose name was later struck from the official records.</div>
+      </div>
+      <div class="section-divider"></div>
+      <div class="output-section">
+        <div class="output-section-label">Dramatic role</div>
+        <div class="output-section-text">The Vaults are a place where things go to be forgotten — documents, people, evidence. They embody the city's relationship with its own history: everyone knows something is down there, no one wants to be the one who opens it. Duke Orvassen has a chamber in the lower level. Caela Vorne's father died in the one next to it.</div>
+      </div>
+      <div class="section-divider"></div>
+      <div class="output-section">
+        <div class="output-section-label">Signature line</div>
+        <div class="output-section-text serif">"The tide comes in. The tide goes out. Whatever the tide leaves behind stays."</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <div class="footer-normal" id="footer-normal">
+      <button class="btn btn-ghost" id="discard-btn" disabled>Discard</button>
+      <div class="footer-main">
+        <button class="btn btn-secondary" id="save-btn" disabled>Save draft</button>
+        <button class="btn btn-primary" id="generate-btn" disabled>Generate →</button>
+      </div>
+    </div>
+    <div class="footer-confirm" id="footer-confirm">
+      <span class="confirm-text"><strong>Discard this location?</strong> Any unsaved work will be lost.</span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-ghost" id="keep-btn">Keep editing</button>
+        <button class="btn btn-danger" id="confirm-discard-btn">Discard</button>
+      </div>
+    </div>
+    <div class="generating-state" id="generating-state">
+      <div class="spinner"></div>
+      <span>Generating…</span>
+    </div>
+  </div>
+</div>
+<script>
+  const pitchEl = document.getElementById('pitch');
+  const nameEl  = document.getElementById('obj-name');
+  const generateBtn = document.getElementById('generate-btn');
+  const saveBtn     = document.getElementById('save-btn');
+  const discardBtn  = document.getElementById('discard-btn');
+  const footerNormal  = document.getElementById('footer-normal');
+  const footerConfirm = document.getElementById('footer-confirm');
+  const generatingState = document.getElementById('generating-state');
+  const outputPanel = document.getElementById('output-panel');
+  const pitchError  = document.getElementById('pitch-error');
+
+  function updateButtons() {
+    const hasPitch = pitchEl.value.trim().length > 0;
+    const dirty = hasPitch || nameEl.value.trim().length > 0;
+    discardBtn.disabled = !dirty; saveBtn.disabled = !dirty; generateBtn.disabled = !hasPitch;
+    if (hasPitch) pitchError.classList.remove('show');
+  }
+  pitchEl.addEventListener('input', updateButtons);
+  nameEl.addEventListener('input', updateButtons);
+
+  let selectedType = null;
+  document.getElementById('type-chips').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const type = chip.dataset.type;
+    document.querySelectorAll('.type-fields').forEach(f => f.classList.remove('visible'));
+    if (selectedType === type) { chip.classList.remove('selected'); selectedType = null; }
+    else {
+      document.querySelectorAll('#type-chips .chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected'); selectedType = type;
+      const f = document.getElementById('type-fields-' + type);
+      if (f) f.classList.add('visible');
+    }
+  });
+
+  const notesContainers = { char: document.getElementById('char-notes'), faction: document.getElementById('faction-notes') };
+  const placeholders = { char: 'e.g. she was born here, he\'s imprisoned here, they\'re trying to reach it…', faction: 'e.g. they control it, they\'re fighting over it, they were driven out of here…' };
+
+  function addNoteRow(notesEl, name, group) {
+    const row = document.createElement('div');
+    row.className = 'assoc-note-row'; row.dataset.name = name;
+    row.innerHTML = `<div class="assoc-note-name"><span class="dot"></span>${name}</div><input class="assoc-note-input" type="text" placeholder="${placeholders[group] || 'What is the connection? (optional)'}">`;
+    notesEl.appendChild(row);
+    setTimeout(() => row.querySelector('input').focus(), 50);
+  }
+  function removeNoteRow(notesEl, name) {
+    const row = notesEl.querySelector(`[data-name="${CSS.escape(name)}"]`);
+    if (row) row.remove();
+  }
+
+  document.querySelectorAll('.assoc-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const was = chip.classList.contains('selected');
+      chip.classList.toggle('selected');
+      const g = chip.dataset.group, n = chip.dataset.name, el = notesContainers[g];
+      if (el) { if (!was) addNoteRow(el, n, g); else removeNoteRow(el, n); }
+      updateCounts();
+    });
+  });
+
+  function updateCounts() {
+    [['char','char-count'],['faction','faction-count']].forEach(([g, id]) => {
+      const el = document.getElementById(id);
+      const count = document.querySelectorAll(`[data-group="${g}"].selected`).length;
+      el.textContent = count ? count + ' selected' : '';
+      count ? el.classList.add('show') : el.classList.remove('show');
+    });
+  }
+
+  discardBtn.addEventListener('click', () => { footerNormal.classList.add('hide'); footerConfirm.classList.add('show'); });
+  document.getElementById('keep-btn').addEventListener('click', () => { footerNormal.classList.remove('hide'); footerConfirm.classList.remove('show'); });
+  document.getElementById('confirm-discard-btn').addEventListener('click', () => {
+    pitchEl.value = ''; nameEl.value = '';
+    document.querySelectorAll('.chip.selected, .assoc-chip.selected').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.type-fields').forEach(f => f.classList.remove('visible'));
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    Object.values(notesContainers).forEach(el => { if (el) el.innerHTML = ''; });
+    outputPanel.classList.remove('show'); selectedType = null;
+    footerNormal.classList.remove('hide'); footerConfirm.classList.remove('show');
+    updateButtons(); updateCounts();
+  });
+
+  generateBtn.addEventListener('click', () => {
+    if (!pitchEl.value.trim()) { pitchError.classList.add('show'); pitchEl.focus(); return; }
+    footerNormal.classList.add('hide'); generatingState.classList.add('show'); outputPanel.classList.remove('show');
+    setTimeout(() => {
+      generatingState.classList.remove('show'); outputPanel.classList.add('show');
+      outputPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      footerNormal.classList.remove('hide'); generateBtn.textContent = 'Regenerate →'; saveBtn.disabled = false;
+    }, 2200);
+  });
+
+  saveBtn.addEventListener('click', () => {
+    saveBtn.textContent = 'Saved ✓'; saveBtn.disabled = true;
+    setTimeout(() => { saveBtn.textContent = 'Save draft'; updateButtons(); }, 2000);
+  });
+</script>
+</body>
+</html>

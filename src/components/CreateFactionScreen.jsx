@@ -1,25 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { callClaudeStreaming } from "../api/claude.js";
-import { buildObjectPrompt } from "../prompts/buildObjectPrompt.js";
+import { buildFactionPrompt } from "../prompts/buildFactionPrompt.js";
 import { extractJson, uid } from "../util.js";
 import {
-  OBJECT_TYPES,
-  OBJECT_TYPE_FIELDS,
-  RARITY_OPTIONS,
-  ERA_OPTIONS,
-  CONDITION_OPTIONS,
-  OBJECT_PHASES,
+  FACTION_TYPES,
+  FACTION_TYPE_FIELDS,
+  FACTION_SIZE_OPTIONS,
+  FACTION_STATUS_OPTIONS,
+  FACTION_AGE_OPTIONS,
+  FACTION_PHASES,
 } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 
 function TypeChips({ value, onChange }) {
   return (
-    <div className="obj-type-chips">
-      {OBJECT_TYPES.map((t) => (
+    <div className="fac-type-chips">
+      {FACTION_TYPES.map((t) => (
         <button
           key={t}
           type="button"
-          className={`obj-type-chip${value === t ? " selected" : ""}`}
+          className={`fac-type-chip${value === t ? " selected" : ""}`}
           onClick={() => onChange(value === t ? "" : t)}
         >
           {t}
@@ -30,11 +30,11 @@ function TypeChips({ value, onChange }) {
 }
 
 function TypeFields({ type, fields, onChange }) {
-  if (!type || !OBJECT_TYPE_FIELDS[type]) {
+  if (!type || !FACTION_TYPE_FIELDS[type]) {
     if (type === "Custom") {
       return (
         <div>
-          <label className="f-label">What kind of thing is this?</label>
+          <label className="f-label">What kind of organisation is this?</label>
           <textarea
             className="f-area"
             rows={2}
@@ -49,7 +49,7 @@ function TypeFields({ type, fields, onChange }) {
   }
   return (
     <>
-      {OBJECT_TYPE_FIELDS[type].map((fd) => (
+      {FACTION_TYPE_FIELDS[type].map((fd) => (
         <div key={fd.key}>
           <label className="f-label">{fd.label}</label>
           <select
@@ -98,9 +98,9 @@ function GenProgress({ accumulated }) {
 
   useEffect(() => {
     let nextPhase = 0;
-    for (let i = OBJECT_PHASES.length - 1; i >= 0; i--) {
-      if (OBJECT_PHASES[i].streamMarker && accumulated.includes(OBJECT_PHASES[i].streamMarker)) {
-        nextPhase = Math.min(i + 1, OBJECT_PHASES.length - 1);
+    for (let i = FACTION_PHASES.length - 1; i >= 0; i--) {
+      if (FACTION_PHASES[i].streamMarker && accumulated.includes(FACTION_PHASES[i].streamMarker)) {
+        nextPhase = Math.min(i + 1, FACTION_PHASES.length - 1);
         break;
       }
     }
@@ -108,7 +108,7 @@ function GenProgress({ accumulated }) {
   }, [accumulated]);
 
   useEffect(() => {
-    const verbs = OBJECT_PHASES[phaseIdx]?.verbs ?? [];
+    const verbs = FACTION_PHASES[phaseIdx]?.verbs ?? [];
     setVerbIdx(0);
     verbTimer.current = setInterval(() => {
       setVerbIdx((v) => (v + 1) % verbs.length);
@@ -116,24 +116,24 @@ function GenProgress({ accumulated }) {
     return () => clearInterval(verbTimer.current);
   }, [phaseIdx]);
 
-  const phase = OBJECT_PHASES[phaseIdx];
+  const phase = FACTION_PHASES[phaseIdx];
   const verb = phase?.verbs[verbIdx] ?? "…";
 
   return (
-    <div className="obj-gen-progress">
-      <span className="obj-gen-verb">{verb}</span>
-      <span className="obj-gen-phase">{phase?.id ?? ""}</span>
+    <div className="fac-gen-progress">
+      <span className="fac-gen-verb">{verb}</span>
+      <span className="fac-gen-phase">{phase?.id ?? ""}</span>
     </div>
   );
 }
 
-export function CreateObjectScreen({ world, onBack, onSave }) {
+export function CreateFactionScreen({ world, onBack, onSave }) {
   const [pitch, setPitch]         = useState("");
   const [type, setType]           = useState("");
   const [name, setName]           = useState("");
-  const [rarity, setRarity]       = useState("");
-  const [era, setEra]             = useState("");
-  const [condition, setCondition] = useState("");
+  const [size, setSize]           = useState("");
+  const [status, setStatus]       = useState("");
+  const [age, setAge]             = useState("");
   const [typeFields, setTypeFields] = useState({});
   const [associations, setAssociations] = useState([]);
   const [generated, setGenerated] = useState(null);
@@ -158,13 +158,13 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
     });
   };
 
-  const setAssocNote = (charId, note) => {
+  const setAssocNote = (id, note) => {
     setAssociations((prev) =>
-      prev.map((a) => (a.id === charId ? { ...a, note } : a))
+      prev.map((a) => (a.id === id ? { ...a, note } : a))
     );
   };
 
-  const formState = { pitch, name, type, rarity, era, condition, typeSpecificFields: typeFields, associations };
+  const formState = { pitch, name, type, size, status, age, typeSpecificFields: typeFields, associations };
 
   const generate = async () => {
     if (!pitch.trim()) return;
@@ -177,9 +177,9 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
     setGenerated(null);
     try {
       const raw = await callClaudeStreaming(
-        buildObjectPrompt(world, formState),
-        "Generate this object.",
-        { maxTokens: 1000, signal: ctrl.signal, onChunk: setGenAccumulated }
+        buildFactionPrompt(world, formState),
+        "Generate this faction.",
+        { maxTokens: 1200, signal: ctrl.signal, onChunk: setGenAccumulated }
       );
       const parsed = extractJson(raw);
       if (!parsed) throw new Error("JSON");
@@ -202,27 +202,30 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
   };
 
   const save = () => {
-    const obj = {
+    const faction = {
       id: uid(),
       worldId: world.id,
       pitch,
       name: name || generated?.name || "",
       type: type || generated?.type || "",
-      rarity: rarity || null,
-      era: era || null,
-      condition: condition || null,
+      size: size || null,
+      status: status || null,
+      age: age || null,
       typeSpecificFields: typeFields,
       associations,
       generated,
       isDraft: false,
       createdAt: Date.now(),
     };
-    onSave(obj);
+    onSave(faction);
   };
 
   const isEmpty = !pitch.trim() && !name.trim();
   const canGenerate = pitch.trim().length > 0;
   const canSave = pitch.trim().length > 0 || name.trim().length > 0;
+
+  const characters = world.characters ?? [];
+  const locations  = world.locations  ?? [];
 
   return (
     <div className="screen" style={{ paddingBottom: "6rem" }}>
@@ -230,9 +233,9 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
         </div>
-        <span className="t-eyebrow">New Object</span>
+        <span className="t-eyebrow">New Faction</span>
         <h1 className="t-heading">Your idea</h1>
-        <p className="t-body">Describe the object — a word or a paragraph. Everything else is optional.</p>
+        <p className="t-body">Describe the faction — a word or a paragraph. Everything else is optional.</p>
       </div>
 
       <div className="divider" />
@@ -243,7 +246,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
           <textarea
             className="f-area"
             rows={4}
-            placeholder="A shattered blade that was never repaired, carried by someone who doesn't know what it means…"
+            placeholder="Describe the faction — who they are, what they want, what they'd do to get it."
             value={pitch}
             onChange={(e) => setPitch(e.target.value)}
           />
@@ -264,7 +267,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
           <label className="f-label">Name <span className="f-optional">optional</span></label>
           <input
             className="f-input"
-            placeholder="Leave blank — the LLM will invent one"
+            placeholder="Leave blank to let the world name them."
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -272,24 +275,24 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
 
         <div className="f-row-3">
           <div>
-            <label className="f-label">Rarity</label>
-            <select className="f-input" value={rarity} onChange={(e) => setRarity(e.target.value)}>
+            <label className="f-label">Size</label>
+            <select className="f-input" value={size} onChange={(e) => setSize(e.target.value)}>
               <option value="">— None</option>
-              {RARITY_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+              {FACTION_SIZE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
-            <label className="f-label">Era</label>
-            <select className="f-input" value={era} onChange={(e) => setEra(e.target.value)}>
+            <label className="f-label">Status</label>
+            <select className="f-input" value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="">— None</option>
-              {ERA_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+              {FACTION_STATUS_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
-            <label className="f-label">Condition</label>
-            <select className="f-input" value={condition} onChange={(e) => setCondition(e.target.value)}>
+            <label className="f-label">Age</label>
+            <select className="f-input" value={age} onChange={(e) => setAge(e.target.value)}>
               <option value="">— None</option>
-              {CONDITION_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+              {FACTION_AGE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
         </div>
@@ -301,8 +304,8 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
 
           <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
             <label className="f-label">Characters</label>
-            {world.characters?.length > 0 ? (
-              world.characters.map((char) => {
+            {characters.length > 0 ? (
+              characters.map((char) => {
                 const assoc = associations.find((a) => a.id === char.id);
                 return (
                   <AssocRow
@@ -312,47 +315,22 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
                     note={assoc?.note || ""}
                     onToggle={() => toggleAssoc(char, "character")}
                     onNoteChange={(note) => setAssocNote(char.id, note)}
-                    placeholder="e.g. she inherited it, it was used against him…"
+                    placeholder="e.g. she founded it, he betrayed them, they're hunting her…"
                     accentColor="var(--amber)"
                   />
                 );
               })
             ) : (
               <p className="t-body" style={{ opacity: 0.5, fontSize: ".8rem" }}>
-                No characters yet — add characters to associate them with this object.
-              </p>
-            )}
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: ".5rem", marginTop: ".75rem" }}>
-            <label className="f-label">Factions</label>
-            {(world.factions ?? []).length > 0 ? (
-              (world.factions ?? []).map((faction) => {
-                const assoc = associations.find((a) => a.id === faction.id);
-                return (
-                  <AssocRow
-                    key={faction.id}
-                    item={faction}
-                    checked={!!assoc}
-                    note={assoc?.note || ""}
-                    onToggle={() => toggleAssoc(faction, "faction")}
-                    onNoteChange={(note) => setAssocNote(faction.id, note)}
-                    placeholder="e.g. it was made by them, it symbolises their power…"
-                    accentColor="var(--fac-accent, #4a6741)"
-                  />
-                );
-              })
-            ) : (
-              <p className="t-body" style={{ opacity: 0.5, fontSize: ".8rem" }}>
-                No factions yet — add them using the Factions tool.
+                No characters yet — add characters to associate them with this faction.
               </p>
             )}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: ".5rem", marginTop: ".75rem" }}>
             <label className="f-label">Locations</label>
-            {(world.locations ?? []).length > 0 ? (
-              (world.locations ?? []).map((loc) => {
+            {locations.length > 0 ? (
+              locations.map((loc) => {
                 const assoc = associations.find((a) => a.id === loc.id);
                 return (
                   <AssocRow
@@ -362,7 +340,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
                     note={assoc?.note || ""}
                     onToggle={() => toggleAssoc(loc, "location")}
                     onNoteChange={(note) => setAssocNote(loc.id, note)}
-                    placeholder="e.g. it was found here, it was hidden here…"
+                    placeholder="e.g. this is their base, they control this region, they were driven out of here…"
                     accentColor="var(--loc-accent, #3a5f7a)"
                   />
                 );
@@ -386,7 +364,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
         )}
 
         {generated && !generating && (
-          <div className="obj-output-panel">
+          <div className="fac-output-panel">
             <div>
               <div className="obj-output-type">{generated.type}</div>
               <div className="obj-output-name">{generated.name}</div>
@@ -396,14 +374,22 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
               <div className="obj-output-body">{generated.description}</div>
             </div>
             <div className="obj-output-section">
-              <div className="obj-output-label">Provenance</div>
-              <div className="obj-output-body">{generated.provenance}</div>
+              <div className="obj-output-label">History</div>
+              <div className="obj-output-body">{generated.history}</div>
             </div>
             <div className="obj-output-section">
-              <div className="obj-output-label">Dramatic Weight</div>
-              <div className="obj-output-body">{generated.dramatic_weight}</div>
+              <div className="obj-output-label">Dramatic Role</div>
+              <div className="obj-output-body">{generated.dramatic_role}</div>
             </div>
-            <div className="obj-output-sig">"{generated.signature_line}"</div>
+            {generated.internal_tension && (
+              <div className="obj-output-section">
+                <div className="obj-output-label">Internal Tension</div>
+                <div className="obj-output-body fac-output-tension">{generated.internal_tension}</div>
+              </div>
+            )}
+            {generated.motto && (
+              <div className="fac-output-sig">"{generated.motto}"</div>
+            )}
           </div>
         )}
       </div>
@@ -411,7 +397,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
       <BottomBar>
         {discardConfirm ? (
           <div className="delete-confirm">
-            <span className="delete-confirm-msg">Discard this object and all changes?</span>
+            <span className="delete-confirm-msg">Discard this faction and all changes?</span>
             <div className="delete-confirm-actions">
               <button type="button" className="btn btn-destroy" onClick={onBack}>Discard</button>
               <button type="button" className="btn btn-ghost" onClick={() => setDiscardConfirm(false)}>Keep editing</button>
