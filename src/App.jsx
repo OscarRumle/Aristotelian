@@ -13,11 +13,16 @@ import { WorldDetail } from "./components/WorldDetail.jsx";
 import { CreateCharacterScreen } from "./components/CreateCharacterScreen.jsx";
 import { CharacterSheet } from "./components/CharacterSheet.jsx";
 import { TokenCounter } from "./components/TokenCounter.jsx";
+import { SceneDetail } from "./components/SceneDetail.jsx";
+import { DialogueWriter } from "./components/DialogueWriter.jsx";
+import { CastAnalysis } from "./components/CastAnalysis.jsx";
 
 export default function App() {
   const [view, setView] = useState("hub");
   const [activeWorldId, setActiveWorldId] = useState(null);
   const [activeCharId, setActiveCharId] = useState(null);
+  const [activeSceneId, setActiveSceneId] = useState(null);
+  const [activeDialogueId, setActiveDialogueId] = useState(null);
   const [worlds, setWorlds] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [storageCorrupted, setStorageCorrupted] = useState(false);
@@ -26,6 +31,7 @@ export default function App() {
   const [expanding, setExpanding] = useState(false);
   const [genError, setGenError] = useState(null);
   const [genAccumulated, setGenAccumulated] = useState("");
+  const [castAnalysisOpen, setCastAnalysisOpen] = useState(false);
 
   const abortRef = useRef(null);
 
@@ -33,6 +39,7 @@ export default function App() {
 
   const activeWorld = worlds.find((w) => w.id === activeWorldId);
   const activeChar = activeWorld?.characters.find((c) => c.id === activeCharId);
+  const activeScene = activeWorld?.scenes?.find((s) => s.id === activeSceneId);
 
   useEffect(() => {
     const { worlds: loaded_worlds, corrupted } = loadWorlds();
@@ -56,12 +63,14 @@ export default function App() {
   const addWorld = (w) => setWorlds((p) => [...p, w]);
   const deleteWorld = (id) => setWorlds((p) => p.filter((w) => w.id !== id));
   const updateWorld = (w) => setWorlds((p) => p.map((x) => (x.id === w.id ? w : x)));
+
   const addCharacter = (c) =>
     setWorlds((p) =>
       p.map((w) =>
         w.id === activeWorldId ? { ...w, characters: [...w.characters, c] } : w
       )
     );
+
   const updateCharacter = (c) =>
     setWorlds((p) =>
       p.map((w) =>
@@ -70,6 +79,41 @@ export default function App() {
           : w
       )
     );
+
+  // Update a character without requiring it to be the active character (for color persistence)
+  const updateWorldCharacter = (c) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, characters: w.characters.map((x) => (x.id === c.id ? c : x)) }
+          : w
+      )
+    );
+
+  const addScene = (scene) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId ? { ...w, scenes: [...(w.scenes ?? []), scene] } : w
+      )
+    );
+
+  const updateScene = (scene) =>
+    setWorlds((p) =>
+      p.map((w) =>
+        w.id === activeWorldId
+          ? { ...w, scenes: (w.scenes ?? []).map((s) => (s.id === scene.id ? scene : s)) }
+          : w
+      )
+    );
+
+  const handleSaveDialogue = (dialogue) => {
+    if (!activeScene) return;
+    const existing = activeScene.dialogues?.find((d) => d.id === dialogue.id);
+    const updatedDialogues = existing
+      ? activeScene.dialogues.map((d) => (d.id === dialogue.id ? dialogue : d))
+      : [...(activeScene.dialogues ?? []), dialogue];
+    updateScene({ ...activeScene, dialogues: updatedDialogues });
+  };
 
   const handleStartGenerating = () => {
     abortRef.current?.abort();
@@ -165,6 +209,10 @@ export default function App() {
         <GeneratingOverlay phaseIdx={phaseIdx} doneIds={doneIds} verb={verb} justDone={justDone} />
       )}
 
+      {castAnalysisOpen && activeWorld && (
+        <CastAnalysis world={activeWorld} onClose={() => setCastAnalysisOpen(false)} />
+      )}
+
       <TokenCounter />
       <div className="app">
         {view === "hub" && (
@@ -194,6 +242,9 @@ export default function App() {
                 ? () => setView("continueInterview")
                 : undefined
             }
+            onSelectScene={(id) => { setActiveSceneId(id); setView("scene"); }}
+            onAddScene={(scene) => { addScene(scene); setActiveSceneId(scene.id); setView("scene"); }}
+            onAnalyseCast={() => setCastAnalysisOpen(true)}
           />
         )}
 
@@ -232,6 +283,27 @@ export default function App() {
             onUpdate={updateCharacter}
             onExpand={handleExpand}
             isExpanding={expanding}
+          />
+        )}
+
+        {view === "scene" && activeScene && activeWorld && (
+          <SceneDetail
+            scene={activeScene}
+            world={activeWorld}
+            onBack={() => setView("world")}
+            onNewDialogue={() => { setActiveDialogueId(null); setView("dialogue"); }}
+            onSelectDialogue={(id) => { setActiveDialogueId(id); setView("dialogue"); }}
+          />
+        )}
+
+        {view === "dialogue" && activeScene && activeWorld && (
+          <DialogueWriter
+            world={activeWorld}
+            scene={activeScene}
+            dialogueId={activeDialogueId}
+            onBack={() => setView("scene")}
+            onSaveDialogue={handleSaveDialogue}
+            onUpdateCharacter={updateWorldCharacter}
           />
         )}
       </div>

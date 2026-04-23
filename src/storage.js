@@ -34,6 +34,16 @@ function migrate(parsed) {
     version = 4;
   }
 
+  // v4 → v5: add scenes array to worlds, color field to characters.
+  if (version < 5) {
+    worlds = worlds.map((w) => ({
+      ...w,
+      scenes: w.scenes ?? [],
+      characters: (w.characters ?? []).map((c) => ({ color: null, ...c })),
+    }));
+    version = 5;
+  }
+
   return { __version: version, worlds };
 }
 

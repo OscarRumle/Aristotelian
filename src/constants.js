@@ -1,5 +1,23 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 4;
+export const STORAGE_VERSION = 5;
+
+export const CHAR_COLORS = [
+  "#C87941",
+  "#5B8A6E",
+  "#7B6FAB",
+  "#B05E6F",
+  "#4A7FA5",
+  "#A07850",
+  "#5A8A8A",
+  "#8A6A5A",
+];
+
+export const MOOD_OPTIONS = [
+  { value: "Tense", label: "Tense" },
+  { value: "Playful", label: "Playful" },
+  { value: "Aftermath", label: "Aftermath" },
+  { value: "First Meeting", label: "First Meeting" },
+];
 
 export const MIN_PHASE_MS = 4000;
 
