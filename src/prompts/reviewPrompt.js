@@ -23,7 +23,13 @@ function characterContext(character) {
     .join("\n\n");
 }
 
-export function buildConsistencyScanPrompt(character, world) {
+const SCRUTINY_INSTRUCTIONS = {
+  low: `Focus only on glaring contradictions — things that would confuse or break immersion for any reader. Ignore subtle tensions, minor variations in tone, and anything a reader could plausibly reconcile themselves. Return at most 2 items.`,
+  mid: `Identify meaningful contradictions that a careful reader would notice. Ignore stylistic variations and minor tensions that don't affect character coherence. Return at most 4 items.`,
+  high: `Be thorough. Flag all contradictions, including subtle tensions between fields — things that don't outright break the character but create friction on close reading. Return up to 6 items.`,
+};
+
+export function buildConsistencyScanPrompt(character, world, scrutiny = "mid") {
   return `Analyse this fictional character for internal inconsistencies — places where one field meaningfully contradicts another.
 
 WORLD: ${world.name} — ${world.description}
@@ -31,7 +37,10 @@ WORLD: ${world.name} — ${world.description}
 CHARACTER:
 ${characterContext(character)}
 
-Identify up to 4 of the most significant contradictions. For each, name the specific field that should be rewritten and provide exactly two resolution options.
+SCRUTINY LEVEL: ${scrutiny.toUpperCase()}
+${SCRUTINY_INSTRUCTIONS[scrutiny]}
+
+For each inconsistency, name the specific field that should be rewritten and provide exactly two resolution options.
 
 Return ONLY a JSON array:
 [
@@ -51,7 +60,7 @@ Return ONLY a JSON array:
   }
 ]
 
-If there are no meaningful inconsistencies, return: []
+If there are no inconsistencies at this scrutiny level, return: []
 Return ONLY valid JSON. No preamble.`;
 }
 

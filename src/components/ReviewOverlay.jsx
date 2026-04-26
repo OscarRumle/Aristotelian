@@ -9,7 +9,8 @@ function parseJson(raw) {
 }
 
 export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplete }) {
-  const [phase, setPhase] = useState("scanning");
+  const [phase, setPhase] = useState("setup");
+  const [scrutiny, setScrutiny] = useState("mid");
   const [items, setItems] = useState([]);
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState("A");
@@ -17,14 +18,12 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
   const [pendingFix, setPendingFix] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => { runScan(); }, []);
-
   async function runScan() {
     setPhase("scanning");
     setError(null);
     try {
       const raw = await callClaude(
-        buildConsistencyScanPrompt(character, world),
+        buildConsistencyScanPrompt(character, world, scrutiny),
         "Scanning character for inconsistencies",
         { maxTokens: 1500 }
       );
@@ -105,6 +104,42 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
             <span className="review-progress">{idx + 1} of {total}</span>
           )}
         </div>
+
+        {phase === "setup" && (
+          <div className="review-setup">
+            <h2 className="review-setup-title">Review character</h2>
+            <p className="review-setup-body">
+              Scan {character.name || "this character"} for internal inconsistencies between fields.
+            </p>
+            <div className="review-setup-level">
+              <span className="review-setup-label">Scrutiny</span>
+              <div className="cs-expand-toggle">
+                {[
+                  { key: "low", label: "Low" },
+                  { key: "mid", label: "Mid" },
+                  { key: "high", label: "High" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`cs-expand-toggle-btn${scrutiny === key ? " active" : ""}`}
+                    onClick={() => setScrutiny(key)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="review-scrutiny-desc">
+                {scrutiny === "low" && "Catches only obvious contradictions — things that would confuse any reader."}
+                {scrutiny === "mid" && "Balanced — flags contradictions a careful reader would notice."}
+                {scrutiny === "high" && "Thorough — flags subtle tensions too, including close-reading friction."}
+              </p>
+            </div>
+            <button type="button" className="btn btn-primary" onClick={runScan}>
+              Start Review →
+            </button>
+          </div>
+        )}
 
         {phase === "scanning" && (
           <div className="review-centered">
