@@ -1,6 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { EditableText } from "./EditableText.jsx";
 
+function parseInline(text) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**"))
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*"))
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
 function renderDocContent(text) {
   const lines = text.split("\n");
   const result = [];
@@ -9,18 +20,24 @@ function renderDocContent(text) {
 
   const flushPara = () => {
     const txt = paraLines.join(" ").trim();
-    if (txt) result.push(<p key={key++} className="doc-p">{txt}</p>);
+    if (txt) result.push(<p key={key++} className="doc-p">{parseInline(txt)}</p>);
     paraLines = [];
   };
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed === "---") {
+    if (trimmed.startsWith("### ")) {
+      flushPara();
+      result.push(<h4 key={key++} className="doc-h4">{trimmed.slice(4)}</h4>);
+    } else if (trimmed.startsWith("## ")) {
+      flushPara();
+      result.push(<h3 key={key++} className="doc-h3">{trimmed.slice(3)}</h3>);
+    } else if (trimmed.startsWith("# ")) {
+      flushPara();
+      result.push(<h2 key={key++} className="doc-h2">{trimmed.slice(2)}</h2>);
+    } else if (trimmed === "---") {
       flushPara();
       result.push(<hr key={key++} className="doc-hr" />);
-    } else if (trimmed && /[A-Z]/.test(trimmed) && trimmed === trimmed.toUpperCase()) {
-      flushPara();
-      result.push(<h3 key={key++} className="doc-h3">{trimmed}</h3>);
     } else if (!trimmed) {
       flushPara();
     } else {
