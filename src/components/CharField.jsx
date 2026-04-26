@@ -149,8 +149,14 @@ export function CharField({
         </div>
       </div>
 
-      {isLoading ? (
-        <AnimatedVerbs verbs={expandLoading ? VERBS.fieldExpand : VERBS.regen} compact />
+      {isRegenning ? (
+        <AnimatedVerbs verbs={VERBS.regen} compact />
+      ) : expandLoading ? (
+        <>
+          <p className="cs-field-body">{value || "—"}</p>
+          <div className="cs-expand-sep"><span className="cs-expand-sep-label">↓ generating</span></div>
+          <AnimatedVerbs verbs={VERBS.fieldExpand} compact />
+        </>
       ) : editOpen ? (
         <div className="cs-field-edit">
           <textarea
