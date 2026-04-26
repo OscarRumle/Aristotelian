@@ -76,6 +76,16 @@ export const VERBS = {
     "Opening new ground…",
     "Finding the edges…",
   ],
+  scan: [
+    "Reading the character…",
+    "Cross-referencing fields…",
+    "Checking for contradictions…",
+    "Tracing the logic…",
+    "Looking for gaps…",
+    "Consulting the Poetics…",
+    "Weighing the evidence…",
+    "Probing for inconsistencies…",
+  ],
 };
 
 /**

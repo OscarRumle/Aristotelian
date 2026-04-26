@@ -5,6 +5,7 @@ import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
 import { metaLine, isFullRole, isMini, isSupport } from "../util.js";
 import { PHIL } from "../constants.js";
 import { CharField } from "./CharField.jsx";
+import { ReviewOverlay } from "./ReviewOverlay.jsx";
 import { ErrorToast } from "./ErrorToast.jsx";
 import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
 
@@ -47,6 +48,10 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(character.name || "");
   const tabRefs = useRef([]);
 
   const meta = metaLine(character);
@@ -104,9 +109,15 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
 
   const confirmField = (fieldKey, value) => {
     onUpdate({ ...character, [fieldKey]: value });
+    setIsDirty(true);
   };
 
   const saveField = (fieldKey, value) => {
+    onUpdate({ ...character, [fieldKey]: value });
+    setIsDirty(true);
+  };
+
+  const applyReviewFix = (fieldKey, value) => {
     onUpdate({ ...character, [fieldKey]: value });
   };
 
@@ -126,7 +137,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
     }
   };
 
-  const F = (label, key, phil, expand = false) => (
+  const F = (label, key, phil, expand = true) => (
     <CharField
       label={label}
       value={character[key]}
@@ -158,6 +169,16 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
   };
 
   return (
+    <>
+    {showReview && (
+      <ReviewOverlay
+        character={character}
+        world={world}
+        onClose={() => setShowReview(false)}
+        onApplyFix={applyReviewFix}
+        onComplete={() => { setIsDirty(false); setShowReview(false); }}
+      />
+    )}
     <div className="screen cs-page">
       <div className="cs-layout">
 
@@ -165,7 +186,27 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
         <aside className="cs-sidebar">
           <div className="char-header">
             <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
-            <h1 className="char-name">{character.name || "Unnamed"}</h1>
+            {editingName ? (
+              <input
+                className="char-name-input"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onBlur={() => { saveField("name", nameInput.trim()); setEditingName(false); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { saveField("name", nameInput.trim()); setEditingName(false); }
+                  if (e.key === "Escape") setEditingName(false);
+                }}
+                autoFocus
+              />
+            ) : (
+              <h1
+                className="char-name char-name-editable"
+                onClick={() => { setNameInput(character.name || ""); setEditingName(true); }}
+                title="Click to edit name"
+              >
+                {character.name || "Unnamed"}
+              </h1>
+            )}
             {character.role && <p className="char-role">{character.role}</p>}
             {(meta || style || role) && (
               <div style={{ display: "flex", flexDirection: "column", gap: ".35rem" }}>
@@ -184,6 +225,11 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
               </ul>
             )}
             {character.quote && <p className="char-quote">"{character.quote}"</p>}
+            {isDirty && (
+              <button type="button" className="btn-review" onClick={() => setShowReview(true)}>
+                ✦ Review
+              </button>
+            )}
           </div>
         </aside>
 
@@ -264,8 +310,11 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                       value={character.collectiveHamartia}
                       fieldKey="collectiveHamartia"
                       onRegen={regen}
+                      onRegenWithFeedback={regenWithFeedback}
                       onSave={saveField}
                       onConfirm={confirmField}
+                      onExpand={expandField}
+                      canExpand
                       regenningKey={regenningKey}
                     />
                   )}
@@ -369,5 +418,6 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
         </div>
       </div>
     </div>
+    </>
   );
 }
