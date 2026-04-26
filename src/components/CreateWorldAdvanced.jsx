@@ -204,7 +204,7 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
 
   if (step === "generating") {
     return (
-      <div className="screen" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "1.5rem" }}>
+      <div className="screen cwa-page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "1.5rem" }}>
         <AnimatedVerbs verbs={VERBS.docGen} subtitle="Building your lore bible" />
         {genError && (
           <div style={{ maxWidth: 320 }}>
@@ -219,7 +219,7 @@ export function CreateWorldAdvanced({ existingWorld, onDone, onBack }) {
   }
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen cwa-page" style={{ paddingBottom: "5rem" }}>
       {/* Header */}
       <div className="page-head">
         <div className="page-head-nav">

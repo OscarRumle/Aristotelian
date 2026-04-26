@@ -1001,6 +1001,15 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
   /* ── D-01 WorldHub ── */
   .wh-page{max-width:1200px;}
 
+  /* ── D-04 CreateWorldScreen + CreateWorldAdvanced ── */
+  .cws-page{max-width:680px;}
+  .cws-page .f-label{font-size:.75rem;}
+  .cws-page .f-input,.cws-page .f-area{font-size:1rem;}
+  .cwa-page{max-width:680px;}
+  .cwa-page .f-label{font-size:.75rem;}
+  .cwa-page .f-input,.cwa-page .f-area{font-size:1rem;}
+  .cwa-page .interview-question{font-size:1.6rem;line-height:1.4;}
+
   /* ── D-03 CreateCharacterScreen ── */
   .ccs-page{max-width:720px;}
   .ccs-page .f-label{font-size:.75rem;}
