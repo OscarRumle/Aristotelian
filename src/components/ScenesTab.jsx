@@ -12,7 +12,7 @@ function SceneCard({ scene, onClick }) {
         </span>
       </div>
       {scene.description && (
-        <p className="card-quote" style={{ fontStyle: "normal" }}>
+        <p className="card-desc">
           {scene.description}
         </p>
       )}
@@ -51,7 +51,7 @@ export function ScenesTab({ scenes, onSelectScene, onAddScene }) {
       )}
 
       {scenes.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: ".85rem" }}>
+        <div className="card-list" style={{ paddingTop: 0 }}>
           {scenes.map((s, i) => (
             <div key={s.id} style={{ animation: `fadeUp .4s ${i * 0.06}s ease both` }}>
               <SceneCard scene={s} onClick={() => onSelectScene(s.id)} />

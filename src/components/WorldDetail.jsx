@@ -50,7 +50,7 @@ function CharactersPanel({ world, onSelectCharacter }) {
           ))}
         </div>
       )}
-      <div style={{ display: "flex", flexDirection: "column", gap: ".85rem", paddingTop: "1.5rem" }}>
+      <div className="card-list">
         {filtered.map((c, i) => {
           const meta = metaLine(c);
           return (
@@ -87,7 +87,7 @@ function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc
   }
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
       <div className="tool-view-header">
         <button type="button" className="back-btn" onClick={onBack}>
           ← {world.name}
@@ -162,7 +162,7 @@ export function WorldDetail({
   // ── Characters tool sub-view ──────────────────────────────────────────────
   if (toolView === "characters") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
         <div className="tool-view-header">
           <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
             ← {world.name}
@@ -187,7 +187,7 @@ export function WorldDetail({
   // ── Scenes tool sub-view ──────────────────────────────────────────────────
   if (toolView === "scenes") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
         <div className="tool-view-header">
           <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
             ← {world.name}
@@ -219,7 +219,7 @@ export function WorldDetail({
   // ── Objects tool sub-view ─────────────────────────────────────────────────
   if (toolView === "objects") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
         <div className="tool-view-header">
           <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
             ← {world.name}
@@ -238,7 +238,7 @@ export function WorldDetail({
   // ── Factions tool sub-view ────────────────────────────────────────────────
   if (toolView === "factions") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
         <div className="tool-view-header">
           <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
             ← {world.name}
@@ -257,7 +257,7 @@ export function WorldDetail({
   // ── Locations tool sub-view ───────────────────────────────────────────────
   if (toolView === "locations") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
         <div className="tool-view-header">
           <button type="button" className="back-btn" onClick={() => onSetToolView(null)}>
             ← {world.name}
@@ -326,7 +326,7 @@ export function WorldDetail({
   ];
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
       {/* Header */}
       <div className="page-head">
         <div className="page-head-nav">

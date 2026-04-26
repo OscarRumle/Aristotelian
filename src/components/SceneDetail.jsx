@@ -53,7 +53,7 @@ export function SceneDetail({ scene, world, onBack, onNewDialogue, onSelectDialo
   const update = (field) => (val) => onUpdateScene?.({ ...scene, [field]: val });
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen scene-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
@@ -79,7 +79,7 @@ export function SceneDetail({ scene, world, onBack, onNewDialogue, onSelectDialo
           body="No dialogues yet. Start one to put your characters in a room together."
         />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: ".85rem", paddingTop: "1.5rem" }}>
+        <div className="card-list">
           {(scene.dialogues ?? []).map((d, i) => (
             <div key={d.id} style={{ animation: `fadeUp .4s ${i * 0.06}s ease both` }}>
               <DialogueCard

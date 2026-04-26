@@ -49,7 +49,7 @@ export function CreateWorldScreen({ onBack, onCreate }) {
   }
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen cws-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Worlds</button>
