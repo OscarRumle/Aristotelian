@@ -96,6 +96,9 @@ main{padding-top:var(--nav-h);position:relative;z-index:1;}
 @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
 @keyframes verbIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 @keyframes checkIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+@keyframes wordReveal{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+@keyframes settleColor{from{color:var(--sage);}to{color:var(--muted);}}
+@keyframes settleColorDark{from{color:var(--sage);}to{color:var(--dk-muted);}}
 
 /* ─────────────────────────── TYPOGRAPHY ────────────────────────────────── */
 .t-eyebrow{font-family:var(--sans);font-size:.63rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);}
@@ -291,6 +294,15 @@ body.theme-dark .cs-feedback-input:focus{border-color:var(--dk-border-hover);}
 .cs-field-pending-actions{display:flex;gap:.5rem;}
 .cs-pending-label{font-family:var(--sans);font-size:.63rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
 body.theme-dark .cs-pending-label{color:var(--dk-faint);}
+.text-reveal-word{display:inline;opacity:0;animation:wordReveal .22s ease forwards;}
+.cs-field-body--addition{color:var(--sage);}
+.cs-field-body--settling{animation:settleColor .9s ease forwards;}
+body.theme-dark .cs-field-body--settling{animation:settleColorDark .9s ease forwards;}
+.cs-field-expand-preview{display:flex;flex-direction:column;gap:.4rem;}
+.cs-expand-sep{position:relative;height:0;border-top:1px dashed var(--border);margin:.6rem 0 .4rem;}
+body.theme-dark .cs-expand-sep{border-top-color:var(--dk-border);}
+.cs-expand-sep-label{position:absolute;top:-8px;left:0;font-family:var(--sans);font-size:.58rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);background:var(--surface);padding-right:.4rem;}
+body.theme-dark .cs-expand-sep-label{color:var(--dk-faint);background:var(--dk-surface);}
 .cs-field-edit{display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem;animation:fadeUp .2s ease both;}
 .cs-field-edit-actions{display:flex;gap:.5rem;}
 .cs-expand-panel{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;animation:fadeUp .2s ease both;}

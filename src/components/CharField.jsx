@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
+import { TextReveal } from "./TextReveal.jsx";
 
 export function CharField({
   label,
@@ -29,6 +30,7 @@ export function CharField({
   const [expandLoading, setExpandLoading] = useState(false);
 
   const [pendingValue, setPendingValue] = useState(null); // { text, type: "regen"|"expand" }
+  const [settling, setSettling] = useState(false);
 
   const isRegenning = regenningKey === fieldKey;
   const isLoading = isRegenning || expandLoading;
@@ -65,11 +67,16 @@ export function CharField({
 
   const handleConfirm = () => {
     if (!pendingValue) return;
-    const finalValue = pendingValue.type === "expand"
+    const isExpand = pendingValue.type === "expand";
+    const finalValue = isExpand
       ? (value || "") + "\n\n" + pendingValue.text
       : pendingValue.text;
     onConfirm(fieldKey, finalValue);
     setPendingValue(null);
+    if (isExpand) {
+      setSettling(true);
+      setTimeout(() => setSettling(false), 900);
+    }
   };
 
   const handleDiscard = () => setPendingValue(null);
@@ -158,11 +165,21 @@ export function CharField({
             <button type="button" className="icon-btn" onClick={() => setEditOpen(false)}>✕ Discard</button>
           </div>
         </div>
+      ) : hasPending && pendingValue.type === "expand" ? (
+        <div className="cs-field-expand-preview">
+          <p className="cs-field-body">{value || "—"}</p>
+          <div className="cs-expand-sep"><span className="cs-expand-sep-label">↓ addition</span></div>
+          <p className="cs-field-body cs-field-body--addition">
+            <TextReveal text={pendingValue.text} />
+          </p>
+          <div className="cs-field-pending-actions">
+            <button type="button" className="icon-btn" onClick={handleConfirm}>✓ Confirm</button>
+            <button type="button" className="icon-btn" onClick={handleDiscard}>✕ Discard</button>
+          </div>
+        </div>
       ) : hasPending ? (
         <div className="cs-field-pending">
-          <p className="cs-pending-label">
-            {pendingValue.type === "expand" ? "Will append:" : "New version:"}
-          </p>
+          <p className="cs-pending-label">New version:</p>
           <p className="cs-field-body">{pendingValue.text}</p>
           <div className="cs-field-pending-actions">
             <button type="button" className="icon-btn" onClick={handleConfirm}>✓ Confirm</button>
@@ -170,7 +187,11 @@ export function CharField({
           </div>
         </div>
       ) : (
-        children || <p className="cs-field-body">{value || "—"}</p>
+        children || (
+          <p className={`cs-field-body${settling ? " cs-field-body--settling" : ""}`}>
+            {value || "—"}
+          </p>
+        )
       )}
 
       {feedbackOpen && !isLoading && !hasPending && (

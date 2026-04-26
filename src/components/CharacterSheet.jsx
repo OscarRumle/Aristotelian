@@ -212,7 +212,6 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
               <div style={{ display: "flex", flexDirection: "column", gap: ".35rem" }}>
                 {meta && <span className="char-meta">{meta}</span>}
                 <div className="char-tags">
-                  {role && <span className="char-tag">{role}</span>}
                   {style && <span className="char-tag">{style}</span>}
                 </div>
               </div>
