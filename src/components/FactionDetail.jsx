@@ -5,6 +5,8 @@ import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
 import { CharField } from "./CharField.jsx";
 import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
+import { RichText } from "./RichText.jsx";
+import { ReferencedIn } from "./ReferencedIn.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -16,7 +18,7 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function FactionDetail({ faction, world, onBack, onUpdate }) {
+export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, onCreateFromRef }) {
   const gen = faction.generated ?? {};
   const charAssocs     = (faction.associations ?? []).filter((a) => a.kind === "character");
   const locationAssocs = (faction.associations ?? []).filter((a) => a.kind === "location");
@@ -96,7 +98,17 @@ export function FactionDetail({ faction, world, onBack, onUpdate }) {
       onExpand={expandField}
       canExpand
       regenningKey={regenningKey}
-    />
+    >
+      {gen[fieldKey] ? (
+        <RichText
+          text={gen[fieldKey]}
+          world={world}
+          onNavigate={onNavigate}
+          onCreateFromRef={onCreateFromRef}
+          sourceContext={{ entityType: 'faction', entityId: faction.id, fieldKey }}
+        />
+      ) : null}
+    </CharField>
   );
 
   return (
@@ -205,6 +217,13 @@ export function FactionDetail({ faction, world, onBack, onUpdate }) {
           <p className="cs-field-body" style={{ fontStyle: "italic", opacity: 0.6 }}>{faction.pitch}</p>
         </div>
       )}
+
+      <ReferencedIn
+        entity={faction}
+        entityType="faction"
+        world={world}
+        onNavigate={onNavigate}
+      />
 
       <BottomBar>
         <button type="button" className="btn btn-ghost" onClick={onBack}>← Back</button>

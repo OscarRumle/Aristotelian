@@ -8,6 +8,8 @@ import { CharField } from "./CharField.jsx";
 import { ReviewOverlay } from "./ReviewOverlay.jsx";
 import { ErrorToast } from "./ErrorToast.jsx";
 import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
+import { RichText } from "./RichText.jsx";
+import { ReferencedIn } from "./ReferencedIn.jsx";
 
 function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   return (
@@ -43,7 +45,7 @@ function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   );
 }
 
-export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange }) {
+export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange, onNavigate, onCreateFromRef }) {
   const tab = charTab ?? "overview";
   const setTab = onTabChange ?? (() => {});
   const [regenningKey, setRegenningKey] = useState(null);
@@ -151,7 +153,17 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
       onConfirm={confirmField}
       regenningKey={regenningKey}
       philNote={phil ? PHIL[phil] : null}
-    />
+    >
+      {character[key] ? (
+        <RichText
+          text={character[key]}
+          world={world}
+          onNavigate={onNavigate}
+          onCreateFromRef={onCreateFromRef}
+          sourceContext={{ entityType: 'character', entityId: character.id, fieldKey: key }}
+        />
+      ) : null}
+    </CharField>
   );
 
   const handleTabKeyDown = (e, idx) => {
@@ -418,6 +430,13 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
               )}
             </div>
           )}
+
+          <ReferencedIn
+            entity={character}
+            entityType="character"
+            world={world}
+            onNavigate={onNavigate}
+          />
 
           <div style={{ height: "2rem" }} />
         </div>

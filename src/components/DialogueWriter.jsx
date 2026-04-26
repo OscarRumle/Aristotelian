@@ -7,6 +7,7 @@ import { BottomBar } from "./BottomBar.jsx";
 import { ConfirmModal } from "./ConfirmModal.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 import { EditableText } from "./EditableText.jsx";
+import { RichText } from "./RichText.jsx";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -48,7 +49,7 @@ function autoName(lines) {
 
 // ── Script-line components ─────────────────────────────────────────────────
 
-function ScriptLine({ line, color, animating, onDone, onEdit }) {
+function ScriptLine({ line, color, animating, onDone, onEdit, world, onNavigate, onCreateFromRef, dialogueId }) {
   return (
     <div className="script-block">
       <span className="script-speaker" style={{ color: color ?? "var(--muted)" }}>
@@ -59,7 +60,15 @@ function ScriptLine({ line, color, animating, onDone, onEdit }) {
           ? <Typewriter text={line.text} onDone={onDone} speed={18} />
           : onEdit
             ? <EditableText value={line.text} onSave={onEdit} multiline className="script-line-editable" />
-            : line.text
+            : world && onNavigate
+              ? <RichText
+                  text={line.text}
+                  world={world}
+                  onNavigate={onNavigate}
+                  onCreateFromRef={onCreateFromRef}
+                  sourceContext={{ entityType: 'lore', entityId: dialogueId, fieldKey: 'dialogue' }}
+                />
+              : line.text
         }
       </p>
     </div>
@@ -469,6 +478,10 @@ function DialogueViewScreen({
                 animating={isAnimating}
                 onDone={isAnimating ? () => setAnimatedUpTo((p) => p + 1) : undefined}
                 onEdit={!streaming && !isAnimating ? (text) => setLines((prev) => prev.map((l, j) => j === i ? { ...l, text } : l)) : undefined}
+                world={world}
+                onNavigate={onNavigate}
+                onCreateFromRef={onCreateFromRef}
+                dialogueId={dialogueId}
               />
             );
           })}
@@ -591,7 +604,7 @@ function DialogueViewScreen({
 
 // ── Main export ────────────────────────────────────────────────────────────
 
-export function DialogueWriter({ world, scene, dialogueId, onBack, onSaveDialogue, onUpdateCharacter }) {
+export function DialogueWriter({ world, scene, dialogueId, onBack, onSaveDialogue, onUpdateCharacter, onNavigate, onCreateFromRef }) {
   const existingDialogue = dialogueId
     ? (scene.dialogues ?? []).find((d) => d.id === dialogueId)
     : null;

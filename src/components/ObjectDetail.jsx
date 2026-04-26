@@ -5,6 +5,8 @@ import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
 import { CharField } from "./CharField.jsx";
 import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
+import { RichText } from "./RichText.jsx";
+import { ReferencedIn } from "./ReferencedIn.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -16,7 +18,7 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function ObjectDetail({ object, world, onBack, onUpdate }) {
+export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCreateFromRef }) {
   const gen = object.generated ?? {};
   const charAssocs = (object.associations ?? []).filter((a) => a.kind === "character");
   const typeFieldEntries = Object.entries(object.typeSpecificFields ?? {}).filter(([, v]) => v && v !== "_custom");
@@ -95,7 +97,17 @@ export function ObjectDetail({ object, world, onBack, onUpdate }) {
       onExpand={expandField}
       canExpand
       regenningKey={regenningKey}
-    />
+    >
+      {gen[fieldKey] ? (
+        <RichText
+          text={gen[fieldKey]}
+          world={world}
+          onNavigate={onNavigate}
+          onCreateFromRef={onCreateFromRef}
+          sourceContext={{ entityType: 'object', entityId: object.id, fieldKey }}
+        />
+      ) : null}
+    </CharField>
   );
 
   return (
@@ -175,6 +187,13 @@ export function ObjectDetail({ object, world, onBack, onUpdate }) {
           <p className="cs-field-body" style={{ fontStyle: "italic", opacity: 0.6 }}>{object.pitch}</p>
         </div>
       )}
+
+      <ReferencedIn
+        entity={object}
+        entityType="object"
+        world={world}
+        onNavigate={onNavigate}
+      />
 
       <BottomBar>
         <button type="button" className="btn btn-ghost" onClick={onBack}>← Back</button>

@@ -23,6 +23,7 @@ import { CreateFactionScreen } from "./components/CreateFactionScreen.jsx";
 import { FactionDetail } from "./components/FactionDetail.jsx";
 import { CreateLocationScreen } from "./components/CreateLocationScreen.jsx";
 import { LocationDetail } from "./components/LocationDetail.jsx";
+import { EntityHoverPreview } from "./components/EntityHoverPreview.jsx";
 
 function findEntityInWorld(world, entityType, entityId) {
   if (!world || !entityId) return null;
@@ -337,6 +338,7 @@ export default function App() {
         />
       )}
 
+      <EntityHoverPreview />
       <TokenCounter />
       <div className="app">
         {view === "hub" && (

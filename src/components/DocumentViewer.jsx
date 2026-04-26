@@ -6,6 +6,8 @@ import { CharField } from "./CharField.jsx";
 import { ReviewOverlay } from "./ReviewOverlay.jsx";
 import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
+import { RichText } from "./RichText.jsx";
+import { ReferencedIn } from "./ReferencedIn.jsx";
 
 function parseSections(content) {
   if (!content?.trim()) return [];
@@ -43,7 +45,7 @@ function assembleSections(sections) {
 
 const sectionKey = (s) => s.heading || "__body__";
 
-export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore", world }) {
+export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore", world, onNavigate, onCreateFromRef }) {
   const [sections, setSections] = useState(() => parseSections(doc.content));
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
@@ -186,6 +188,7 @@ export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore",
 
             <div className="cs-section">
               <div className="cs-fields-grid">
+
                 {sections.map((section) => (
                   <CharField
                     key={sectionKey(section)}
@@ -199,11 +202,30 @@ export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore",
                     onExpand={expandSection}
                     canExpand
                     regenningKey={regenningKey}
-                  />
+                  >
+                    {section.body ? (
+                      <RichText
+                        text={section.body}
+                        world={world}
+                        onNavigate={onNavigate}
+                        onCreateFromRef={onCreateFromRef}
+                        sourceContext={{ entityType: 'lore', entityId: doc.id, fieldKey: sectionKey(section) }}
+                      />
+                    ) : null}
+                  </CharField>
                 ))}
               </div>
             </div>
           </div>
+        </div>
+
+        <div style={{ padding: "0 1.25rem" }}>
+          <ReferencedIn
+            entity={doc}
+            entityType="lore"
+            world={world}
+            onNavigate={onNavigate}
+          />
         </div>
 
         <BottomBar>
