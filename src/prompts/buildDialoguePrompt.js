@@ -1,4 +1,5 @@
 import { ROLE_OPTIONS } from "../constants.js";
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
 
 function formatExistingLines(lines) {
   return lines
@@ -86,6 +87,7 @@ export function buildDialoguePrompt(world, participants, mentions, opts) {
 
 ${sections}
 
+${REFERENCE_SYNTAX_INSTRUCTION}
 OUTPUT RULES — follow exactly:
 - Output ONLY newline-delimited JSON objects. One object per line. No array wrapper. No preamble. No explanation.
 - Each line must be exactly one of:

@@ -1,3 +1,5 @@
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+
 export function buildDocumentsPrompt(world, extendedInputs, allInterviews) {
   const inputsBlock =
     extendedInputs
@@ -52,6 +54,7 @@ For each document:
 
 Also include a top-level "tagline" field: 1–2 sentences capturing the world's tone, setting, and atmosphere. Specific — uses the actual details, not generic phrases.
 
+${REFERENCE_SYNTAX_INSTRUCTION}
 Return ONLY valid JSON. No preamble. No markdown fences.
 {"tagline":"","documents":[{"title":"","summary":"","content":""}]}`;
 }

@@ -127,7 +127,7 @@ function GenProgress({ accumulated }) {
   );
 }
 
-export function CreateLocationScreen({ world, onBack, onSave }) {
+export function CreateLocationScreen({ world, onBack, onSave, refContext = null, onRefContextConsumed }) {
   const [pitch, setPitch]         = useState("");
   const [type, setType]           = useState("");
   const [name, setName]           = useState("");
@@ -141,7 +141,15 @@ export function CreateLocationScreen({ world, onBack, onSave }) {
   const [genAccumulated, setGenAccumulated] = useState("");
   const [genError, setGenError]   = useState(null);
   const [discardConfirm, setDiscardConfirm] = useState(false);
+  const [refNote, setRefNote]     = useState(null);
   const abortRef = useRef(null);
+
+  useEffect(() => {
+    if (!refContext) return;
+    setName(refContext.name || "");
+    setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
+    onRefContextConsumed?.();
+  }, []);
 
   const handleTypeChange = (t) => {
     setType(t);
@@ -241,6 +249,11 @@ export function CreateLocationScreen({ world, onBack, onSave }) {
       <div className="divider" />
 
       <div className="form-stack">
+        {refNote && (
+          <div className="ref-context-note">
+            From <strong>{refNote.sourceName}</strong>'s {refNote.sourceFieldKey.replace(/_/g, " ")} field
+          </div>
+        )}
         <div>
           <label className="f-label">Pitch</label>
           <textarea

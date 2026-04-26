@@ -1,3 +1,5 @@
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+
 /**
  * Builds the system prompt for faction generation.
  * formState: { pitch, name, type, size, status, age, typeSpecificFields, associations }
@@ -66,6 +68,7 @@ export function buildFactionPrompt(world, formState) {
   lines.push(`- "motto": A phrase, creed, or saying — real or unspoken — that captures their self-image. One sentence or less.`);
   lines.push(``);
 
+  lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","history":"","dramatic_role":"","internal_tension":"","motto":""}`);
 

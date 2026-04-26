@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { callClaudeStreaming } from "../api/claude.js";
 import { buildPrompt } from "../prompts/build.js";
 import { extractJson, uid } from "../util.js";
@@ -15,18 +15,29 @@ export function CreateCharacterScreen({
   onChunk,
   signal,
   initialPitch = "",
+  refContext = null,
+  onRefContextConsumed,
 }) {
   const [pitch, setPitch] = useState(initialPitch);
   const [role, setRole] = useState("");
   const [style, setStyle] = useState("");
   const [targetLeadId, setTargetLeadId] = useState("");
   const [showMore, setShowMore] = useState(false);
+  const [refNote, setRefNote] = useState(null);
   const [f, setF] = useState({
     name: "", age: "", gender: "", race: "",
     appearance: "", clothing: "", details: "",
     background: "", personality: "", desires: "", fears: "", moralCore: "",
   });
   const upd = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
+
+  useEffect(() => {
+    if (!refContext) return;
+    setF((p) => ({ ...p, name: refContext.name || "" }));
+    setShowMore(true);
+    setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
+    onRefContextConsumed?.();
+  }, []);
 
   const leads = world.characters.filter((c) => c.role === "Lead");
   const targetLead = leads.find((c) => c.id === targetLeadId) || null;
@@ -67,6 +78,11 @@ export function CreateCharacterScreen({
       <div className="divider" />
 
       <div className="form-stack">
+        {refNote && (
+          <div className="ref-context-note">
+            From <strong>{refNote.sourceName}</strong>'s {refNote.sourceFieldKey.replace(/_/g, " ")} field
+          </div>
+        )}
         <div>
           <label className="f-label">Idea / Pitch</label>
           <textarea

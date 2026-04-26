@@ -1,3 +1,5 @@
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+
 /**
  * Builds the system prompt for object generation.
  * formState: { pitch, name, type, rarity, era, condition, typeSpecificFields, associations }
@@ -71,6 +73,7 @@ export function buildObjectPrompt(world, formState) {
   lines.push(`- "signature_line": One sentence — the single most interesting thing about this object. Could be a caption, inscription, or label.`);
   lines.push(``);
 
+  lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","provenance":"","dramatic_weight":"","signature_line":""}`);
 

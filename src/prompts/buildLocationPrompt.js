@@ -1,3 +1,5 @@
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+
 /**
  * Builds the system prompt for location generation.
  * formState: { pitch, name, type, scale, status, access, typeSpecificFields, associations }
@@ -65,6 +67,7 @@ export function buildLocationPrompt(world, formState) {
   lines.push(`- "signature_line": One evocative sentence that captures the place — not a quote, more like a caption or epitaph. The single most interesting thing about being here.`);
   lines.push(``);
 
+  lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","history":"","dramatic_role":"","signature_line":""}`);
 

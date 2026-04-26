@@ -1,3 +1,5 @@
+import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+
 const SCRUTINY = {
   low: "Flag only glaring contradictions — things that would confuse any reader. Maximum 2 items.",
   mid: "Flag contradictions a careful reader would notice. Maximum 4 items.",
@@ -24,6 +26,7 @@ ${currentBody}
 
 TASK: Rewrite only this section. Stay consistent with the other sections and the world's tone.${feedback ? `\nFEEDBACK: ${feedback}` : ""}
 
+${REFERENCE_SYNTAX_INSTRUCTION}
 Return ONLY the new section body text. No heading, no labels, no JSON. Plain prose.`;
 }
 
@@ -82,5 +85,6 @@ ${current?.body || ""}
 
 INSTRUCTION: ${instruction}
 
+${REFERENCE_SYNTAX_INSTRUCTION}
 Rewrite only this section. Return ONLY the new section body. No heading, no labels. Plain prose.`;
 }
