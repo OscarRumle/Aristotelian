@@ -66,6 +66,16 @@ export const VERBS = {
     "Searching for consistency…",
     "Weighing the options…",
   ],
+  fieldExpand: [
+    "Deepening…",
+    "Branching…",
+    "Digging…",
+    "Diverging…",
+    "Weaving in…",
+    "Extending…",
+    "Opening new ground…",
+    "Finding the edges…",
+  ],
 };
 
 /**

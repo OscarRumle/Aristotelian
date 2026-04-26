@@ -289,6 +289,18 @@ body.theme-dark .cs-feedback-input{background:var(--dk-card);color:var(--dk-text
 body.theme-dark .cs-feedback-input:focus{border-color:var(--dk-border-hover);}
 .cs-field-pending{display:flex;flex-direction:column;gap:.5rem;}
 .cs-field-pending-actions{display:flex;gap:.5rem;}
+.cs-pending-label{font-family:var(--sans);font-size:.63rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);}
+body.theme-dark .cs-pending-label{color:var(--dk-faint);}
+.cs-field-edit{display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem;animation:fadeUp .2s ease both;}
+.cs-field-edit-actions{display:flex;gap:.5rem;}
+.cs-expand-panel{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;animation:fadeUp .2s ease both;}
+.cs-expand-toggle{display:flex;gap:.35rem;}
+.cs-expand-toggle-btn{font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.08em;padding:.28rem .65rem;border-radius:var(--r-sm);border:1px solid var(--border);background:none;cursor:pointer;color:var(--faint);transition:color .15s,border-color .15s,background .15s;}
+body.theme-dark .cs-expand-toggle-btn{border-color:var(--dk-border);color:var(--dk-faint);}
+.cs-expand-toggle-btn:hover{color:var(--muted);border-color:var(--border-hover);}
+body.theme-dark .cs-expand-toggle-btn:hover{color:var(--dk-muted);}
+.cs-expand-toggle-btn.active{background:var(--dark);color:var(--surface);border-color:var(--dark);}
+body.theme-dark .cs-expand-toggle-btn.active{background:var(--dk-text);color:var(--dk-bg);border-color:var(--dk-text);}
 .cs-speech-tag{display:inline-block;font-family:var(--sans);font-size:.63rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.22rem .65rem;border-radius:var(--r-sm);background:rgba(0,0,0,.04);color:var(--muted);border:1px solid var(--border);}
 body.theme-dark .cs-speech-tag{background:rgba(255,255,255,.05);color:var(--dk-muted);border-color:var(--dk-border);}
 .icon-btn{background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:.26rem .48rem;font-size:.76rem;color:var(--faint);cursor:pointer;font-family:var(--sans);transition:color .15s,border-color .15s;line-height:1;}

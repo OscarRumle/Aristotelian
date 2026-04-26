@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { callClaude } from "../api/claude.js";
 import { buildRegenPrompt } from "../prompts/regen.js";
+import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
 import { metaLine, isFullRole, isMini, isSupport } from "../util.js";
 import { PHIL } from "../constants.js";
 import { CharField } from "./CharField.jsx";
@@ -72,10 +73,11 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
         `Regenerate ${fieldKey}.`,
         { maxTokens: 500 }
       );
-      onUpdate({ ...character, [fieldKey]: text.trim() });
+      return text.trim();
     } catch {
       setRegenError("Couldn't regenerate. Tap ↻ to try again.");
       setTimeout(() => setRegenError(null), 5000);
+      return null;
     } finally {
       setRegenningKey(null);
     }
@@ -104,13 +106,36 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
     onUpdate({ ...character, [fieldKey]: value });
   };
 
-  const F = (label, key, phil) => (
+  const saveField = (fieldKey, value) => {
+    onUpdate({ ...character, [fieldKey]: value });
+  };
+
+  const expandField = async (fieldKey, mode, direction) => {
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildFieldExpandPrompt("character", character, world, fieldKey, mode, direction),
+        `Expand ${fieldKey}`,
+        { maxTokens: 800 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't expand. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    }
+  };
+
+  const F = (label, key, phil, expand = false) => (
     <CharField
       label={label}
       value={character[key]}
       fieldKey={key}
       onRegen={regen}
       onRegenWithFeedback={regenWithFeedback}
+      onExpand={expand ? expandField : undefined}
+      canExpand={expand}
+      onSave={saveField}
       onConfirm={confirmField}
       regenningKey={regenningKey}
       philNote={phil ? PHIL[phil] : null}
@@ -218,7 +243,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                 {F("Appearance", "appearance", "appearance")}
                 {F("Clothing", "clothing", null)}
                 {F("Details", "details", null)}
-                {F("Background", "background", null)}
+                {F("Background", "background", null, true)}
               </div>
             </div>
           )}
@@ -228,9 +253,9 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
               {full && (
                 <div className="cs-section">
                   <div className="cs-fields-grid">
-                    {F("Personality", "personality", "personality")}
-                    {F("Desires", "desires", "desires")}
-                    {F("Fears", "fears", "fears")}
+                    {F("Personality", "personality", "personality", true)}
+                    {F("Desires", "desires", "desires", true)}
+                    {F("Fears", "fears", "fears", true)}
                     {F("Hamartia", "hamartia", "hamartia")}
                   </div>
                   {role === "Ensemble" && character.collectiveHamartia && (
@@ -239,6 +264,8 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                       value={character.collectiveHamartia}
                       fieldKey="collectiveHamartia"
                       onRegen={regen}
+                      onSave={saveField}
+                      onConfirm={confirmField}
                       regenningKey={regenningKey}
                     />
                   )}
@@ -248,9 +275,9 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                 <>
                   <div className="cs-section">
                     <div className="cs-fields-grid">
-                      {F("Personality", "personality", "personality")}
-                      {F("Desires", "desires", "desires")}
-                      {F("Fears", "fears", "fears")}
+                      {F("Personality", "personality", "personality", true)}
+                      {F("Desires", "desires", "desires", true)}
+                      {F("Fears", "fears", "fears", true)}
                     </div>
                   </div>
                   <LockedSection
@@ -269,23 +296,17 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
             <div id="tabpanel-dialogue" role="tabpanel" className="cs-section">
               <div className="cs-section-title">Dialogue</div>
               {character.speechMode ? (
-                <div className="cs-field">
-                  <div className="cs-field-head">
-                    <span className="cs-field-label">Speech Mode</span>
-                    <div className="cs-field-actions">
-                      <button
-                        type="button"
-                        className="icon-btn"
-                        aria-label="Regenerate Speech Mode"
-                        onClick={() => regen("speechMode")}
-                        disabled={!!regenningKey}
-                      >
-                        {regenningKey === "speechMode" ? "…" : "↻"}
-                      </button>
-                    </div>
-                  </div>
+                <CharField
+                  label="Speech Mode"
+                  value={character.speechMode}
+                  fieldKey="speechMode"
+                  onRegen={regen}
+                  onSave={saveField}
+                  onConfirm={confirmField}
+                  regenningKey={regenningKey}
+                >
                   <span className="cs-speech-tag">{character.speechMode}</span>
-                </div>
+                </CharField>
               ) : null}
               <div className="cs-fields-grid">
                 {F("Under Pressure", "underPressure", "underPressure")}
