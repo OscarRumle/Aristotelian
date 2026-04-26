@@ -108,7 +108,7 @@ function SetupScreen({ world, onGenerate, onBack }) {
   if (ungrouped.length > 0) groups.push({ role: "Other", chars: ungrouped });
 
   return (
-    <div className="screen" style={{ paddingBottom: "8rem" }}>
+    <div className="screen dlg-page" style={{ paddingBottom: "8rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Scene</button>
@@ -415,7 +415,7 @@ function DialogueViewScreen({
   }
 
   return (
-    <div className="screen dialogue-screen" style={{ paddingBottom: "9rem" }}>
+    <div className="screen dialogue-screen dlg-page" style={{ paddingBottom: "9rem" }}>
       <div className="page-head" style={{ paddingBottom: ".5rem" }}>
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Scene</button>

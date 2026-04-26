@@ -1001,6 +1001,22 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
   /* ── D-01 WorldHub ── */
   .wh-page{max-width:1200px;}
 
+  /* ── D-06 DialogueWriter ── */
+  .dlg-page{max-width:800px;}
+  .dialogue-screen.dlg-page{max-width:800px;}
+  .dlg-page .script-text{font-size:1rem;line-height:1.9;}
+  .dlg-page .stage-direction{font-size:.95rem;}
+  .dlg-page .script-speaker{font-size:.65rem;}
+
+  /* ── D-07 SceneDetail ── */
+  .scene-page{max-width:820px;}
+  .scene-page .t-heading{font-size:2rem;}
+
+  /* ── D-08 DocumentViewer ── */
+  .doc-viewer-inner{max-width:860px;padding:3rem 2.5rem 5rem;}
+  .doc-viewer-title{font-size:2.2rem;}
+  .doc-viewer-inner .doc-p{font-size:1rem;line-height:1.9;}
+
   /* ── D-04 CreateWorldScreen + CreateWorldAdvanced ── */
   .cws-page{max-width:680px;}
   .cws-page .f-label{font-size:.75rem;}
