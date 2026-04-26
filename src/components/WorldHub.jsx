@@ -3,10 +3,15 @@ import { EmptyState } from "./EmptyState.jsx";
 
 export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen wh-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <span className="t-eyebrow">Aristotelian</span>
         <h1 className="t-display">Your Worlds</h1>
+        {worlds.length > 0 && (
+          <button type="button" className="btn btn-ghost wh-new-btn" onClick={onNewWorld}>
+            + New World
+          </button>
+        )}
       </div>
       <div className="divider" />
       {worlds.length === 0 ? (
@@ -15,7 +20,7 @@ export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
           body="Create a world to begin. Every character you forge will be shaped by its tone, rules, and history."
         />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: ".85rem", paddingTop: "1.5rem" }}>
+        <div className="card-list">
           {worlds.map((w, i) => (
             <div key={w.id} style={{ animation: `fadeUp .4s ${i * 0.06}s ease both` }}>
               <div className="card" onClick={() => onSelectWorld(w.id)}>

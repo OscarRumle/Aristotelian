@@ -811,6 +811,7 @@ body.theme-dark .btn-analyse-cast{color:var(--sage);border-color:rgba(91,138,110
 
 /* Card list container */
 .card-list{display:flex;flex-direction:column;gap:.85rem;padding-top:1.5rem;}
+.wh-new-btn{display:none;align-self:flex-start;margin-top:.75rem;font-size:.8rem;}
 
 /* Utility: 3-column field row */
 .f-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
@@ -994,5 +995,17 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
     gap:1rem 3rem;
     align-items:start;
   }
+
+  /* ── D-01 WorldHub ── */
+  .wh-page{max-width:1200px;}
+  .wh-new-btn{display:inline-flex;}
+  .wh-page .card-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
+    gap:1rem;
+  }
+  .wh-page .card-name{font-size:1.3rem;}
+  .wh-page .card-desc{font-size:.95rem;}
+  .wh-page .card-quote{font-size:.9rem;}
 }
 .loc-output-sig{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--loc-accent);line-height:1.6;padding:.3rem 0;}
