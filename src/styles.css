@@ -1028,8 +1028,8 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
 .cs-fields-grid{display:flex;flex-direction:column;gap:1rem;}
 
 @media(min-width:1024px){
-  /* Override screen max-width for the character sheet */
-  .cs-page{max-width:1440px;padding:0 4rem 5rem;}
+  /* Override screen max-width for character sheet and document viewer */
+  .cs-page,.dv-page{max-width:1440px;padding:0 4rem 5rem;}
 
   .cs-layout{
     display:grid;
