@@ -53,7 +53,7 @@ export function CreateCharacterScreen({
   };
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen ccs-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
@@ -71,7 +71,7 @@ export function CreateCharacterScreen({
           <label className="f-label">Idea / Pitch</label>
           <textarea
             className="f-area"
-            rows={4}
+            rows={5}
             placeholder="A disgraced accountant who knows too much about the wrong people's money…"
             value={pitch}
             onChange={(e) => setPitch(e.target.value)}
@@ -116,38 +116,44 @@ export function CreateCharacterScreen({
 
         {showMore && (
           <>
-            <span className="s-label">Identity</span>
-            <div>
-              <label className="f-label">Name</label>
-              <input className="f-input" placeholder="Leave blank to generate" value={f.name} onChange={upd("name")} />
-            </div>
-            <div className="f-row">
-              <div>
-                <label className="f-label">Age</label>
-                <input className="f-input" placeholder="Mid 40s…" value={f.age} onChange={upd("age")} />
+            <div className="ccs-specifics-grid">
+              <div className="ccs-col">
+                <span className="s-label">Identity</span>
+                <div>
+                  <label className="f-label">Name</label>
+                  <input className="f-input" placeholder="Leave blank to generate" value={f.name} onChange={upd("name")} />
+                </div>
+                <div className="f-row">
+                  <div>
+                    <label className="f-label">Age</label>
+                    <input className="f-input" placeholder="Mid 40s…" value={f.age} onChange={upd("age")} />
+                  </div>
+                  <div>
+                    <label className="f-label">Gender</label>
+                    <input className="f-input" placeholder="Open" value={f.gender} onChange={upd("gender")} />
+                  </div>
+                </div>
+                <div>
+                  <label className="f-label">Race / Species</label>
+                  <input className="f-input" placeholder="Interpreted by world context" value={f.race} onChange={upd("race")} />
+                </div>
               </div>
-              <div>
-                <label className="f-label">Gender</label>
-                <input className="f-input" placeholder="Open" value={f.gender} onChange={upd("gender")} />
-              </div>
-            </div>
-            <div>
-              <label className="f-label">Race / Species</label>
-              <input className="f-input" placeholder="Interpreted by world context" value={f.race} onChange={upd("race")} />
-            </div>
 
-            <span className="s-label">Physical</span>
-            <div>
-              <label className="f-label">Appearance</label>
-              <textarea className="f-area" rows={2} placeholder="Physical traits…" value={f.appearance} onChange={upd("appearance")} />
-            </div>
-            <div>
-              <label className="f-label">Clothing</label>
-              <textarea className="f-area" rows={2} placeholder="Style, garments…" value={f.clothing} onChange={upd("clothing")} />
-            </div>
-            <div>
-              <label className="f-label">Details</label>
-              <textarea className="f-area" rows={2} placeholder="Scars, mannerisms, voice…" value={f.details} onChange={upd("details")} />
+              <div className="ccs-col">
+                <span className="s-label">Physical</span>
+                <div>
+                  <label className="f-label">Appearance</label>
+                  <textarea className="f-area" rows={2} placeholder="Physical traits…" value={f.appearance} onChange={upd("appearance")} />
+                </div>
+                <div>
+                  <label className="f-label">Clothing</label>
+                  <textarea className="f-area" rows={2} placeholder="Style, garments…" value={f.clothing} onChange={upd("clothing")} />
+                </div>
+                <div>
+                  <label className="f-label">Details</label>
+                  <textarea className="f-area" rows={2} placeholder="Scars, mannerisms, voice…" value={f.details} onChange={upd("details")} />
+                </div>
+              </div>
             </div>
 
             <span className="s-label">Psychology</span>
