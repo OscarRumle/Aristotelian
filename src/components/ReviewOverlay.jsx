@@ -8,7 +8,13 @@ function parseJson(raw) {
   return JSON.parse(cleaned);
 }
 
-export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplete }) {
+export function ReviewOverlay({
+  character, world,
+  buildScanPrompt: customScanPrompt,
+  buildFixPrompt: customFixPrompt,
+  entityName,
+  onClose, onApplyFix, onComplete,
+}) {
   const [phase, setPhase] = useState("setup");
   const [scrutiny, setScrutiny] = useState("mid");
   const [items, setItems] = useState([]);
@@ -18,13 +24,20 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
   const [pendingFix, setPendingFix] = useState(null);
   const [error, setError] = useState(null);
 
+  const displayName = entityName || character?.name || "Character";
+
+  const doScanPrompt = (s) =>
+    customScanPrompt ? customScanPrompt(s) : buildConsistencyScanPrompt(character, world, s);
+  const doFixPrompt = (fieldKey, fieldLabel, instruction) =>
+    customFixPrompt ? customFixPrompt(fieldKey, fieldLabel, instruction) : buildReviewFixPrompt(character, world, fieldKey, fieldLabel, instruction);
+
   async function runScan() {
     setPhase("scanning");
     setError(null);
     try {
       const raw = await callClaude(
-        buildConsistencyScanPrompt(character, world, scrutiny),
-        "Scanning character for inconsistencies",
+        doScanPrompt(scrutiny),
+        "Scanning for inconsistencies",
         { maxTokens: 1500 }
       );
       const data = parseJson(raw);
@@ -54,9 +67,9 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
     setPhase("applying");
     try {
       const raw = await callClaude(
-        buildReviewFixPrompt(character, world, item.fieldKey, item.fieldLabel, instruction),
+        doFixPrompt(item.fieldKey, item.fieldLabel, instruction),
         `Rewriting ${item.fieldLabel}`,
-        { maxTokens: 600 }
+        { maxTokens: 800 }
       );
       setPendingFix({ fieldKey: item.fieldKey, fieldLabel: item.fieldLabel, value: raw.trim() });
       setPhase("pending");
@@ -98,7 +111,7 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
 
         <div className="review-header">
           <button type="button" className="back-btn" onClick={onClose}>
-            ← {character.name || "Character"}
+            ← {displayName}
           </button>
           {phase === "reviewing" && total > 1 && (
             <span className="review-progress">{idx + 1} of {total}</span>
@@ -107,9 +120,9 @@ export function ReviewOverlay({ character, world, onClose, onApplyFix, onComplet
 
         {phase === "setup" && (
           <div className="review-setup">
-            <h2 className="review-setup-title">Review character</h2>
+            <h2 className="review-setup-title">Review</h2>
             <p className="review-setup-body">
-              Scan {character.name || "this character"} for internal inconsistencies between fields.
+              Scan {displayName} for internal inconsistencies.
             </p>
             <div className="review-setup-level">
               <span className="review-setup-label">Scrutiny</span>

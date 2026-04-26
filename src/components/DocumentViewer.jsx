@@ -1,125 +1,228 @@
-import { useState, useRef, useEffect } from "react";
-import { EditableText } from "./EditableText.jsx";
+import { useState } from "react";
+import { callClaude } from "../api/claude.js";
+import { buildDocSectionRegenPrompt, buildDocScanPrompt, buildDocSectionFixPrompt } from "../prompts/docSectionRegen.js";
+import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
+import { CharField } from "./CharField.jsx";
+import { ReviewOverlay } from "./ReviewOverlay.jsx";
+import { ErrorToast } from "./ErrorToast.jsx";
+import { BottomBar } from "./BottomBar.jsx";
 
-function parseInline(text) {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**"))
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
-    if (part.startsWith("*") && part.endsWith("*"))
-      return <em key={i}>{part.slice(1, -1)}</em>;
-    return part;
-  });
-}
-
-function renderDocContent(text) {
-  const lines = text.split("\n");
-  const result = [];
-  let paraLines = [];
-  let key = 0;
-
-  const flushPara = () => {
-    const txt = paraLines.join(" ").trim();
-    if (txt) result.push(<p key={key++} className="doc-p">{parseInline(txt)}</p>);
-    paraLines = [];
-  };
+function parseSections(content) {
+  if (!content?.trim()) return [];
+  const lines = content.split("\n");
+  const sections = [];
+  let current = null;
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed.startsWith("### ")) {
-      flushPara();
-      result.push(<h4 key={key++} className="doc-h4">{trimmed.slice(4)}</h4>);
-    } else if (trimmed.startsWith("## ")) {
-      flushPara();
-      result.push(<h3 key={key++} className="doc-h3">{trimmed.slice(3)}</h3>);
+    if (trimmed.startsWith("## ")) {
+      if (current) sections.push(current);
+      current = { heading: trimmed.slice(3).trim(), body: "" };
     } else if (trimmed.startsWith("# ")) {
-      flushPara();
-      result.push(<h2 key={key++} className="doc-h2">{trimmed.slice(2)}</h2>);
-    } else if (trimmed === "---") {
-      flushPara();
-      result.push(<hr key={key++} className="doc-hr" />);
-    } else if (!trimmed) {
-      flushPara();
+      // skip — title is shown in sidebar
     } else {
-      paraLines.push(line);
+      if (current) {
+        current.body = current.body ? current.body + "\n" + line : line;
+      }
     }
   }
-  flushPara();
+  if (current) sections.push(current);
 
-  return result;
-}
-
-function DocContentField({ value, onSave }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (editing && ref.current) {
-      ref.current.focus();
-      ref.current.setSelectionRange(draft.length, draft.length);
-    }
-  }, [editing]);
-
-  const open = () => { setDraft(value); setEditing(true); };
-  const save = () => { onSave(draft); setEditing(false); };
-  const discard = () => setEditing(false);
-
-  if (editing) {
-    return (
-      <div className="editable-text-wrap">
-        <textarea
-          ref={ref}
-          className="editable-text-input doc-content-textarea"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Escape") discard(); }}
-        />
-        <div className="editable-text-actions">
-          <button type="button" className="editable-save" onClick={save}>Save</button>
-          <button type="button" className="editable-discard" onClick={discard}>Discard</button>
-        </div>
-      </div>
-    );
+  if (sections.length === 0 && content.trim()) {
+    sections.push({ heading: null, body: content.trim() });
   }
 
-  return (
-    <div
-      className={`doc-content-display${onSave ? " doc-content-editable" : ""}`}
-      onClick={onSave ? open : undefined}
-      title={onSave ? "Click to edit" : undefined}
-    >
-      {renderDocContent(value)}
-      {onSave && <span className="editable-hint" aria-hidden="true">✎</span>}
-    </div>
-  );
+  return sections.map((s) => ({ ...s, body: s.body.trim() }));
 }
 
-export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore" }) {
-  const update = (field) => (val) => onUpdate?.({ ...doc, [field]: val });
+function assembleSections(sections) {
+  return sections
+    .map((s) => (s.heading ? `## ${s.heading}\n\n${s.body}` : s.body))
+    .join("\n\n");
+}
+
+const sectionKey = (s) => s.heading || "__body__";
+
+export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore", world }) {
+  const [sections, setSections] = useState(() => parseSections(doc.content));
+  const [regenningKey, setRegenningKey] = useState(null);
+  const [regenError, setRegenError] = useState(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleInput, setTitleInput] = useState(doc.title || "");
+
+  const updateSection = (fieldKey, body) => {
+    const next = sections.map((s) => sectionKey(s) === fieldKey ? { ...s, body } : s);
+    setSections(next);
+    onUpdate?.({ ...doc, content: assembleSections(next) });
+    setIsDirty(true);
+  };
+
+  const regen = async (fieldKey) => {
+    const section = sections.find((s) => sectionKey(s) === fieldKey);
+    if (!section) return null;
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildDocSectionRegenPrompt(world, doc, section.heading, section.body, sections),
+        `Regenerate section`,
+        { maxTokens: 900 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const regenWithFeedback = async (fieldKey, feedback) => {
+    const section = sections.find((s) => sectionKey(s) === fieldKey);
+    if (!section) return null;
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildDocSectionRegenPrompt(world, doc, section.heading, section.body, sections, feedback),
+        `Regenerate section with feedback`,
+        { maxTokens: 900 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const expandSection = async (fieldKey, mode, direction) => {
+    const section = sections.find((s) => sectionKey(s) === fieldKey);
+    if (!section) return null;
+    setRegenError(null);
+    try {
+      const pseudoEntity = { title: doc.title, summary: doc.summary, [fieldKey]: section.body };
+      const text = await callClaude(
+        buildFieldExpandPrompt("lore document section", pseudoEntity, world, fieldKey, mode, direction, section.body),
+        `Expand section`,
+        { maxTokens: 1000 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't expand. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    }
+  };
+
+  const applyReviewFix = (fieldKey, value) => {
+    const next = sections.map((s) => sectionKey(s) === fieldKey ? { ...s, body: value } : s);
+    setSections(next);
+    onUpdate?.({ ...doc, content: assembleSections(next) });
+  };
+
+  const saveTitle = (val) => {
+    onUpdate?.({ ...doc, title: val });
+    setIsDirty(true);
+  };
 
   return (
-    <div className="doc-viewer-overlay">
-      <div className="doc-viewer-inner">
-        <button type="button" className="doc-viewer-back" onClick={onClose}>
-          {backLabel}
-        </button>
-        {onUpdate ? (
-          <EditableText value={doc.title} onSave={update("title")} className="doc-viewer-title-editable" />
-        ) : (
-          <h1 className="doc-viewer-title">{doc.title}</h1>
-        )}
-        {doc.summary && (
-          <div className="doc-viewer-summary">
-            {onUpdate ? (
-              <EditableText value={doc.summary} onSave={update("summary")} multiline className="doc-viewer-summary-editable" />
-            ) : (
-              <span className="doc-viewer-summary-text">{doc.summary}</span>
-            )}
+    <>
+      <div className="screen dv-page" style={{ paddingBottom: "5rem" }}>
+        <div className="cs-layout">
+          <aside className="cs-sidebar">
+            <div className="char-header">
+              <div className="page-head-nav">
+                <button type="button" className="back-btn" onClick={onClose}>{backLabel}</button>
+              </div>
+
+              {editingTitle ? (
+                <input
+                  className="char-name-input"
+                  value={titleInput}
+                  autoFocus
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  onBlur={() => { saveTitle(titleInput); setEditingTitle(false); }}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") e.target.blur(); }}
+                />
+              ) : (
+                <h1
+                  className="char-name char-name-editable"
+                  title="Click to edit title"
+                  onClick={() => { setTitleInput(doc.title || ""); setEditingTitle(true); }}
+                >
+                  {doc.title || "Untitled"}
+                </h1>
+              )}
+
+              {doc.summary && (
+                <p className="char-role" style={{ fontStyle: "normal", marginTop: ".5rem" }}>
+                  {doc.summary}
+                </p>
+              )}
+
+              {isDirty && (
+                <button
+                  type="button"
+                  className="btn-review"
+                  style={{ marginTop: "1.25rem" }}
+                  onClick={() => setShowReview(true)}
+                >
+                  ✦ Review
+                </button>
+              )}
+            </div>
+          </aside>
+
+          <div className="cs-main">
+            <div className="divider cs-mobile-divider" />
+
+            {regenError && <ErrorToast message={regenError} />}
+
+            <div className="cs-section">
+              <div className="cs-fields-grid">
+                {sections.map((section) => (
+                  <CharField
+                    key={sectionKey(section)}
+                    label={section.heading || "Content"}
+                    value={section.body}
+                    fieldKey={sectionKey(section)}
+                    onRegen={regen}
+                    onRegenWithFeedback={regenWithFeedback}
+                    onSave={updateSection}
+                    onConfirm={updateSection}
+                    onExpand={expandSection}
+                    canExpand
+                    regenningKey={regenningKey}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        )}
-        <DocContentField value={doc.content} onSave={onUpdate ? update("content") : null} />
+        </div>
+
+        <BottomBar>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>← Back</button>
+        </BottomBar>
       </div>
-    </div>
+
+      {showReview && (
+        <ReviewOverlay
+          entityName={doc.title || "Document"}
+          buildScanPrompt={(scrutiny) => buildDocScanPrompt(doc, sections, world, scrutiny)}
+          buildFixPrompt={(fieldKey, fieldLabel, instruction) =>
+            buildDocSectionFixPrompt(doc, sections, fieldKey === "__body__" ? null : fieldKey, instruction)
+          }
+          onClose={() => setShowReview(false)}
+          onApplyFix={applyReviewFix}
+          onComplete={() => { setShowReview(false); setIsDirty(false); }}
+        />
+      )}
+    </>
   );
 }

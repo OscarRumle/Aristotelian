@@ -629,9 +629,8 @@ body.theme-dark .doc-card-summary{color:var(--dk-muted);}
 body.theme-dark .doc-card-cta{color:var(--dk-faint);}
 
 /* ─────────────────────────── DOCUMENT VIEWER ───────────────────────────── */
-.doc-viewer-overlay{position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:499;background:var(--surface);display:flex;flex-direction:column;animation:fadeUp .3s ease both;overflow-y:auto;}
-body.theme-dark .doc-viewer-overlay{background:var(--dk-surface);}
-.doc-viewer-inner{width:100%;max-width:520px;margin:0 auto;padding:2.5rem 1.25rem 5rem;}
+.dv-page .cs-sidebar{padding-top:2rem;}
+.dv-page .cs-main{padding-top:2rem;}
 .doc-viewer-back{font-family:var(--sans);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);background:none;border:none;cursor:pointer;padding:0;margin-bottom:1.5rem;transition:color .2s;}
 .doc-viewer-back:hover{color:var(--muted);}
 body.theme-dark .doc-viewer-back{color:var(--dk-faint);}
@@ -1112,9 +1111,9 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
   .scene-page .t-heading{font-size:2rem;}
 
   /* ── D-08 DocumentViewer ── */
-  .doc-viewer-inner{max-width:860px;padding:3rem 2.5rem 5rem;}
-  .doc-viewer-title{font-size:2.2rem;}
-  .doc-viewer-inner .doc-p{font-size:1rem;line-height:1.9;}
+  .dv-page .cs-main .cs-field-body{font-size:1rem;line-height:1.9;}
+  .dv-page .doc-h2{font-size:1.5rem;}
+  .dv-page .doc-h3{font-size:.68rem;}
 
   /* ── D-04 CreateWorldScreen + CreateWorldAdvanced ── */
   .cws-page{max-width:680px;}

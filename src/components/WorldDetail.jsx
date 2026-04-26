@@ -80,6 +80,7 @@ function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc
     return (
       <DocumentViewer
         doc={activeDoc}
+        world={world}
         onClose={() => setActiveDoc(null)}
         onUpdate={(updated) => { onUpdateDoc(updated); setActiveDoc(updated); }}
       />
