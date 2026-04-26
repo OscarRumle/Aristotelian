@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { callClaude } from "../api/claude.js";
 import { buildRegenPrompt } from "../prompts/regen.js";
 import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
@@ -45,7 +45,15 @@ function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   );
 }
 
-export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange, onNavigate, onCreateFromRef }) {
+const FIELD_TO_TAB = {
+  appearance: 'identity', clothing: 'identity', details: 'identity', background: 'identity',
+  personality: 'psychology', desires: 'psychology', fears: 'psychology', hamartia: 'psychology',
+  moralCore: 'overview', consistency: 'overview',
+  subtext: 'dialogue', voicePattern: 'dialogue', underPressure: 'dialogue',
+  aristotelianNote: 'aristotelian',
+};
+
+export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange, onNavigate, onCreateFromRef, scrollToFieldKey, onScrollConsumed }) {
   const tab = charTab ?? "overview";
   const setTab = onTabChange ?? (() => {});
   const [regenningKey, setRegenningKey] = useState(null);
@@ -56,6 +64,13 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(character.name || "");
   const tabRefs = useRef([]);
+
+  useEffect(() => {
+    if (!scrollToFieldKey) return;
+    const targetTab = FIELD_TO_TAB[scrollToFieldKey];
+    if (targetTab) setTab(targetTab);
+    onScrollConsumed?.();
+  }, [scrollToFieldKey]);
 
   const meta = metaLine(character);
   const role = character.role || "";

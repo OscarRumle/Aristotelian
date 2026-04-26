@@ -34,6 +34,7 @@ export function CreateCharacterScreen({
   useEffect(() => {
     if (!refContext) return;
     setF((p) => ({ ...p, name: refContext.name || "" }));
+    if (refContext.sourceText) setPitch(refContext.sourceText);
     setShowMore(true);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();

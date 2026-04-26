@@ -61,6 +61,7 @@ export default function App() {
   const [activeLoreDocId, setActiveLoreDocId] = useState(null);
   const [activeCharTab, setActiveCharTab] = useState("overview");
   const [createRefContext, setCreateRefContext] = useState(null);
+  const [navScrollToField, setNavScrollToField] = useState(null);
 
   const abortRef = useRef(null);
 
@@ -253,7 +254,8 @@ export default function App() {
     }
   };
 
-  const navigate = (entityType, entityId) => {
+  const navigate = (entityType, entityId, scrollToField = null) => {
+    setNavScrollToField(scrollToField);
     switch (entityType) {
       case 'character': setActiveCharId(entityId); setView('character'); break;
       case 'object':    setActiveObjectId(entityId); setView('object'); break;
@@ -425,6 +427,8 @@ export default function App() {
             onTabChange={setActiveCharTab}
             onNavigate={navigate}
             onCreateFromRef={handleCreateFromRef}
+            scrollToFieldKey={navScrollToField}
+            onScrollConsumed={() => setNavScrollToField(null)}
           />
         )}
 
@@ -485,6 +489,8 @@ export default function App() {
               onUpdate={updateObject}
               onNavigate={navigate}
               onCreateFromRef={handleCreateFromRef}
+              scrollToFieldKey={navScrollToField}
+              onScrollConsumed={() => setNavScrollToField(null)}
             />
           ) : null;
         })()}
@@ -509,6 +515,8 @@ export default function App() {
               onUpdate={updateFaction}
               onNavigate={navigate}
               onCreateFromRef={handleCreateFromRef}
+              scrollToFieldKey={navScrollToField}
+              onScrollConsumed={() => setNavScrollToField(null)}
             />
           ) : null;
         })()}
@@ -533,6 +541,8 @@ export default function App() {
               onUpdate={updateLocation}
               onNavigate={navigate}
               onCreateFromRef={handleCreateFromRef}
+              scrollToFieldKey={navScrollToField}
+              onScrollConsumed={() => setNavScrollToField(null)}
             />
           ) : null;
         })()}

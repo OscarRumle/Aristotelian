@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { callClaude } from "../api/claude.js";
 import { buildEntityRegenPrompt } from "../prompts/entityRegen.js";
 import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
@@ -18,7 +18,7 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCreateFromRef }) {
+export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCreateFromRef, scrollToFieldKey, onScrollConsumed }) {
   const gen = object.generated ?? {};
   const charAssocs = (object.associations ?? []).filter((a) => a.kind === "character");
   const typeFieldEntries = Object.entries(object.typeSpecificFields ?? {}).filter(([, v]) => v && v !== "_custom");
@@ -26,6 +26,13 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
 
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
+
+  useEffect(() => {
+    if (!scrollToFieldKey) return;
+    const el = document.getElementById(`field-${scrollToFieldKey}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    onScrollConsumed?.();
+  }, [scrollToFieldKey]);
 
   const saveField = (fieldKey, value) => {
     onUpdate({ ...object, generated: { ...gen, [fieldKey]: value } });
@@ -134,13 +141,13 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
       {regenError && <ErrorToast message={regenError} />}
 
       {gen.description && (
-        <div className="cs-section">{F("Description", "description")}</div>
+        <div id="field-description" className="cs-section">{F("Description", "description")}</div>
       )}
       {gen.provenance && (
-        <div className="cs-section">{F("Provenance", "provenance")}</div>
+        <div id="field-provenance" className="cs-section">{F("Provenance", "provenance")}</div>
       )}
       {gen.dramatic_weight && (
-        <div className="cs-section">{F("Dramatic Weight", "dramatic_weight")}</div>
+        <div id="field-dramatic_weight" className="cs-section">{F("Dramatic Weight", "dramatic_weight")}</div>
       )}
 
       {(object.rarity || object.era || object.condition || typeFieldEntries.length > 0 || customNote) && (

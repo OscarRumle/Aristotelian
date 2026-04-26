@@ -61,7 +61,7 @@ export function ReferencedIn({ entity, entityType, world, onNavigate }) {
                     <button
                       type="button"
                       className="referenced-in-link"
-                      onClick={() => onNavigate?.(bl.entityType, bl.entityId)}
+                      onClick={() => onNavigate?.(bl.entityType, bl.entityId, bl.fieldKey)}
                     >
                       {bl.entityName}
                     </button>

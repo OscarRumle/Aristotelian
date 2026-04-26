@@ -147,6 +147,7 @@ export function CreateObjectScreen({ world, onBack, onSave, refContext = null, o
   useEffect(() => {
     if (!refContext) return;
     setName(refContext.name || "");
+    if (refContext.sourceText) setPitch(refContext.sourceText);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();
   }, []);

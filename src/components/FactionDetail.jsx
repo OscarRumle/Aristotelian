@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { callClaude } from "../api/claude.js";
 import { buildEntityRegenPrompt } from "../prompts/entityRegen.js";
 import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
@@ -18,7 +18,7 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, onCreateFromRef }) {
+export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, onCreateFromRef, scrollToFieldKey, onScrollConsumed }) {
   const gen = faction.generated ?? {};
   const charAssocs     = (faction.associations ?? []).filter((a) => a.kind === "character");
   const locationAssocs = (faction.associations ?? []).filter((a) => a.kind === "location");
@@ -27,6 +27,13 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
 
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
+
+  useEffect(() => {
+    if (!scrollToFieldKey) return;
+    const el = document.getElementById(`field-${scrollToFieldKey}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    onScrollConsumed?.();
+  }, [scrollToFieldKey]);
 
   const saveField = (fieldKey, value) => {
     onUpdate({ ...faction, generated: { ...gen, [fieldKey]: value } });
@@ -135,16 +142,16 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
       {regenError && <ErrorToast message={regenError} />}
 
       {gen.description && (
-        <div className="cs-section">{F("Description", "description")}</div>
+        <div id="field-description" className="cs-section">{F("Description", "description")}</div>
       )}
       {gen.history && (
-        <div className="cs-section">{F("History", "history")}</div>
+        <div id="field-history" className="cs-section">{F("History", "history")}</div>
       )}
       {gen.dramatic_role && (
-        <div className="cs-section">{F("Dramatic Role", "dramatic_role")}</div>
+        <div id="field-dramatic_role" className="cs-section">{F("Dramatic Role", "dramatic_role")}</div>
       )}
       {gen.internal_tension && (
-        <div className="cs-section">
+        <div id="field-internal_tension" className="cs-section">
           <CharField
             label="Internal Tension"
             value={gen.internal_tension}
