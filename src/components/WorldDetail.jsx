@@ -72,7 +72,7 @@ function CharactersPanel({ world, onSelectCharacter }) {
   );
 }
 
-function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc }) {
+function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc, onNavigate, onCreateFromRef }) {
   const [activeDoc, setActiveDoc] = useState(null);
   const docs = world.documents ?? [];
 
@@ -83,6 +83,8 @@ function LoreView({ world, onBack, onContinueInterview, onExpandDoc, onUpdateDoc
         world={world}
         onClose={() => setActiveDoc(null)}
         onUpdate={(updated) => { onUpdateDoc(updated); setActiveDoc(updated); }}
+        onNavigate={onNavigate}
+        onCreateFromRef={onCreateFromRef}
       />
     );
   }
@@ -154,6 +156,8 @@ export function WorldDetail({
   onSelectFaction,
   onNewLocation,
   onSelectLocation,
+  onNavigate,
+  onCreateFromRef,
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 

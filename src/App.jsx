@@ -24,6 +24,18 @@ import { FactionDetail } from "./components/FactionDetail.jsx";
 import { CreateLocationScreen } from "./components/CreateLocationScreen.jsx";
 import { LocationDetail } from "./components/LocationDetail.jsx";
 
+function findEntityInWorld(world, entityType, entityId) {
+  if (!world || !entityId) return null;
+  switch (entityType) {
+    case 'character': return (world.characters ?? []).find((e) => e.id === entityId) ?? null;
+    case 'object':    return (world.objects ?? []).find((e) => e.id === entityId) ?? null;
+    case 'faction':   return (world.factions ?? []).find((e) => e.id === entityId) ?? null;
+    case 'location':  return (world.locations ?? []).find((e) => e.id === entityId) ?? null;
+    case 'lore':      return (world.documents ?? []).find((e) => e.id === entityId) ?? null;
+    default:          return null;
+  }
+}
+
 export default function App() {
   const [view, setView] = useState("hub");
   const [activeWorldId, setActiveWorldId] = useState(null);
@@ -47,6 +59,7 @@ export default function App() {
   const [worldToolView, setWorldToolView] = useState(null);
   const [activeLoreDocId, setActiveLoreDocId] = useState(null);
   const [activeCharTab, setActiveCharTab] = useState("overview");
+  const [createRefContext, setCreateRefContext] = useState(null);
 
   const abortRef = useRef(null);
 
@@ -239,6 +252,30 @@ export default function App() {
     }
   };
 
+  const navigate = (entityType, entityId) => {
+    switch (entityType) {
+      case 'character': setActiveCharId(entityId); setView('character'); break;
+      case 'object':    setActiveObjectId(entityId); setView('object'); break;
+      case 'faction':   setActiveFactionId(entityId); setView('faction'); break;
+      case 'location':  setActiveLocationId(entityId); setView('location'); break;
+      case 'lore':      setActiveLoreDocId(entityId); setView('loreExpand'); break;
+      default: break;
+    }
+  };
+
+  const handleCreateFromRef = ({ entityType, name, sourceText, sourceEntityType, sourceEntityId, sourceFieldKey }) => {
+    const sourceEntity = findEntityInWorld(activeWorld, sourceEntityType, sourceEntityId);
+    const sourceName = sourceEntity?.name ?? sourceEntity?.title ?? '';
+    setCreateRefContext({ name, sourceText, sourceName, sourceType: sourceEntityType, sourceFieldKey });
+    switch (entityType) {
+      case 'character': setGenError(null); setView('createCharacter'); break;
+      case 'object':    setView('createObject'); break;
+      case 'faction':   setView('createFaction'); break;
+      case 'location':  setView('createLocation'); break;
+      default: break;
+    }
+  };
+
   const handleResetStorage = () => {
     resetStorage();
     window.location.reload();
@@ -339,6 +376,8 @@ export default function App() {
             onSelectFaction={(id) => { setActiveFactionId(id); setView("faction"); }}
             onNewLocation={() => setView("createLocation")}
             onSelectLocation={(id) => { setActiveLocationId(id); setView("location"); }}
+            onNavigate={navigate}
+            onCreateFromRef={handleCreateFromRef}
           />
         )}
 
@@ -354,13 +393,15 @@ export default function App() {
           <>
             <CreateCharacterScreen
               world={activeWorld}
-              onBack={() => { handleNavigateAway(); setCreateCharInitialPitch(""); setView("world"); }}
+              onBack={() => { handleNavigateAway(); setCreateCharInitialPitch(""); setCreateRefContext(null); setView("world"); }}
               onStartGenerating={handleStartGenerating}
               onGenerated={handleGenerated}
               onError={handleGenError}
               onChunk={setGenAccumulated}
               signal={abortRef.current?.signal}
               initialPitch={createCharInitialPitch}
+              refContext={createRefContext}
+              onRefContextConsumed={() => setCreateRefContext(null)}
             />
             {genError && (
               <div style={{ position: "fixed", bottom: "9rem", left: "1.25rem", right: "1.25rem", zIndex: 500, maxWidth: "420px", margin: "0 auto" }}>
@@ -380,6 +421,8 @@ export default function App() {
             isExpanding={expanding}
             charTab={activeCharTab}
             onTabChange={setActiveCharTab}
+            onNavigate={navigate}
+            onCreateFromRef={handleCreateFromRef}
           />
         )}
 
@@ -402,6 +445,8 @@ export default function App() {
             onBack={() => setView("scene")}
             onSaveDialogue={handleSaveDialogue}
             onUpdateCharacter={updateWorldCharacter}
+            onNavigate={navigate}
+            onCreateFromRef={handleCreateFromRef}
           />
         )}
 
@@ -421,8 +466,10 @@ export default function App() {
         {view === "createObject" && activeWorld && (
           <CreateObjectScreen
             world={activeWorld}
-            onBack={() => setView("world")}
+            onBack={() => { setCreateRefContext(null); setView("world"); }}
             onSave={(o) => { addObject(o); setActiveObjectId(o.id); setView("object"); }}
+            refContext={createRefContext}
+            onRefContextConsumed={() => setCreateRefContext(null)}
           />
         )}
 
@@ -434,6 +481,8 @@ export default function App() {
               world={activeWorld}
               onBack={() => { setWorldToolView("objects"); setView("world"); }}
               onUpdate={updateObject}
+              onNavigate={navigate}
+              onCreateFromRef={handleCreateFromRef}
             />
           ) : null;
         })()}
@@ -441,8 +490,10 @@ export default function App() {
         {view === "createFaction" && activeWorld && (
           <CreateFactionScreen
             world={activeWorld}
-            onBack={() => setView("world")}
+            onBack={() => { setCreateRefContext(null); setView("world"); }}
             onSave={(f) => { addFaction(f); setActiveFactionId(f.id); setView("faction"); }}
+            refContext={createRefContext}
+            onRefContextConsumed={() => setCreateRefContext(null)}
           />
         )}
 
@@ -454,6 +505,8 @@ export default function App() {
               world={activeWorld}
               onBack={() => { setWorldToolView("factions"); setView("world"); }}
               onUpdate={updateFaction}
+              onNavigate={navigate}
+              onCreateFromRef={handleCreateFromRef}
             />
           ) : null;
         })()}
@@ -461,8 +514,10 @@ export default function App() {
         {view === "createLocation" && activeWorld && (
           <CreateLocationScreen
             world={activeWorld}
-            onBack={() => setView("world")}
+            onBack={() => { setCreateRefContext(null); setView("world"); }}
             onSave={(l) => { addLocation(l); setActiveLocationId(l.id); setView("location"); }}
+            refContext={createRefContext}
+            onRefContextConsumed={() => setCreateRefContext(null)}
           />
         )}
 
@@ -474,6 +529,8 @@ export default function App() {
               world={activeWorld}
               onBack={() => { setWorldToolView("locations"); setView("world"); }}
               onUpdate={updateLocation}
+              onNavigate={navigate}
+              onCreateFromRef={handleCreateFromRef}
             />
           ) : null;
         })()}
