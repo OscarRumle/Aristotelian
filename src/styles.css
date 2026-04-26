@@ -998,6 +998,13 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
 
   /* ── D-01 WorldHub ── */
   .wh-page{max-width:1200px;}
+
+  /* ── D-02 WorldDetail + D-05 CharactersTab ── */
+  .wd-page{max-width:1200px;}
+  .wd-page .t-heading{font-size:2.8rem;}
+  .wd-page .t-body{font-size:1rem;line-height:1.85;}
+  .wd-page .card-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:1rem;}
+  .wd-page .world-library-body{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:1rem;}
   .wh-new-btn{display:inline-flex;}
   .wh-page .card-list{
     display:grid;
