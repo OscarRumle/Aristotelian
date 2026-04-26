@@ -1,5 +1,5 @@
-export function buildFieldExpandPrompt(entityType, entity, world, fieldKey, mode, direction = "") {
-  const currentValue = entity[fieldKey];
+export function buildFieldExpandPrompt(entityType, entity, world, fieldKey, mode, direction = "", currentValue = null) {
+  if (currentValue === null) currentValue = entity[fieldKey];
   const directionClause = direction.trim()
     ? `Direction from the user: "${direction.trim()}"`
     : `No direction given — use your judgment about what would enrich this content.`;

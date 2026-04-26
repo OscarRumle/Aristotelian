@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { callClaude } from "../api/claude.js";
+import { buildEntityRegenPrompt } from "../prompts/entityRegen.js";
+import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
+import { CharField } from "./CharField.jsx";
+import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 
 function DetailPill({ label, value }) {
@@ -10,12 +16,87 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function ObjectDetail({ object, world, onBack }) {
-  const gen = object.generated;
+export function ObjectDetail({ object, world, onBack, onUpdate }) {
+  const gen = object.generated ?? {};
   const charAssocs = (object.associations ?? []).filter((a) => a.kind === "character");
-
   const typeFieldEntries = Object.entries(object.typeSpecificFields ?? {}).filter(([, v]) => v && v !== "_custom");
   const customNote = object.typeSpecificFields?._custom;
+
+  const [regenningKey, setRegenningKey] = useState(null);
+  const [regenError, setRegenError] = useState(null);
+
+  const saveField = (fieldKey, value) => {
+    onUpdate({ ...object, generated: { ...gen, [fieldKey]: value } });
+  };
+
+  const regen = async (fieldKey) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, object, "object", fieldKey, gen[fieldKey]),
+        `Regenerate ${fieldKey}`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const regenWithFeedback = async (fieldKey, feedback) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, object, "object", fieldKey, gen[fieldKey], feedback),
+        `Regenerate ${fieldKey} with feedback`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const expandField = async (fieldKey, mode, direction) => {
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildFieldExpandPrompt("object", object, world, fieldKey, mode, direction, gen[fieldKey]),
+        `Expand ${fieldKey}`,
+        { maxTokens: 800 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't expand. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    }
+  };
+
+  const F = (label, fieldKey) => (
+    <CharField
+      label={label}
+      value={gen[fieldKey]}
+      fieldKey={fieldKey}
+      onRegen={regen}
+      onRegenWithFeedback={regenWithFeedback}
+      onSave={saveField}
+      onConfirm={saveField}
+      onExpand={expandField}
+      canExpand
+      regenningKey={regenningKey}
+    />
+  );
 
   return (
     <div className="screen obj-det-page" style={{ paddingBottom: "5rem" }}>
@@ -29,7 +110,7 @@ export function ObjectDetail({ object, world, onBack }) {
           </span>
         )}
         <h1 className="t-heading">{object.name || "Unnamed Object"}</h1>
-        {gen?.signature_line && (
+        {gen.signature_line && (
           <p className="obj-output-sig" style={{ marginTop: ".35rem" }}>
             "{gen.signature_line}"
           </p>
@@ -38,25 +119,16 @@ export function ObjectDetail({ object, world, onBack }) {
 
       <div className="divider" />
 
-      {gen?.description && (
-        <div className="cs-section">
-          <div className="cs-section-title">Description</div>
-          <p className="cs-field-body">{gen.description}</p>
-        </div>
-      )}
+      {regenError && <ErrorToast message={regenError} />}
 
-      {gen?.provenance && (
-        <div className="cs-section">
-          <div className="cs-section-title">Provenance</div>
-          <p className="cs-field-body">{gen.provenance}</p>
-        </div>
+      {gen.description && (
+        <div className="cs-section">{F("Description", "description")}</div>
       )}
-
-      {gen?.dramatic_weight && (
-        <div className="cs-section">
-          <div className="cs-section-title">Dramatic Weight</div>
-          <p className="cs-field-body">{gen.dramatic_weight}</p>
-        </div>
+      {gen.provenance && (
+        <div className="cs-section">{F("Provenance", "provenance")}</div>
+      )}
+      {gen.dramatic_weight && (
+        <div className="cs-section">{F("Dramatic Weight", "dramatic_weight")}</div>
       )}
 
       {(object.rarity || object.era || object.condition || typeFieldEntries.length > 0 || customNote) && (
@@ -84,16 +156,11 @@ export function ObjectDetail({ object, world, onBack }) {
               return (
                 <div key={a.id} className="obj-assoc-row">
                   <div className="assoc-char-top">
-                    <div
-                      className="assoc-char-swatch"
-                      style={{ background: char.color || "var(--amber)" }}
-                    />
+                    <div className="assoc-char-swatch" style={{ background: char.color || "var(--amber)" }} />
                     <span className="assoc-char-name">{char.name}</span>
                   </div>
                   {a.note && (
-                    <p className="cs-field-body" style={{ marginTop: ".3rem", paddingLeft: "1.5rem" }}>
-                      {a.note}
-                    </p>
+                    <p className="cs-field-body" style={{ marginTop: ".3rem", paddingLeft: "1.5rem" }}>{a.note}</p>
                   )}
                 </div>
               );

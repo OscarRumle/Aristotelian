@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { callClaude } from "../api/claude.js";
+import { buildEntityRegenPrompt } from "../prompts/entityRegen.js";
+import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
+import { CharField } from "./CharField.jsx";
+import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 
 function DetailPill({ label, value }) {
@@ -10,13 +16,88 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function FactionDetail({ faction, world, onBack }) {
-  const gen = faction.generated;
+export function FactionDetail({ faction, world, onBack, onUpdate }) {
+  const gen = faction.generated ?? {};
   const charAssocs     = (faction.associations ?? []).filter((a) => a.kind === "character");
   const locationAssocs = (faction.associations ?? []).filter((a) => a.kind === "location");
-
   const typeFieldEntries = Object.entries(faction.typeSpecificFields ?? {}).filter(([k, v]) => v && k !== "_custom");
   const customNote = faction.typeSpecificFields?._custom;
+
+  const [regenningKey, setRegenningKey] = useState(null);
+  const [regenError, setRegenError] = useState(null);
+
+  const saveField = (fieldKey, value) => {
+    onUpdate({ ...faction, generated: { ...gen, [fieldKey]: value } });
+  };
+
+  const regen = async (fieldKey) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, faction, "faction", fieldKey, gen[fieldKey]),
+        `Regenerate ${fieldKey}`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const regenWithFeedback = async (fieldKey, feedback) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, faction, "faction", fieldKey, gen[fieldKey], feedback),
+        `Regenerate ${fieldKey} with feedback`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const expandField = async (fieldKey, mode, direction) => {
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildFieldExpandPrompt("faction", faction, world, fieldKey, mode, direction, gen[fieldKey]),
+        `Expand ${fieldKey}`,
+        { maxTokens: 800 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't expand. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    }
+  };
+
+  const F = (label, fieldKey) => (
+    <CharField
+      label={label}
+      value={gen[fieldKey]}
+      fieldKey={fieldKey}
+      onRegen={regen}
+      onRegenWithFeedback={regenWithFeedback}
+      onSave={saveField}
+      onConfirm={saveField}
+      onExpand={expandField}
+      canExpand
+      regenningKey={regenningKey}
+    />
+  );
 
   return (
     <div className="screen fac-det-page" style={{ paddingBottom: "5rem" }}>
@@ -30,7 +111,7 @@ export function FactionDetail({ faction, world, onBack }) {
           </span>
         )}
         <h1 className="t-heading">{faction.name || "Unnamed Faction"}</h1>
-        {gen?.motto && (
+        {gen.motto && (
           <p className="fac-output-sig" style={{ marginTop: ".35rem" }}>
             "{gen.motto}"
           </p>
@@ -39,31 +120,33 @@ export function FactionDetail({ faction, world, onBack }) {
 
       <div className="divider" />
 
-      {gen?.description && (
-        <div className="cs-section">
-          <div className="cs-section-title">Description</div>
-          <p className="cs-field-body">{gen.description}</p>
-        </div>
-      )}
+      {regenError && <ErrorToast message={regenError} />}
 
-      {gen?.history && (
-        <div className="cs-section">
-          <div className="cs-section-title">History</div>
-          <p className="cs-field-body">{gen.history}</p>
-        </div>
+      {gen.description && (
+        <div className="cs-section">{F("Description", "description")}</div>
       )}
-
-      {gen?.dramatic_role && (
-        <div className="cs-section">
-          <div className="cs-section-title">Dramatic Role</div>
-          <p className="cs-field-body">{gen.dramatic_role}</p>
-        </div>
+      {gen.history && (
+        <div className="cs-section">{F("History", "history")}</div>
       )}
-
-      {gen?.internal_tension && (
+      {gen.dramatic_role && (
+        <div className="cs-section">{F("Dramatic Role", "dramatic_role")}</div>
+      )}
+      {gen.internal_tension && (
         <div className="cs-section">
-          <div className="cs-section-title">Internal Tension</div>
-          <p className="cs-field-body fac-output-tension">{gen.internal_tension}</p>
+          <CharField
+            label="Internal Tension"
+            value={gen.internal_tension}
+            fieldKey="internal_tension"
+            onRegen={regen}
+            onRegenWithFeedback={regenWithFeedback}
+            onSave={saveField}
+            onConfirm={saveField}
+            onExpand={expandField}
+            canExpand
+            regenningKey={regenningKey}
+          >
+            <p className="cs-field-body fac-output-tension">{gen.internal_tension}</p>
+          </CharField>
         </div>
       )}
 

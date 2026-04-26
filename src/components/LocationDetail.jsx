@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { callClaude } from "../api/claude.js";
+import { buildEntityRegenPrompt } from "../prompts/entityRegen.js";
+import { buildFieldExpandPrompt } from "../prompts/fieldExpand.js";
+import { CharField } from "./CharField.jsx";
+import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 
 function DetailPill({ label, value }) {
@@ -10,13 +16,88 @@ function DetailPill({ label, value }) {
   );
 }
 
-export function LocationDetail({ location, world, onBack }) {
-  const gen = location.generated;
+export function LocationDetail({ location, world, onBack, onUpdate }) {
+  const gen = location.generated ?? {};
   const charAssocs    = (location.associations ?? []).filter((a) => a.kind === "character");
   const factionAssocs = (location.associations ?? []).filter((a) => a.kind === "faction");
-
   const typeFieldEntries = Object.entries(location.typeSpecificFields ?? {}).filter(([k, v]) => v && k !== "_custom");
   const customNote = location.typeSpecificFields?._custom;
+
+  const [regenningKey, setRegenningKey] = useState(null);
+  const [regenError, setRegenError] = useState(null);
+
+  const saveField = (fieldKey, value) => {
+    onUpdate({ ...location, generated: { ...gen, [fieldKey]: value } });
+  };
+
+  const regen = async (fieldKey) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, location, "location", fieldKey, gen[fieldKey]),
+        `Regenerate ${fieldKey}`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const regenWithFeedback = async (fieldKey, feedback) => {
+    setRegenningKey(fieldKey);
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildEntityRegenPrompt(world, location, "location", fieldKey, gen[fieldKey], feedback),
+        `Regenerate ${fieldKey} with feedback`,
+        { maxTokens: 600 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't regenerate. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    } finally {
+      setRegenningKey(null);
+    }
+  };
+
+  const expandField = async (fieldKey, mode, direction) => {
+    setRegenError(null);
+    try {
+      const text = await callClaude(
+        buildFieldExpandPrompt("location", location, world, fieldKey, mode, direction, gen[fieldKey]),
+        `Expand ${fieldKey}`,
+        { maxTokens: 800 }
+      );
+      return text.trim();
+    } catch {
+      setRegenError("Couldn't expand. Try again.");
+      setTimeout(() => setRegenError(null), 5000);
+      return null;
+    }
+  };
+
+  const F = (label, fieldKey) => (
+    <CharField
+      label={label}
+      value={gen[fieldKey]}
+      fieldKey={fieldKey}
+      onRegen={regen}
+      onRegenWithFeedback={regenWithFeedback}
+      onSave={saveField}
+      onConfirm={saveField}
+      onExpand={expandField}
+      canExpand
+      regenningKey={regenningKey}
+    />
+  );
 
   return (
     <div className="screen loc-det-page" style={{ paddingBottom: "5rem" }}>
@@ -30,7 +111,7 @@ export function LocationDetail({ location, world, onBack }) {
           </span>
         )}
         <h1 className="t-heading">{location.name || "Unnamed Location"}</h1>
-        {gen?.signature_line && (
+        {gen.signature_line && (
           <p className="loc-output-sig" style={{ marginTop: ".35rem" }}>
             "{gen.signature_line}"
           </p>
@@ -39,25 +120,16 @@ export function LocationDetail({ location, world, onBack }) {
 
       <div className="divider" />
 
-      {gen?.description && (
-        <div className="cs-section">
-          <div className="cs-section-title">Description</div>
-          <p className="cs-field-body">{gen.description}</p>
-        </div>
-      )}
+      {regenError && <ErrorToast message={regenError} />}
 
-      {gen?.history && (
-        <div className="cs-section">
-          <div className="cs-section-title">History</div>
-          <p className="cs-field-body">{gen.history}</p>
-        </div>
+      {gen.description && (
+        <div className="cs-section">{F("Description", "description")}</div>
       )}
-
-      {gen?.dramatic_role && (
-        <div className="cs-section">
-          <div className="cs-section-title">Dramatic Role</div>
-          <p className="cs-field-body">{gen.dramatic_role}</p>
-        </div>
+      {gen.history && (
+        <div className="cs-section">{F("History", "history")}</div>
+      )}
+      {gen.dramatic_role && (
+        <div className="cs-section">{F("Dramatic Role", "dramatic_role")}</div>
       )}
 
       {(location.scale || location.status || location.access || typeFieldEntries.length > 0 || customNote) && (
