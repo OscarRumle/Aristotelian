@@ -275,15 +275,9 @@ export function WorldDetail({
   }
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
-  const tools = [
-    {
-      id: "characters",
-      name: "Characters",
-      description: "Build your cast using the Aristotelian framework",
-      count: world.characters.length,
-      unit: world.characters.length === 1 ? "character" : "characters",
-      onClick: () => onSetToolView("characters"),
-    },
+  const charCount = world.characters.length;
+
+  const worldBuildingTools = [
     {
       id: "scenes",
       name: "Scenes",
@@ -347,15 +341,29 @@ export function WorldDetail({
       </div>
       <div className="divider" />
 
-      {/* Tools grid */}
+      {/* Characters — primary tool */}
       <div className="tools-section">
-        <p className="tools-section-label">Tools</p>
+        <p className="tools-section-label">Characters</p>
+        <button type="button" className="tool-card tool-card-primary" onClick={() => onSetToolView("characters")}>
+          <div className="tool-card-header">
+            <span className="tool-card-name">Cast</span>
+            {charCount > 0 && (
+              <span className="tool-card-count">{charCount} {charCount === 1 ? "character" : "characters"}</span>
+            )}
+          </div>
+          <p className="tool-card-desc">Build your cast using the Aristotelian framework</p>
+        </button>
+      </div>
+
+      {/* World Building — secondary tools */}
+      <div className="tools-section">
+        <p className="tools-section-label">World Building</p>
         <div className="tools-grid">
-          {tools.map((tool) => (
+          {worldBuildingTools.map((tool) => (
             <button key={tool.id} type="button" className="tool-card" onClick={tool.onClick}>
               <div className="tool-card-header">
                 <span className="tool-card-name">{tool.name}</span>
-                {tool.count !== null && tool.count > 0 && (
+                {tool.count > 0 && (
                   <span className="tool-card-count">{tool.count} {tool.unit}</span>
                 )}
               </div>
@@ -378,7 +386,7 @@ export function WorldDetail({
         {confirmDelete ? (
           <div className="delete-confirm">
             <p className="delete-confirm-msg">
-              Delete <strong>{world.name}</strong> and all {world.characters.length} character{world.characters.length !== 1 ? "s" : ""}? This cannot be undone.
+              Delete <strong>{world.name}</strong> and all {charCount} character{charCount !== 1 ? "s" : ""}? This cannot be undone.
             </p>
             <div className="delete-confirm-actions">
               <button type="button" className="btn btn-destroy" onClick={() => onDelete(world.id)}>
@@ -390,9 +398,14 @@ export function WorldDetail({
             </div>
           </div>
         ) : (
-          <button type="button" className="btn-delete-world" onClick={() => setConfirmDelete(true)}>
-            Delete world
-          </button>
+          <>
+            <button type="button" className="btn btn-primary" onClick={onNewCharacter}>
+              + New Character
+            </button>
+            <button type="button" className="btn-delete-world" onClick={() => setConfirmDelete(true)}>
+              Delete world
+            </button>
+          </>
         )}
       </BottomBar>
     </div>

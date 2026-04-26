@@ -46,6 +46,7 @@ export default function App() {
   const [createCharInitialPitch, setCreateCharInitialPitch] = useState("");
   const [worldToolView, setWorldToolView] = useState(null);
   const [activeLoreDocId, setActiveLoreDocId] = useState(null);
+  const [activeCharTab, setActiveCharTab] = useState("overview");
 
   const abortRef = useRef(null);
 
@@ -66,13 +67,17 @@ export default function App() {
     if (!loaded) return;
     saveWorlds(worlds);
     setJustSaved(true);
-    const t = setTimeout(() => setJustSaved(false), 1200);
+    const t = setTimeout(() => setJustSaved(false), 2500);
     return () => clearTimeout(t);
   }, [worlds, loaded]);
 
   useEffect(() => {
     return () => { abortRef.current?.abort(); };
   }, []);
+
+  useEffect(() => {
+    setActiveCharTab("overview");
+  }, [activeCharId]);
 
   const addWorld = (w) => setWorlds((p) => [...p, w]);
   const deleteWorld = (id) => setWorlds((p) => p.filter((w) => w.id !== id));
@@ -277,7 +282,7 @@ export default function App() {
       )}
 
       {generating && (
-        <GeneratingOverlay phaseIdx={phaseIdx} doneIds={doneIds} verb={verb} justDone={justDone} />
+        <GeneratingOverlay phaseIdx={phaseIdx} doneIds={doneIds} verb={verb} justDone={justDone} onCancel={handleNavigateAway} />
       )}
 
       {castAnalysisOpen && activeWorld && (
@@ -358,7 +363,7 @@ export default function App() {
               initialPitch={createCharInitialPitch}
             />
             {genError && (
-              <div style={{ position: "fixed", bottom: "7rem", left: "1.25rem", right: "1.25rem", zIndex: 500, maxWidth: "420px", margin: "0 auto" }}>
+              <div style={{ position: "fixed", bottom: "9rem", left: "1.25rem", right: "1.25rem", zIndex: 500, maxWidth: "420px", margin: "0 auto" }}>
                 <ErrorToast message={genError} onRetry={() => setGenError(null)} />
               </div>
             )}
@@ -373,6 +378,8 @@ export default function App() {
             onUpdate={updateCharacter}
             onExpand={handleExpand}
             isExpanding={expanding}
+            charTab={activeCharTab}
+            onTabChange={setActiveCharTab}
           />
         )}
 

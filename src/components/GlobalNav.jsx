@@ -28,14 +28,14 @@ export function GlobalNav({ route, navigate, theme, toggleTheme }) {
     <>
       <nav className="gnav" role="navigation" aria-label="Primary">
         <div className="gnav-inner">
-          <div className="gnav-brand" onClick={() => go("home")} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && go("home")}>
+          <button className="gnav-brand" type="button" onClick={() => go("home")}>
             <span className="gnav-brand-mark" aria-hidden="true" />
             <span>Aristotelian</span>
-          </div>
+          </button>
 
           <div className="gnav-links">
-            <button className={`gnav-link ${is("home") ? "active" : ""}`} onClick={() => go("home")}>Home</button>
-            <button className={`gnav-link ${is("design") ? "active" : ""}`} onClick={() => go("design")}>Design</button>
+            {!user && <button className={`gnav-link ${is("home") ? "active" : ""}`} onClick={() => go("home")}>Home</button>}
+            <button className={`gnav-link ${is("design") ? "active" : ""}`} onClick={() => go("design")}>Worlds</button>
             <button className={`gnav-link ${is("plans") ? "active" : ""}`} onClick={() => go("plans")}>Plans</button>
           </div>
 
@@ -98,8 +98,8 @@ export function GlobalNav({ route, navigate, theme, toggleTheme }) {
 
       {mobileOpen && (
         <div className="gnav-sheet">
-          <button className={`gnav-link ${is("home") ? "active" : ""}`} onClick={() => go("home")}>Home</button>
-          <button className={`gnav-link ${is("design") ? "active" : ""}`} onClick={() => go("design")}>Design</button>
+          {!user && <button className={`gnav-link ${is("home") ? "active" : ""}`} onClick={() => go("home")}>Home</button>}
+          <button className={`gnav-link ${is("design") ? "active" : ""}`} onClick={() => go("design")}>Worlds</button>
           <button className={`gnav-link ${is("plans") ? "active" : ""}`} onClick={() => go("plans")}>Plans</button>
         </div>
       )}

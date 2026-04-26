@@ -121,6 +121,7 @@ export function CharField({
               type="button"
               className="icon-btn"
               aria-label={`Expand ${label}`}
+              title={`Expand ${label}`}
               onClick={() => setExpandOpen(true)}
             >
               ✦
@@ -131,6 +132,7 @@ export function CharField({
               type="button"
               className="icon-btn"
               aria-label={`Give feedback on ${label}`}
+              title={`Give feedback on ${label}`}
               onClick={() => { setFeedbackOpen((p) => !p); setFeedbackText(""); }}
             >
               ✎
@@ -141,6 +143,7 @@ export function CharField({
               type="button"
               className="icon-btn"
               aria-label={`Regenerate ${label}`}
+              title={`Regenerate ${label}`}
               onClick={handleRegen}
             >
               ↻

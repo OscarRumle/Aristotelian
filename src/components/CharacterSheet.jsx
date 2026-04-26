@@ -19,7 +19,7 @@ function LockedSection({ title, fields, character, onExpand, isExpanding }) {
           {character[key] ? (
             <p className="cs-field-body">{character[key]}</p>
           ) : (
-            <span className="locked-msg">Not generated — expand this character to unlock.</span>
+            <span className="locked-msg">Use ✦ Expand Character below to unlock.</span>
           )}
         </div>
       ))}
@@ -43,8 +43,9 @@ function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   );
 }
 
-export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding }) {
-  const [tab, setTab] = useState("overview");
+export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange }) {
+  const tab = charTab ?? "overview";
+  const setTab = onTabChange ?? (() => {});
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -185,7 +186,12 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
         {/* ── LEFT SIDEBAR ── character identity ── */}
         <aside className="cs-sidebar">
           <div className="char-header">
-            <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>
+            <nav className="char-breadcrumb" aria-label="Breadcrumb">
+              <span>Worlds</span>
+              <span className="char-breadcrumb-sep" aria-hidden="true">›</span>
+              <span>{world.name}</span>
+            </nav>
+            <button type="button" className="back-btn" onClick={onBack}>← Back</button>
             {editingName ? (
               <input
                 className="char-name-input"

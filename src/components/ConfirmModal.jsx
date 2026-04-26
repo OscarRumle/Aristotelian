@@ -12,11 +12,15 @@ import { useEffect } from "react";
  */
 export function ConfirmModal({ title, message, actions, onClose }) {
   useEffect(() => {
+    const trigger = document.activeElement;
     function onKey(e) {
       if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      trigger?.focus();
+    };
   }, [onClose]);
 
   return (

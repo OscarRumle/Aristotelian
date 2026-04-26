@@ -1,17 +1,14 @@
-import { BottomBar } from "./BottomBar.jsx";
 import { EmptyState } from "./EmptyState.jsx";
 
 export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
   return (
-    <div className="screen wh-page" style={{ paddingBottom: "5rem" }}>
+    <div className="screen wh-page">
       <div className="page-head">
         <span className="t-eyebrow">Aristotelian</span>
         <h1 className="t-display">Your Worlds</h1>
-        {worlds.length > 0 && (
-          <button type="button" className="btn btn-ghost wh-new-btn" onClick={onNewWorld}>
-            + New World
-          </button>
-        )}
+        <button type="button" className="btn btn-primary wh-new-btn" onClick={onNewWorld}>
+          + New World
+        </button>
       </div>
       <div className="divider" />
       {worlds.length === 0 ? (
@@ -39,11 +36,6 @@ export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
           ))}
         </div>
       )}
-      <BottomBar>
-        <button type="button" className="btn btn-primary" onClick={onNewWorld}>
-          + New World
-        </button>
-      </BottomBar>
     </div>
   );
 }

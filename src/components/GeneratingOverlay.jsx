@@ -3,7 +3,7 @@ import { PHASES } from "../constants.js";
 import { AnimatedDots } from "./AnimatedDots.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 
-export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone }) {
+export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone, onCancel }) {
   const [typed, setTyped] = useState(false);
   useEffect(() => setTyped(false), [verb]);
   const color = justDone ? "var(--sage)" : "var(--amber)";
@@ -22,6 +22,11 @@ export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone }) {
         </p>
         <p className="gen-phase-name">{PHASES[phaseIdx]?.label}</p>
       </div>
+      {onCancel && (
+        <button type="button" className="gen-cancel-btn" onClick={onCancel}>
+          Cancel
+        </button>
+      )}
     </div>
   );
 }
