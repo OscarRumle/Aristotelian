@@ -228,7 +228,7 @@ export function CreateLocationScreen({ world, onBack, onSave }) {
   const factions   = world.factions   ?? [];
 
   return (
-    <div className="screen" style={{ paddingBottom: "6rem" }}>
+    <div className="screen cls-page" style={{ paddingBottom: "6rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>

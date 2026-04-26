@@ -114,7 +114,7 @@ export function LoreExpandInterview({ world, doc, onDone, onBack }) {
 
   if (step === "error") {
     return (
-      <div className="screen" style={{ paddingBottom: "5rem" }}>
+      <div className="screen lei-page" style={{ paddingBottom: "5rem" }}>
         <div className="page-head">
           <div className="page-head-nav">
             <button type="button" className="back-btn" onClick={onBack}>← Lore</button>
@@ -131,7 +131,7 @@ export function LoreExpandInterview({ world, doc, onDone, onBack }) {
   }
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen lei-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Lore</button>

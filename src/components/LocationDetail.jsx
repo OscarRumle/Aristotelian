@@ -19,7 +19,7 @@ export function LocationDetail({ location, world, onBack }) {
   const customNote = location.typeSpecificFields?._custom;
 
   return (
-    <div className="screen" style={{ paddingBottom: "5rem" }}>
+    <div className="screen loc-det-page" style={{ paddingBottom: "5rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>

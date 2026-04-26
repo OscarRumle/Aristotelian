@@ -228,7 +228,7 @@ export function CreateFactionScreen({ world, onBack, onSave }) {
   const locations  = world.locations  ?? [];
 
   return (
-    <div className="screen" style={{ paddingBottom: "6rem" }}>
+    <div className="screen cfs-page" style={{ paddingBottom: "6rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>

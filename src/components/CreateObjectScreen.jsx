@@ -225,7 +225,7 @@ export function CreateObjectScreen({ world, onBack, onSave }) {
   const canSave = pitch.trim().length > 0 || name.trim().length > 0;
 
   return (
-    <div className="screen" style={{ paddingBottom: "6rem" }}>
+    <div className="screen cos-page" style={{ paddingBottom: "6rem" }}>
       <div className="page-head">
         <div className="page-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← {world.name}</button>

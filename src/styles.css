@@ -1058,5 +1058,23 @@ body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--d
   .wh-page .card-name{font-size:1.3rem;}
   .wh-page .card-desc{font-size:.95rem;}
   .wh-page .card-quote{font-size:.9rem;}
+
+  /* ── LoreExpandInterview ── */
+  .lei-page{max-width:680px;}
+  .lei-page .interview-question{font-size:1.6rem;line-height:1.4;font-style:italic;font-family:var(--serif);}
+  .lei-page .f-area{font-size:1rem;}
+  .lei-page .f-label{font-size:.75rem;}
+
+  /* ── ObjectDetail / FactionDetail / LocationDetail ── */
+  .obj-det-page,.fac-det-page,.loc-det-page{max-width:820px;}
+  .obj-det-page .cs-field-body,.fac-det-page .cs-field-body,.loc-det-page .cs-field-body{font-size:1rem;line-height:1.9;}
+  .obj-det-page .cs-section-title,.fac-det-page .cs-section-title,.loc-det-page .cs-section-title{font-size:.75rem;}
+  .obj-det-page .t-heading,.fac-det-page .t-heading,.loc-det-page .t-heading{font-size:2rem;}
+
+  /* ── CreateObjectScreen / CreateFactionScreen / CreateLocationScreen ── */
+  .cos-page,.cfs-page,.cls-page{max-width:720px;}
+  .cos-page .f-label,.cfs-page .f-label,.cls-page .f-label{font-size:.75rem;}
+  .cos-page .f-input,.cos-page .f-area,.cfs-page .f-input,.cfs-page .f-area,.cls-page .f-input,.cls-page .f-area{font-size:1rem;}
+  .cos-page .obj-output-body,.cfs-page .obj-output-body,.cls-page .obj-output-body{font-size:1rem;line-height:1.9;}
 }
 .loc-output-sig{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--loc-accent);line-height:1.6;padding:.3rem 0;}
