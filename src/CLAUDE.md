@@ -33,7 +33,7 @@ React + Vite web app. All runtime code lives here.
 ### Root files
 | File | What it does |
 |---|---|
-| `App.jsx` | Root component. Owns all state: worlds, activeWorldId, route. Defines addWorld / addCharacter / updateCharacter. |
+| `App.jsx` | Root component. Owns all state: worlds, activeWorldId, route, activeCharTab. Defines addWorld / addCharacter / updateCharacter. Passes charTab + onTabChange to CharacterSheet. |
 | `Root.jsx` | Entry wrapper (auth gate + theme provider) |
 | `main.jsx` | Vite entry point |
 | `landing.jsx` | Landing page entry |

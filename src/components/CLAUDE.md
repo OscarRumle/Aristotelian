@@ -33,12 +33,12 @@
 | Component | What it does |
 |---|---|
 | `App.jsx` | *(in src/ root)* — owns all state, renders active screen via route |
-| `WorldHub.jsx` | Main screen: world list + character roster per world |
-| `WorldDetail.jsx` | World viewer/editor: description, cast, tabs for scenes/docs |
+| `WorldHub.jsx` | World list screen. Single btn-primary "+ New World" in page-head. No BottomBar. |
+| `WorldDetail.jsx` | World dashboard. Tools split: "Characters" (primary full-width card) + "World Building" (5-card grid: Scenes, Lore, Objects, Factions, Locations). Dashboard BottomBar shows "+ New Character" as primary CTA. |
 | `CreateWorldScreen.jsx` | Simple world creation form (name + description) |
 | `CreateWorldAdvanced.jsx` | AI-interview world-building flow — multi-step, uses buildInterviewPrompt |
 | `CreateCharacterScreen.jsx` | Character creation form: role, style, optional seed fields |
-| `CharacterSheet.jsx` | Full character editor/viewer. All tabs (Identity, Psychology, Aristotelian, Dialogue). Handles single-field regen inline. |
+| `CharacterSheet.jsx` | Full character editor/viewer. All tabs (Identity, Psychology, Aristotelian, Dialogue). Handles single-field regen inline. Tab state is controlled: accepts `charTab` + `onTabChange` props from App.jsx — do not add local tab state here. |
 | `CharField.jsx` | Single editable field with [?] tooltip (PHIL), regen button, label. Used throughout CharacterSheet. |
 | `CastAnalysis.jsx` | AI analysis of the full character roster — ensemble dynamics, hamartia collisions |
 | `DialogueWriter.jsx` | AI dialogue generation: pick two characters, generate a scripted scene |
@@ -46,7 +46,7 @@
 | `ScenesTab.jsx` | List of scenes within a world |
 | `DocumentLibrary.jsx` | Library of generated export documents |
 | `DocumentViewer.jsx` | Renders a single generated document |
-| `GeneratingOverlay.jsx` | Full-screen streaming progress overlay. Driven by useGeneratingProgress. |
+| `GeneratingOverlay.jsx` | Full-screen streaming progress overlay. Driven by useGeneratingProgress. Accepts `onCancel` prop — wired to AbortController in App.jsx via `handleNavigateAway`. |
 | `Typewriter.jsx` | Animated text reveal component — used in GeneratingOverlay |
 | `AnimatedVerbs.jsx` | Cycles through verb list during generation phases |
 | `AnimatedDots.jsx` | Loading ellipsis animation (BUG B-02: appends instead of cycling) |
@@ -56,4 +56,4 @@
 | `TokenCounter.jsx` | Displays estimated token usage |
 | `EmptyState.jsx` | Placeholder when list is empty |
 | `ErrorToast.jsx` | Dismissable error notification |
-| `ConfirmModal.jsx` | Confirm dialog for destructive actions |
+| `ConfirmModal.jsx` | Confirm dialog for destructive actions. Restores focus to the triggering element on close. Handles Escape key. |

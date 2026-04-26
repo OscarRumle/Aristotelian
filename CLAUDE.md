@@ -47,7 +47,25 @@ Users create **Worlds** (named fictional settings), then generate **Characters**
 - `addCharacter(c)` — appends to active world's characters
 - `updateCharacter(c)` — replaces character by id in active world
 
+Key navigation state:
+- `activeCharTab` / `setActiveCharTab` — controlled tab for CharacterSheet (passed as `charTab` + `onTabChange` props). Resets to `"overview"` via `useEffect` whenever `activeCharId` changes. **Do not add local tab state to CharacterSheet — it lives in App.jsx.**
+
 All use immutable `.map()` patterns. No external state library.
+
+---
+
+## CSS design system — color tokens
+
+`src/styles.css` uses a four-level text color hierarchy. **Never use `--faint` for readable interactive text** — it fails WCAG AA contrast (~2.1:1).
+
+| Token | Use for |
+|---|---|
+| `--dark` | Headings, primary content, active states |
+| `--label` | Interactive labels, tabs, back buttons, field labels, nav links, card CTAs |
+| `--muted` | Secondary body text, descriptions, role lines |
+| `--faint` | Decorative only — dividers, placeholders, ambient rules |
+
+Dark mode equivalent for `--label` is `--dk-muted`. See `.claude/skills/accessibility-token-hierarchy/SKILL.md` for full details.
 
 ---
 
@@ -58,6 +76,8 @@ All use immutable `.map()` patterns. No external state library.
 - Don't change `STORAGE_KEY` without bumping the version string (breaks existing user data)
 - Don't remove `MIN_PHASE_MS = 4000` — it makes the overlay legible, not just fast
 - Don't split src/ files into a monorepo or add a bundler without discussion
+- Don't use `--faint` for any text the user must read — use `--label` instead
+- Don't add local `tab` state to `CharacterSheet` — tab state lives in `App.jsx` as `activeCharTab`
 
 ---
 
