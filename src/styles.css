@@ -925,4 +925,74 @@ body.theme-dark .loc-gen-phase{color:var(--dk-faint);}
 
 .loc-output-panel{margin-top:1.5rem;padding:1.25rem 1.4rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;flex-direction:column;gap:.85rem;animation:fadeUp .4s ease both;}
 body.theme-dark .loc-output-panel{background:var(--dk-card);border-color:var(--dk-border);}
+
+/* ─────────────────────────── CHARACTER SHEET — DESKTOP LAYOUT ──────────── */
+
+/* Mobile defaults — cs-layout is just stacked blocks */
+.cs-page{padding-bottom:5rem;}
+.cs-layout{display:block;}
+.cs-sidebar{}
+.cs-main{}
+.cs-mobile-divider{margin:0;}
+.cs-fields-grid{display:flex;flex-direction:column;gap:1rem;}
+
+@media(min-width:1024px){
+  /* Override screen max-width for the character sheet */
+  .cs-page{max-width:1440px;padding:0 4rem 5rem;}
+
+  .cs-layout{
+    display:grid;
+    grid-template-columns:400px 1fr;
+    gap:0;
+    align-items:start;
+  }
+
+  /* Sticky left sidebar */
+  .cs-sidebar{
+    position:sticky;
+    top:var(--nav-h);
+    min-height:calc(100vh - var(--nav-h));
+    padding:3rem 3.5rem 3rem 0;
+    border-right:1px solid var(--border);
+  }
+  body.theme-dark .cs-sidebar{border-right-color:var(--dk-border);}
+
+  /* Right content area */
+  .cs-main{padding:3rem 0 3rem 4rem;}
+
+  /* Hide the mobile divider — sidebar border handles separation */
+  .cs-mobile-divider{display:none;}
+
+  /* Tab bar — more breathing room */
+  .cs-page .tab-bar{margin-top:0;margin-bottom:2rem;}
+  .cs-page .tab-btn{font-size:.72rem;padding:.9rem 1.2rem .8rem;}
+
+  /* Character header typography — desktop scale */
+  .cs-page .char-header{padding:0;gap:.6rem;}
+  .cs-page .char-name{font-size:3.4rem;line-height:1.02;letter-spacing:-.02em;}
+  .cs-page .char-role{font-size:1.25rem;}
+  .cs-page .char-meta{font-size:.78rem;}
+  .cs-page .char-tag{font-size:.63rem;}
+  .cs-page .char-summary{gap:.6rem;padding:.35rem 0;}
+  .cs-page .char-summary-item{font-size:.93rem;line-height:1.75;}
+  .cs-page .char-quote{font-size:1.05rem;padding:.6rem 0;}
+
+  /* Field typography — desktop scale */
+  .cs-page .cs-field-label{font-size:.7rem;}
+  .cs-page .cs-field-body{font-size:.98rem;line-height:1.85;}
+  .cs-page .cs-field-empty{font-size:.93rem;}
+  .cs-page .cs-field-regen{font-size:.92rem;}
+  .cs-page .analysis-body{font-size:.93rem;line-height:1.9;}
+  .cs-page .rel-name{font-size:1.05rem;}
+  .cs-page .rel-desc{font-size:.88rem;}
+  .cs-page .cs-feedback-input{font-size:.9rem;}
+
+  /* Two-column field grid */
+  .cs-fields-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem 3rem;
+    align-items:start;
+  }
+}
 .loc-output-sig{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--loc-accent);line-height:1.6;padding:.3rem 0;}
