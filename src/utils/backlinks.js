@@ -104,6 +104,36 @@ export function computeBacklinks(world, targetId) {
     }
   }
 
+  // Also scan explicit associations arrays
+  const assocTypeArrays = [
+    { type: 'character', entities: world.characters ?? [], nameKey: 'name' },
+    { type: 'object',    entities: world.objects ?? [],    nameKey: 'name' },
+    { type: 'faction',   entities: world.factions ?? [],   nameKey: 'name' },
+    { type: 'location',  entities: world.locations ?? [],  nameKey: 'name' },
+  ];
+  for (const { type, entities, nameKey } of assocTypeArrays) {
+    for (const entity of entities) {
+      if (entity.id === targetId) continue;
+      for (const assoc of entity.associations ?? []) {
+        if (assoc.id === targetId) {
+          const alreadyFound = results.some(
+            (r) => r.entityId === entity.id && r.fieldKey === 'associations'
+          );
+          if (!alreadyFound) {
+            results.push({
+              entityType: type,
+              entityId: entity.id,
+              entityName: entity[nameKey] ?? '',
+              fieldKey: 'associations',
+              fieldLabel: 'Connections',
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+
   return results;
 }
 

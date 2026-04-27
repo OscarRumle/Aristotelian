@@ -2,6 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { callClaudeStreaming } from "../api/claude.js";
 import { buildObjectPrompt } from "../prompts/buildObjectPrompt.js";
 import { extractJson, uid } from "../util.js";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
+import { RichText } from "./RichText.jsx";
+import { buildMentionContext } from "../utils/entityContext.js";
 import {
   OBJECT_TYPES,
   OBJECT_TYPE_FIELDS,
@@ -144,10 +148,11 @@ export function CreateObjectScreen({ world, onBack, onSave, refContext = null, o
   const [refNote, setRefNote]     = useState(null);
   const abortRef = useRef(null);
 
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
+
   useEffect(() => {
     if (!refContext) return;
     setName(refContext.name || "");
-    if (refContext.sourceText) setPitch(refContext.sourceText);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();
   }, []);
@@ -185,8 +190,9 @@ export function CreateObjectScreen({ world, onBack, onSave, refContext = null, o
     setGenAccumulated("");
     setGenerated(null);
     try {
+      const mentionContext = buildMentionContext(world, pitch);
       const raw = await callClaudeStreaming(
-        buildObjectPrompt(world, formState),
+        buildObjectPrompt(world, { ...formState, mentionContext }),
         "Generate this object.",
         { maxTokens: 1000, signal: ctrl.signal, onChunk: setGenAccumulated }
       );
@@ -259,8 +265,20 @@ export function CreateObjectScreen({ world, onBack, onSave, refContext = null, o
             rows={4}
             placeholder="A shattered blade that was never repaired, carried by someone who doesn't know what it means…"
             value={pitch}
-            onChange={(e) => setPitch(e.target.value)}
+            onChange={(e) => handleMentionChange(e, setPitch)}
+            onKeyDown={handleMentionKeyDown}
           />
+          {mentionState?.active && mentionState.query.length > 0 && (
+            <MentionAutocomplete
+              query={mentionState.query}
+              world={world}
+              anchorRect={mentionState.anchorRect}
+              selectedIdx={selectedIdx}
+              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+              onDismiss={clearMention}
+              onMoveSelection={onMoveSelection}
+            />
+          )}
         </div>
 
         <div className="divider" />
@@ -407,15 +425,15 @@ export function CreateObjectScreen({ world, onBack, onSave, refContext = null, o
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">Description</div>
-              <div className="obj-output-body">{generated.description}</div>
+              <div className="obj-output-body"><RichText text={generated.description} world={world} /></div>
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">Provenance</div>
-              <div className="obj-output-body">{generated.provenance}</div>
+              <div className="obj-output-body"><RichText text={generated.provenance} world={world} /></div>
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">Dramatic Weight</div>
-              <div className="obj-output-body">{generated.dramatic_weight}</div>
+              <div className="obj-output-body"><RichText text={generated.dramatic_weight} world={world} /></div>
             </div>
             <div className="obj-output-sig">"{generated.signature_line}"</div>
           </div>

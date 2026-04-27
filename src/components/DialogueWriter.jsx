@@ -8,6 +8,9 @@ import { ConfirmModal } from "./ConfirmModal.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 import { EditableText } from "./EditableText.jsx";
 import { RichText } from "./RichText.jsx";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
+import { buildMentionContext } from "../utils/entityContext.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -59,7 +62,7 @@ function ScriptLine({ line, color, animating, onDone, onEdit, world, onNavigate,
         {animating
           ? <Typewriter text={line.text} onDone={onDone} speed={18} />
           : onEdit
-            ? <EditableText value={line.text} onSave={onEdit} multiline className="script-line-editable" />
+            ? <EditableText value={line.text} onSave={onEdit} multiline className="script-line-editable" world={world} />
             : world && onNavigate
               ? <RichText
                   text={line.text}
@@ -92,6 +95,8 @@ function SetupScreen({ world, onGenerate, onBack }) {
   const [pitch, setPitch] = useState("");
   const [mood, setMood] = useState("");
   const [hamartiaOn, setHamartiaOn] = useState(true);
+
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
 
   const chars = world.characters;
   const selected = chars.filter((c) => selectedIds.has(c.id));
@@ -188,9 +193,21 @@ function SetupScreen({ world, onGenerate, onBack }) {
           rows={4}
           placeholder="What's this scene about? What do you imagine happening? Any context, conflict, tone, or specific beats you want."
           value={pitch}
-          onChange={(e) => setPitch(e.target.value)}
+          onChange={(e) => handleMentionChange(e, setPitch)}
+          onKeyDown={handleMentionKeyDown}
           style={{ resize: "vertical" }}
         />
+        {mentionState?.active && mentionState.query.length > 0 && (
+          <MentionAutocomplete
+            query={mentionState.query}
+            world={world}
+            anchorRect={mentionState.anchorRect}
+            selectedIdx={selectedIdx}
+            onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+            onDismiss={clearMention}
+            onMoveSelection={onMoveSelection}
+          />
+        )}
       </div>
 
       {/* Mood */}
@@ -327,6 +344,7 @@ function DialogueViewScreen({
       existingLines: baseLines,
       direction: extraDirection || direction,
       directionTarget: extraTarget || directionTarget,
+      mentionContext: buildMentionContext(world, setup.pitch),
     });
 
     let finalLines = [...baseLines];

@@ -7,6 +7,7 @@ import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
+import { AssociationsPanel } from "./AssociationsPanel.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -105,6 +106,7 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
       onExpand={expandField}
       canExpand
       regenningKey={regenningKey}
+      world={world}
     >
       {gen[fieldKey] ? (
         <RichText
@@ -163,6 +165,7 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
             onExpand={expandField}
             canExpand
             regenningKey={regenningKey}
+            world={world}
           >
             <p className="cs-field-body fac-output-tension">{gen.internal_tension}</p>
           </CharField>
@@ -225,6 +228,13 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
         </div>
       )}
 
+      <AssociationsPanel
+        entity={faction}
+        entityType="faction"
+        world={world}
+        onUpdate={(assocs) => onUpdate({ ...faction, associations: assocs })}
+        onNavigate={onNavigate}
+      />
       <ReferencedIn
         entity={faction}
         entityType="faction"

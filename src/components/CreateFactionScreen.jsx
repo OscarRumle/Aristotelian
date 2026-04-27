@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
+import { RichText } from "./RichText.jsx";
+import { buildMentionContext } from "../utils/entityContext.js";
 import { callClaudeStreaming } from "../api/claude.js";
 import { buildFactionPrompt } from "../prompts/buildFactionPrompt.js";
 import { extractJson, uid } from "../util.js";
@@ -144,10 +148,11 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
   const [refNote, setRefNote]     = useState(null);
   const abortRef = useRef(null);
 
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
+
   useEffect(() => {
     if (!refContext) return;
     setName(refContext.name || "");
-    if (refContext.sourceText) setPitch(refContext.sourceText);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();
   }, []);
@@ -185,8 +190,9 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
     setGenAccumulated("");
     setGenerated(null);
     try {
+      const mentionContext = buildMentionContext(world, pitch);
       const raw = await callClaudeStreaming(
-        buildFactionPrompt(world, formState),
+        buildFactionPrompt(world, { ...formState, mentionContext }),
         "Generate this faction.",
         { maxTokens: 1200, signal: ctrl.signal, onChunk: setGenAccumulated }
       );
@@ -262,8 +268,20 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
             rows={4}
             placeholder="Describe the faction — who they are, what they want, what they'd do to get it."
             value={pitch}
-            onChange={(e) => setPitch(e.target.value)}
+            onChange={(e) => handleMentionChange(e, setPitch)}
+            onKeyDown={handleMentionKeyDown}
           />
+          {mentionState?.active && mentionState.query.length > 0 && (
+            <MentionAutocomplete
+              query={mentionState.query}
+              world={world}
+              anchorRect={mentionState.anchorRect}
+              selectedIdx={selectedIdx}
+              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+              onDismiss={clearMention}
+              onMoveSelection={onMoveSelection}
+            />
+          )}
         </div>
 
         <div className="divider" />
@@ -385,20 +403,20 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">Description</div>
-              <div className="obj-output-body">{generated.description}</div>
+              <div className="obj-output-body"><RichText text={generated.description} world={world} /></div>
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">History</div>
-              <div className="obj-output-body">{generated.history}</div>
+              <div className="obj-output-body"><RichText text={generated.history} world={world} /></div>
             </div>
             <div className="obj-output-section">
               <div className="obj-output-label">Dramatic Role</div>
-              <div className="obj-output-body">{generated.dramatic_role}</div>
+              <div className="obj-output-body"><RichText text={generated.dramatic_role} world={world} /></div>
             </div>
             {generated.internal_tension && (
               <div className="obj-output-section">
                 <div className="obj-output-label">Internal Tension</div>
-                <div className="obj-output-body fac-output-tension">{generated.internal_tension}</div>
+                <div className="obj-output-body fac-output-tension"><RichText text={generated.internal_tension} world={world} /></div>
               </div>
             )}
             {generated.motto && (

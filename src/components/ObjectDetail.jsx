@@ -7,6 +7,7 @@ import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
+import { AssociationsPanel } from "./AssociationsPanel.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -104,6 +105,7 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
       onExpand={expandField}
       canExpand
       regenningKey={regenningKey}
+      world={world}
     >
       {gen[fieldKey] ? (
         <RichText
@@ -195,6 +197,13 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
         </div>
       )}
 
+      <AssociationsPanel
+        entity={object}
+        entityType="object"
+        world={world}
+        onUpdate={(assocs) => onUpdate({ ...object, associations: assocs })}
+        onNavigate={onNavigate}
+      />
       <ReferencedIn
         entity={object}
         entityType="object"

@@ -6,7 +6,7 @@ import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
  * associations: [{ kind: "character", id, note }]
  */
 export function buildObjectPrompt(world, formState) {
-  const { pitch, name, type, rarity, era, condition, typeSpecificFields = {}, associations = [] } = formState;
+  const { pitch, name, type, rarity, era, condition, typeSpecificFields = {}, associations = [], mentionContext } = formState;
 
   const lines = [];
 
@@ -73,6 +73,7 @@ export function buildObjectPrompt(world, formState) {
   lines.push(`- "signature_line": One sentence — the single most interesting thing about this object. Could be a caption, inscription, or label.`);
   lines.push(``);
 
+  if (mentionContext) lines.push(mentionContext);
   lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","provenance":"","dramatic_weight":"","signature_line":""}`);

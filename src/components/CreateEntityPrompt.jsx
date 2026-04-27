@@ -76,44 +76,39 @@ export function CreateEntityPrompt({ name: initialName, typeHint, anchorRect, on
       role="dialog"
       aria-label={`Create entity: ${entityName}`}
     >
-      <p className="create-entity-prompt-title">
-        Create <strong>"{entityName}"</strong>?
-      </p>
+      <p className="cep-title">Create <strong>"{entityName}"</strong>?</p>
 
-      <label className="create-entity-prompt-label">
-        Name
-        <input
-          ref={inputRef}
-          type="text"
-          className="create-entity-prompt-input"
-          value={entityName}
-          onChange={(e) => setEntityName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleConfirm();
-          }}
-        />
-      </label>
+      <div className="cep-fields">
+        <label className="cep-field cep-field--name">
+          <span className="cep-field-label">Name</span>
+          <input
+            ref={inputRef}
+            type="text"
+            className="cep-input"
+            value={entityName}
+            onChange={(e) => setEntityName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleConfirm(); }}
+          />
+        </label>
+        <label className="cep-field cep-field--type">
+          <span className="cep-field-label">Type</span>
+          <select
+            className="cep-select"
+            value={entityType}
+            onChange={(e) => setEntityType(e.target.value)}
+          >
+            {ENTITY_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
 
-      <label className="create-entity-prompt-label">
-        Type
-        <select
-          className="create-entity-prompt-select"
-          value={entityType}
-          onChange={(e) => setEntityType(e.target.value)}
-        >
-          {ENTITY_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>{t.label}</option>
-          ))}
-        </select>
-      </label>
-
-      <div className="create-entity-prompt-actions">
-        <button type="button" className="icon-btn" onClick={onCancel}>
-          Cancel
-        </button>
+      <div className="cep-actions">
+        <button type="button" className="cep-cancel" onClick={onCancel}>Cancel</button>
         <button
           type="button"
-          className="btn btn-primary create-entity-prompt-confirm"
+          className="cep-confirm"
           onClick={handleConfirm}
           disabled={!entityName.trim()}
         >

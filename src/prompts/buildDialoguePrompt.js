@@ -26,6 +26,7 @@ export function buildDialoguePrompt(world, participants, mentions, opts) {
     existingLines = [],
     direction = "",
     directionTarget = "@everyone",
+    mentionContext = "",
   } = opts;
 
   const participantBlock = participants
@@ -86,7 +87,7 @@ export function buildDialoguePrompt(world, participants, mentions, opts) {
   return `You are a dramatic dialogue writer working within the Aristotelian framework.
 
 ${sections}
-
+${mentionContext ? `\n${mentionContext}` : ""}
 ${REFERENCE_SYNTAX_INSTRUCTION}
 OUTPUT RULES — follow exactly:
 - Output ONLY newline-delimited JSON objects. One object per line. No array wrapper. No preamble. No explanation.

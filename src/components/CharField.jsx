@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
 import { TextReveal } from "./TextReveal.jsx";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
 
 export function CharField({
   label,
@@ -14,6 +16,7 @@ export function CharField({
   canExpand,
   regenningKey,
   philNote,
+  world,
   children,
 }) {
   const [showPhil, setShowPhil] = useState(false);
@@ -31,6 +34,8 @@ export function CharField({
 
   const [pendingValue, setPendingValue] = useState(null); // { text, type: "regen"|"expand" }
   const [settling, setSettling] = useState(false);
+
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
 
   const isRegenning = regenningKey === fieldKey;
   const isLoading = isRegenning || expandLoading;
@@ -166,9 +171,21 @@ export function CharField({
             className="cs-feedback-input"
             rows={4}
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={(e) => handleMentionChange(e, setEditValue)}
+            onKeyDown={handleMentionKeyDown}
             autoFocus
           />
+          {world && mentionState?.active && mentionState.query.length > 0 && (
+            <MentionAutocomplete
+              query={mentionState.query}
+              world={world}
+              anchorRect={mentionState.anchorRect}
+              selectedIdx={selectedIdx}
+              onSelect={(item) => selectMention(editValue, setEditValue, item.name, item.entityType)}
+              onDismiss={clearMention}
+              onMoveSelection={onMoveSelection}
+            />
+          )}
           <div className="cs-field-edit-actions">
             <button type="button" className="icon-btn" onClick={handleEditSave}>✓ Save</button>
             <button type="button" className="icon-btn" onClick={() => setEditOpen(false)}>✕ Discard</button>

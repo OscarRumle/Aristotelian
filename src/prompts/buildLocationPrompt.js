@@ -6,7 +6,7 @@ import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
  * associations: [{ kind: "character"|"faction", id, note }]
  */
 export function buildLocationPrompt(world, formState) {
-  const { pitch, name, type, scale, status, access, typeSpecificFields = {}, associations = [] } = formState;
+  const { pitch, name, type, scale, status, access, typeSpecificFields = {}, associations = [], mentionContext } = formState;
 
   const lines = [];
 
@@ -67,6 +67,7 @@ export function buildLocationPrompt(world, formState) {
   lines.push(`- "signature_line": One evocative sentence that captures the place — not a quote, more like a caption or epitaph. The single most interesting thing about being here.`);
   lines.push(``);
 
+  if (mentionContext) lines.push(mentionContext);
   lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","history":"","dramatic_role":"","signature_line":""}`);

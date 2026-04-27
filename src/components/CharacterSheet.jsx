@@ -10,6 +10,7 @@ import { ErrorToast } from "./ErrorToast.jsx";
 import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
+import { AssociationsPanel } from "./AssociationsPanel.jsx";
 
 function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   return (
@@ -168,6 +169,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
       onConfirm={confirmField}
       regenningKey={regenningKey}
       philNote={phil ? PHIL[phil] : null}
+      world={world}
     >
       {character[key] ? (
         <RichText
@@ -348,6 +350,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                       onExpand={expandField}
                       canExpand
                       regenningKey={regenningKey}
+                      world={world}
                     />
                   )}
                 </div>
@@ -385,6 +388,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                   onSave={saveField}
                   onConfirm={confirmField}
                   regenningKey={regenningKey}
+                  world={world}
                 >
                   <span className="cs-speech-tag">{character.speechMode}</span>
                 </CharField>
@@ -446,6 +450,13 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
             </div>
           )}
 
+          <AssociationsPanel
+            entity={character}
+            entityType="character"
+            world={world}
+            onUpdate={(assocs) => onUpdate({ ...character, associations: assocs })}
+            onNavigate={onNavigate}
+          />
           <ReferencedIn
             entity={character}
             entityType="character"

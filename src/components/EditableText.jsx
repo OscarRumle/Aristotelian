@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from "react";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
 
-export function EditableText({ value, onSave, multiline = false, className = "", placeholder = "" }) {
+export function EditableText({ value, onSave, multiline = false, className = "", placeholder = "", world = null }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef(null);
+
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world && multiline ? world : null);
 
   useEffect(() => {
     if (editing) {
@@ -28,14 +32,27 @@ export function EditableText({ value, onSave, multiline = false, className = "",
     return (
       <div className="editable-text-wrap">
         {multiline ? (
-          <textarea
-            ref={inputRef}
-            className={`editable-text-input ${className}`}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKey}
-            placeholder={placeholder}
-          />
+          <>
+            <textarea
+              ref={inputRef}
+              className={`editable-text-input ${className}`}
+              value={draft}
+              onChange={(e) => world ? handleMentionChange(e, setDraft) : setDraft(e.target.value)}
+              onKeyDown={(e) => { if (world) handleMentionKeyDown(e); handleKey(e); }}
+              placeholder={placeholder}
+            />
+            {world && mentionState?.active && (
+              <MentionAutocomplete
+                query={mentionState.query}
+                world={world}
+                anchorRect={mentionState.anchorRect}
+                selectedIdx={selectedIdx}
+                onSelect={(item) => selectMention(draft, setDraft, item.name, item.entityType)}
+                onDismiss={clearMention}
+                onMoveSelection={onMoveSelection}
+              />
+            )}
+          </>
         ) : (
           <input
             ref={inputRef}

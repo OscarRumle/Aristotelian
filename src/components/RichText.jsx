@@ -43,6 +43,7 @@ export function RichText({ text, world, onNavigate, onCreateFromRef, sourceConte
   }
 
   const handleResolvedClick = (entity) => {
+    clearHoverPreview();
     onNavigate?.(entity.type, entity.id);
   };
 

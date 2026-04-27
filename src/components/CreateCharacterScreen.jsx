@@ -5,6 +5,9 @@ import { extractJson, uid } from "../util.js";
 import { ROLE_OPTIONS, STYLE_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { PillSelect } from "./PillSelect.jsx";
+import { useMentionInput } from "../hooks/useMentionInput.js";
+import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
+import { buildMentionContext } from "../utils/entityContext.js";
 
 export function CreateCharacterScreen({
   world,
@@ -31,10 +34,11 @@ export function CreateCharacterScreen({
   });
   const upd = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
+  const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
+
   useEffect(() => {
     if (!refContext) return;
     setF((p) => ({ ...p, name: refContext.name || "" }));
-    if (refContext.sourceText) setPitch(refContext.sourceText);
     setShowMore(true);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();
@@ -46,10 +50,11 @@ export function CreateCharacterScreen({
   const generate = async () => {
     onStartGenerating();
     try {
+      const mentionContext = buildMentionContext(world, pitch);
       const raw = await callClaudeStreaming(
-        buildPrompt(world, world.characters, { role, style, pitch, ...f }, targetLead),
+        buildPrompt(world, world.characters, { role, style, pitch, mentionContext, ...f }, targetLead),
         "Generate the character.",
-        { maxTokens: 2000, signal, onChunk }
+        { maxTokens: 3000, signal, onChunk }
       );
       const parsed = extractJson(raw);
       if (!parsed) throw new Error("JSON");
@@ -91,8 +96,20 @@ export function CreateCharacterScreen({
             rows={5}
             placeholder="A disgraced accountant who knows too much about the wrong people's money…"
             value={pitch}
-            onChange={(e) => setPitch(e.target.value)}
+            onChange={(e) => handleMentionChange(e, setPitch)}
+            onKeyDown={handleMentionKeyDown}
           />
+          {mentionState?.active && mentionState.query.length > 0 && (
+            <MentionAutocomplete
+              query={mentionState.query}
+              world={world}
+              anchorRect={mentionState.anchorRect}
+              selectedIdx={selectedIdx}
+              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+              onDismiss={clearMention}
+              onMoveSelection={onMoveSelection}
+            />
+          )}
         </div>
 
         <PillSelect
