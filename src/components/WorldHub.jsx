@@ -20,18 +20,23 @@ export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
         <div className="card-list">
           {worlds.map((w, i) => (
             <div key={w.id} style={{ animation: `fadeUp .4s ${i * 0.06}s ease both` }}>
-              <div className="card" onClick={() => onSelectWorld(w.id)}>
-                <div className="card-top">
+              <button
+                type="button"
+                className="card card-button"
+                onClick={() => onSelectWorld(w.id)}
+                aria-label={`Enter ${w.name}`}
+              >
+                <span className="card-top">
                   <span className="card-name">{w.name}</span>
                   <span className="card-badge">
                     {w.characters.length === 0
                       ? "Empty"
                       : `${w.characters.length} character${w.characters.length !== 1 ? "s" : ""}`}
                   </span>
-                </div>
+                </span>
                 <p className="card-desc">{w.tagline || w.description}</p>
-                <span className="card-cta">Enter →</span>
-              </div>
+                <span className="card-cta" aria-hidden="true">Enter →</span>
+              </button>
             </div>
           ))}
         </div>

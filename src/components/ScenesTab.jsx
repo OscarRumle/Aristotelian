@@ -4,20 +4,23 @@ import { EmptyState } from "./EmptyState.jsx";
 function SceneCard({ scene, onClick }) {
   const count = scene.dialogues?.length ?? 0;
   return (
-    <div className="card" onClick={onClick} style={{ cursor: "pointer" }}>
-      <div className="card-top">
+    <button
+      type="button"
+      className="card card-button"
+      onClick={onClick}
+      aria-label={`Open scene: ${scene.name}`}
+    >
+      <span className="card-top">
         <span className="card-name">{scene.name}</span>
         <span className="card-badge">
           {count} {count === 1 ? "dialogue" : "dialogues"}
         </span>
-      </div>
+      </span>
       {scene.description && (
-        <p className="card-desc">
-          {scene.description}
-        </p>
+        <p className="card-desc">{scene.description}</p>
       )}
-      <span className="card-cta">Open scene →</span>
-    </div>
+      <span className="card-cta" aria-hidden="true">Open scene →</span>
+    </button>
   );
 }
 
@@ -75,14 +78,15 @@ export function ScenesTab({ scenes, onSelectScene, onAddScene }) {
             />
           </div>
           <div className="f-group">
-            <label className="f-label" htmlFor="scene-desc">Setup note (optional)</label>
-            <input
+            <label className="f-label" htmlFor="scene-desc">Premise</label>
+            <textarea
               id="scene-desc"
               className="f-input"
-              type="text"
-              placeholder="Brief context or location…"
+              rows={3}
+              placeholder="What is this scene about? Where, when, who's there, what's at stake. This becomes the starting context for every dialogue you generate inside it."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              style={{ resize: "vertical" }}
             />
           </div>
           <div style={{ display: "flex", gap: ".6rem", marginTop: ".5rem" }}>

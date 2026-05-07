@@ -90,9 +90,9 @@ function StageDirection({ text, onAutoAdvance }) {
 
 // ── Setup screen ───────────────────────────────────────────────────────────
 
-function SetupScreen({ world, onGenerate, onBack }) {
+function SetupScreen({ world, scene, onGenerate, onBack }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const [pitch, setPitch] = useState("");
+  const [pitch, setPitch] = useState(scene?.description ?? "");
   const [mood, setMood] = useState("");
   const [hamartiaOn, setHamartiaOn] = useState(true);
 
@@ -645,6 +645,7 @@ export function DialogueWriter({ world, scene, dialogueId, onBack, onSaveDialogu
     return (
       <SetupScreen
         world={world}
+        scene={scene}
         onBack={onBack}
         onGenerate={(s) => setSetup(s)}
       />

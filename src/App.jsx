@@ -425,6 +425,7 @@ export default function App() {
             isExpanding={expanding}
             charTab={activeCharTab}
             onTabChange={setActiveCharTab}
+            onSelectCharacter={(id) => setActiveCharId(id)}
             onNavigate={navigate}
             onCreateFromRef={handleCreateFromRef}
             scrollToFieldKey={navScrollToField}

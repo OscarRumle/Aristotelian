@@ -20,6 +20,7 @@ export function CharField({
   children,
 }) {
   const [showPhil, setShowPhil] = useState(false);
+  const [overflowOpen, setOverflowOpen] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editValue, setEditValue] = useState("");
@@ -96,21 +97,26 @@ export function CharField({
     setEditOpen(false);
   };
 
+  const hasOverflow = (canExpand && onExpand) || onRegenWithFeedback;
+
   return (
     <div className="cs-field">
       <div className="cs-field-head">
-        <span className="cs-field-label">{label}</span>
+        {philNote ? (
+          <button
+            type="button"
+            className="cs-field-label cs-field-label-btn"
+            aria-label={`Philosophy note for ${label}`}
+            aria-expanded={showPhil}
+            onClick={() => setShowPhil((p) => !p)}
+          >
+            {label}
+            <span className="cs-field-label-hint" aria-hidden="true">?</span>
+          </button>
+        ) : (
+          <span className="cs-field-label">{label}</span>
+        )}
         <div className="cs-field-actions">
-          {philNote && (
-            <button
-              type="button"
-              className="icon-btn"
-              aria-label={`Philosophy note for ${label}`}
-              onClick={() => setShowPhil((p) => !p)}
-            >
-              ?
-            </button>
-          )}
           {showActions && onSave && (
             <button
               type="button"
@@ -119,28 +125,6 @@ export function CharField({
               onClick={handleEditOpen}
             >
               Edit
-            </button>
-          )}
-          {showActions && canExpand && onExpand && (
-            <button
-              type="button"
-              className="icon-btn"
-              aria-label={`Expand ${label}`}
-              title={`Expand ${label}`}
-              onClick={() => setExpandOpen(true)}
-            >
-              ✦
-            </button>
-          )}
-          {showActions && onRegenWithFeedback && (
-            <button
-              type="button"
-              className="icon-btn"
-              aria-label={`Give feedback on ${label}`}
-              title={`Give feedback on ${label}`}
-              onClick={() => { setFeedbackOpen((p) => !p); setFeedbackText(""); }}
-            >
-              ✎
             </button>
           )}
           {showActions && onRegen && (
@@ -153,6 +137,47 @@ export function CharField({
             >
               ↻
             </button>
+          )}
+          {showActions && hasOverflow && (
+            <div className="cs-field-overflow">
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label={`More actions for ${label}`}
+                aria-haspopup="menu"
+                aria-expanded={overflowOpen}
+                onClick={() => setOverflowOpen((p) => !p)}
+              >
+                ⋯
+              </button>
+              {overflowOpen && (
+                <>
+                  <div className="cs-field-overflow-overlay" onClick={() => setOverflowOpen(false)} />
+                  <div className="cs-field-overflow-panel" role="menu">
+                    {onRegenWithFeedback && (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="cs-field-overflow-item"
+                        onClick={() => { setOverflowOpen(false); setFeedbackOpen(true); setFeedbackText(""); }}
+                      >
+                        ✎ Regenerate with feedback
+                      </button>
+                    )}
+                    {canExpand && onExpand && (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="cs-field-overflow-item"
+                        onClick={() => { setOverflowOpen(false); setExpandOpen(true); }}
+                      >
+                        ✦ Expand
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>

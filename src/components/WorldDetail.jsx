@@ -55,15 +55,20 @@ function CharactersPanel({ world, onSelectCharacter }) {
           const meta = metaLine(c);
           return (
             <div key={c.id} style={{ animation: `fadeUp .4s ${i * 0.06}s ease both` }}>
-              <div className="card" onClick={() => onSelectCharacter(c.id)}>
-                <div className="card-top">
+              <button
+                type="button"
+                className="card card-button"
+                onClick={() => onSelectCharacter(c.id)}
+                aria-label={`View character: ${c.name || "Unnamed"}`}
+              >
+                <span className="card-top">
                   <span className="card-name">{c.name || "Unnamed"}</span>
                   {meta && <span className="card-badge">{meta}</span>}
-                </div>
+                </span>
                 {c.role && <span className="card-role-line">{c.role}</span>}
                 {c.quote && <p className="card-quote">"{c.quote}"</p>}
-                <span className="card-cta">View character →</span>
-              </div>
+                <span className="card-cta" aria-hidden="true">View character →</span>
+              </button>
             </div>
           );
         })}
@@ -160,6 +165,7 @@ export function WorldDetail({
   onCreateFromRef,
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const scenes = world.scenes ?? [];
   const docs = world.documents ?? [];
@@ -328,8 +334,35 @@ export function WorldDetail({
     <div className="screen wd-page" style={{ paddingBottom: "5rem" }}>
       {/* Header */}
       <div className="page-head">
-        <div className="page-head-nav">
+        <div className="page-head-nav wd-head-nav">
           <button type="button" className="back-btn" onClick={onBack}>← Aristotelian</button>
+          <div className="wd-head-menu">
+            <button
+              type="button"
+              className="icon-btn wd-head-menu-trigger"
+              aria-label="World options"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((p) => !p)}
+            >
+              ⋯
+            </button>
+            {menuOpen && (
+              <>
+                <div className="wd-head-menu-overlay" onClick={() => setMenuOpen(false)} />
+                <div className="wd-head-menu-panel" role="menu">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="wd-head-menu-item wd-head-menu-item--danger"
+                    onClick={() => { setMenuOpen(false); setConfirmDelete(true); }}
+                  >
+                    Delete world…
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         <h1 className="t-heading">{world.name}</h1>
         {onUpdateWorld ? (
@@ -387,31 +420,37 @@ export function WorldDetail({
 
       {/* Bottom bar */}
       <BottomBar>
-        {confirmDelete ? (
-          <div className="delete-confirm">
-            <p className="delete-confirm-msg">
-              Delete <strong>{world.name}</strong> and all {charCount} character{charCount !== 1 ? "s" : ""}? This cannot be undone.
-            </p>
-            <div className="delete-confirm-actions">
-              <button type="button" className="btn btn-destroy" onClick={() => onDelete(world.id)}>
-                Delete
-              </button>
+        <button type="button" className="btn btn-primary btn-block" onClick={onNewCharacter}>
+          + New Character
+        </button>
+      </BottomBar>
+
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={() => setConfirmDelete(false)}>
+          <div
+            className="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-delete-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-head">
+              <h3 id="confirm-delete-title" className="modal-title">Delete this world?</h3>
+              <p className="modal-sub">
+                <strong>{world.name}</strong> and all {charCount} character{charCount !== 1 ? "s" : ""} will be removed. This cannot be undone.
+              </p>
+            </div>
+            <div className="modal-actions">
               <button type="button" className="btn btn-ghost" onClick={() => setConfirmDelete(false)}>
                 Cancel
               </button>
+              <button type="button" className="btn btn-destroy" onClick={() => onDelete(world.id)}>
+                Delete
+              </button>
             </div>
           </div>
-        ) : (
-          <>
-            <button type="button" className="btn btn-primary" onClick={onNewCharacter}>
-              + New Character
-            </button>
-            <button type="button" className="btn-delete-world" onClick={() => setConfirmDelete(true)}>
-              Delete world
-            </button>
-          </>
-        )}
-      </BottomBar>
+        </div>
+      )}
     </div>
   );
 }

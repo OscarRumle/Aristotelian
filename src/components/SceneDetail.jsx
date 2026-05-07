@@ -17,8 +17,13 @@ function DialogueCard({ dialogue, world, onClick }) {
   const lineCount = (dialogue.lines ?? []).filter((l) => l.type === "line").length;
 
   return (
-    <div className="card" onClick={onClick} style={{ cursor: "pointer" }}>
-      <div className="card-top">
+    <button
+      type="button"
+      className="card card-button"
+      onClick={onClick}
+      aria-label={`Open dialogue: ${dialogue.name || "Untitled"}`}
+    >
+      <span className="card-top">
         <span className="card-name">{dialogue.name || "Untitled"}</span>
         {dialogue.mood && (
           <span
@@ -28,9 +33,9 @@ function DialogueCard({ dialogue, world, onClick }) {
             {dialogue.mood}
           </span>
         )}
-      </div>
+      </span>
       {participants.length > 0 && (
-        <div className="dialogue-card-participants">
+        <span className="dialogue-card-participants">
           {participants.map((c) => (
             <span
               key={c.id}
@@ -40,12 +45,12 @@ function DialogueCard({ dialogue, world, onClick }) {
               {c.name}
             </span>
           ))}
-        </div>
+        </span>
       )}
-      <span className="card-cta">
+      <span className="card-cta" aria-hidden="true">
         {lineCount} {lineCount === 1 ? "exchange" : "exchanges"} · Open →
       </span>
-    </div>
+    </button>
   );
 }
 

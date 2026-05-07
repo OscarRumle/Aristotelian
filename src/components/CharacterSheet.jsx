@@ -54,7 +54,7 @@ const FIELD_TO_TAB = {
   aristotelianNote: 'aristotelian',
 };
 
-export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange, onNavigate, onCreateFromRef, scrollToFieldKey, onScrollConsumed }) {
+export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, isExpanding, charTab, onTabChange, onSelectCharacter, onNavigate, onCreateFromRef, scrollToFieldKey, onScrollConsumed }) {
   const tab = charTab ?? "overview";
   const setTab = onTabChange ?? (() => {});
   const [regenningKey, setRegenningKey] = useState(null);
@@ -265,6 +265,28 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
               </button>
             )}
           </div>
+
+          {onSelectCharacter && world.characters.length > 1 && (
+            <div className="char-switcher">
+              <p className="char-switcher-label">Other characters</p>
+              <ul className="char-switcher-list">
+                {world.characters
+                  .filter((c) => c.id !== character.id)
+                  .map((c) => (
+                    <li key={c.id}>
+                      <button
+                        type="button"
+                        className="char-switcher-item"
+                        onClick={() => onSelectCharacter(c.id)}
+                      >
+                        <span className="char-switcher-name">{c.name || "Unnamed"}</span>
+                        {c.role && <span className="char-switcher-role">{c.role}</span>}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
         </aside>
 
         {/* ── RIGHT MAIN ── tabs + content ── */}
