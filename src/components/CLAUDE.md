@@ -49,8 +49,8 @@
 | `GeneratingOverlay.jsx` | Full-screen streaming progress overlay. Driven by useGeneratingProgress. Accepts `onCancel` prop — wired to AbortController in App.jsx via `handleNavigateAway`. |
 | `Typewriter.jsx` | Animated text reveal component — used in GeneratingOverlay |
 | `AnimatedVerbs.jsx` | Cycles through verb list during generation phases |
-| `AnimatedDots.jsx` | Loading ellipsis animation (BUG B-02: appends instead of cycling) |
-| `PillSelect.jsx` | Role / Style selector. Renders pill buttons. (BUG B-03: type badge color) |
+| `AnimatedDots.jsx` | Loading ellipsis animation. Cycles 1→2→3 dots; parents (e.g. AnimatedVerbs) strip trailing `.`/`…` from base text first to prevent duplication. |
+| `PillSelect.jsx` | Role / Style selector. Renders pill buttons. |
 | `GlobalNav.jsx` | Top navigation bar. Reads route from useRoute. |
 | `BottomBar.jsx` | Fixed footer with context actions |
 | `TokenCounter.jsx` | Displays estimated token usage |
