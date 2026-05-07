@@ -279,6 +279,8 @@ function DialogueViewScreen({
   onBack,
   onSaveDialogue,
   onUpdateCharacter,
+  onNavigate,
+  onCreateFromRef,
 }) {
   const participants = setup.participantIds
     .map((id) => world.characters.find((c) => c.id === id))
@@ -660,6 +662,8 @@ export function DialogueWriter({ world, scene, dialogueId, onBack, onSaveDialogu
       onBack={onBack}
       onSaveDialogue={onSaveDialogue}
       onUpdateCharacter={onUpdateCharacter}
+      onNavigate={onNavigate}
+      onCreateFromRef={onCreateFromRef}
     />
   );
 }
