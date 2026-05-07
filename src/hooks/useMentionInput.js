@@ -166,12 +166,14 @@ export function useMentionInput(world) {
     // Enter is handled in MentionAutocomplete's onSelect via selectedIdx
   }, [mentionState, clearMention]);
 
-  const selectMention = useCallback((text, setValue, entityName, entityType) => {
+  const selectMention = useCallback((text, setValue, entityName, entityType, entityId) => {
     if (!mentionState) return;
     const { queryStart } = mentionState;
     // queryStart is the index right after @, so the @ is at queryStart-1
     const atIdx = queryStart - 1;
-    const token = `[[${entityName}]]`;
+    const token = entityId
+      ? `[[${entityId}|${entityName}|${entityType}]]`
+      : `[[${entityName}|${entityType}]]`;
     const before = text.slice(0, atIdx);
     const after = text.slice(queryStart + mentionState.query.length);
     setValue(before + token + after);

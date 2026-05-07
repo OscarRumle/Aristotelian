@@ -5,6 +5,7 @@ import { useMentionInput } from "../hooks/useMentionInput.js";
 import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
 import { RichText } from "./RichText.jsx";
 import { buildMentionContext } from "../utils/entityContext.js";
+import { buildSourceMentionContext } from "../utils/neighborhood.js";
 import { extractJson, uid } from "../util.js";
 import {
   LOCATION_TYPES,
@@ -146,12 +147,14 @@ export function CreateLocationScreen({ world, onBack, onSave, refContext = null,
   const [genError, setGenError]   = useState(null);
   const [discardConfirm, setDiscardConfirm] = useState(false);
   const [refNote, setRefNote]     = useState(null);
+  const [capturedRef, setCapturedRef] = useState(null);
   const abortRef = useRef(null);
 
   const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
 
   useEffect(() => {
     if (!refContext) return;
+    setCapturedRef(refContext);
     setName(refContext.name || "");
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
     onRefContextConsumed?.();
@@ -190,7 +193,9 @@ export function CreateLocationScreen({ world, onBack, onSave, refContext = null,
     setGenAccumulated("");
     setGenerated(null);
     try {
-      const mentionContext = buildMentionContext(world, pitch);
+      const sourceCtx = buildSourceMentionContext(capturedRef ?? refContext, world);
+      const pitchMentionCtx = buildMentionContext(world, pitch);
+      const mentionContext = [sourceCtx, pitchMentionCtx].filter(Boolean).join("\n");
       const raw = await callClaudeStreaming(
         buildLocationPrompt(world, { ...formState, mentionContext }),
         "Generate this location.",
@@ -277,7 +282,7 @@ export function CreateLocationScreen({ world, onBack, onSave, refContext = null,
               world={world}
               anchorRect={mentionState.anchorRect}
               selectedIdx={selectedIdx}
-              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType, item.id)}
               onDismiss={clearMention}
               onMoveSelection={onMoveSelection}
             />

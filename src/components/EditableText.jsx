@@ -47,7 +47,7 @@ export function EditableText({ value, onSave, multiline = false, className = "",
                 world={world}
                 anchorRect={mentionState.anchorRect}
                 selectedIdx={selectedIdx}
-                onSelect={(item) => selectMention(draft, setDraft, item.name, item.entityType)}
+                onSelect={(item) => selectMention(draft, setDraft, item.name, item.entityType, item.id)}
                 onDismiss={clearMention}
                 onMoveSelection={onMoveSelection}
               />

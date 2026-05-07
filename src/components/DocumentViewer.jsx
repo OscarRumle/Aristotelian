@@ -8,6 +8,7 @@ import { ErrorToast } from "./ErrorToast.jsx";
 import { BottomBar } from "./BottomBar.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
+import { LiveReferenceRail } from "./LiveReferenceRail.jsx";
 
 function parseSections(content) {
   if (!content?.trim()) return [];
@@ -178,6 +179,13 @@ export function DocumentViewer({ doc, onClose, onUpdate, backLabel = "← Lore",
                   ✦ Review
                 </button>
               )}
+
+              <LiveReferenceRail
+                text={sections.map((s) => s.body)}
+                world={world}
+                onNavigate={onNavigate}
+                title="In this document"
+              />
             </div>
           </aside>
 

@@ -1,4 +1,4 @@
-import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
 
 /**
  * Builds the system prompt for object generation.
@@ -74,6 +74,8 @@ export function buildObjectPrompt(world, formState) {
   lines.push(``);
 
   if (mentionContext) lines.push(mentionContext);
+  const idListing = buildEntityIdListing(world);
+  if (idListing) lines.push(idListing);
   lines.push(REFERENCE_SYNTAX_INSTRUCTION);
   lines.push(`Return ONLY valid JSON. No preamble. No markdown fences.`);
   lines.push(`{"name":"","type":"","description":"","provenance":"","dramatic_weight":"","signature_line":""}`);

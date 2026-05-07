@@ -17,6 +17,8 @@ export function CharField({
   regenningKey,
   philNote,
   world,
+  onCreateFromRef,
+  sourceContext,
   children,
 }) {
   const [showPhil, setShowPhil] = useState(false);
@@ -206,7 +208,18 @@ export function CharField({
               world={world}
               anchorRect={mentionState.anchorRect}
               selectedIdx={selectedIdx}
-              onSelect={(item) => selectMention(editValue, setEditValue, item.name, item.entityType)}
+              onSelect={(item) => selectMention(editValue, setEditValue, item.name, item.entityType, item.id)}
+              onSelectNew={onCreateFromRef ? ({ name, entityType }) => {
+                clearMention();
+                onCreateFromRef({
+                  entityType,
+                  name,
+                  sourceText: editValue,
+                  sourceEntityType: sourceContext?.entityType,
+                  sourceEntityId: sourceContext?.entityId,
+                  sourceFieldKey: sourceContext?.fieldKey,
+                });
+              } : undefined}
               onDismiss={clearMention}
               onMoveSelection={onMoveSelection}
             />

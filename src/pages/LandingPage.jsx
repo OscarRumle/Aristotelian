@@ -27,7 +27,7 @@ export function LandingPage({ navigate }) {
     <div className="lp-root">
       <section className="lp-hero">
         <div className="lp-container">
-          <p className="lp-eyebrow">Aristotle's Poetics · AI Character Forge</p>
+          <p className="lp-eyebrow">Aristotle's Poetics · AI Character Studio</p>
           <h1 className="lp-h1">Every character<br />contains their undoing.</h1>
           <p className="lp-sub">
             An AI writing tool built on Aristotle's <em>Poetics</em>. Create characters with genuine dramatic structure — hamartia, moral core, and the specific error that emerges from their greatest strength.
@@ -75,7 +75,7 @@ export function LandingPage({ navigate }) {
             ))}
           </div>
           <div style={{ textAlign: "center", marginTop: "3.5rem" }}>
-            <button className="btn btn-primary" onClick={startFree}>Open the forge</button>
+            <button className="btn btn-primary" onClick={startFree}>Open the studio</button>
           </div>
         </div>
       </section>

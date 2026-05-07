@@ -1,4 +1,4 @@
-import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
 
 export function buildEntityRegenPrompt(world, entity, entityType, fieldKey, currentValue, feedback = null) {
   return `Regenerate one field for an existing ${entityType}.
@@ -12,6 +12,7 @@ CURRENT VALUE: ${currentValue}
 
 TASK: Regenerate only the "${fieldKey}" field. Stay consistent with all other fields and the world's tone.${feedback ? `\nFEEDBACK: ${feedback}` : ""}
 
+${buildEntityIdListing(world)}
 ${REFERENCE_SYNTAX_INSTRUCTION}
 Return ONLY the new value as a plain string. No JSON. No labels.`;
 }

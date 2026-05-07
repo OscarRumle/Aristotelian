@@ -4,7 +4,7 @@ import {
   STYLE_INSTRUCTIONS,
   FRAMEWORK_BLOCK,
 } from "./schema.js";
-import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
 
 export function buildPrompt(world, existingChars, inputs, targetLead) {
   const { role, style, pitch, mentionContext, ...fields } = inputs;
@@ -63,7 +63,8 @@ FIELD INSTRUCTIONS:
 - "aristotelianNote": 3-5 sentences on how this character satisfies Aristotle's four requirements.
 - "collectiveHamartia": For Ensemble only — the shared assumption or worldview the ensemble collectively carries into their downfall. Empty string otherwise.
 
-${mentionContext ? mentionContext + "\n\n" : ""}${REFERENCE_SYNTAX_INSTRUCTION}
+${mentionContext ? mentionContext + "\n\n" : ""}${buildEntityIdListing(world)}
+${REFERENCE_SYNTAX_INSTRUCTION}
 Return ONLY valid JSON. No preamble. No markdown fences.
 ${CHARACTER_SCHEMA}`;
 }

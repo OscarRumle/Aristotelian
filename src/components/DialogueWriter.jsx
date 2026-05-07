@@ -203,7 +203,7 @@ function SetupScreen({ world, scene, onGenerate, onBack }) {
             world={world}
             anchorRect={mentionState.anchorRect}
             selectedIdx={selectedIdx}
-            onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+            onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType, item.id)}
             onDismiss={clearMention}
             onMoveSelection={onMoveSelection}
           />

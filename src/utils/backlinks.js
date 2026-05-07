@@ -88,7 +88,7 @@ export function computeBacklinks(world, targetId) {
         const segments = parseReferences(text);
         for (const seg of segments) {
           if (seg.kind !== 'tag') continue;
-          const resolved = resolveEntity(world, seg.name, seg.typeHint);
+          const resolved = resolveEntity(world, { id: seg.id, name: seg.name, typeHint: seg.typeHint });
           if (resolved && resolved.id === targetId) {
             results.push({
               entityType: type,

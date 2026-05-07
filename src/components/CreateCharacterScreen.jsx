@@ -8,6 +8,7 @@ import { PillSelect } from "./PillSelect.jsx";
 import { useMentionInput } from "../hooks/useMentionInput.js";
 import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
 import { buildMentionContext } from "../utils/entityContext.js";
+import { buildSourceMentionContext } from "../utils/neighborhood.js";
 
 export function CreateCharacterScreen({
   world,
@@ -27,6 +28,7 @@ export function CreateCharacterScreen({
   const [targetLeadId, setTargetLeadId] = useState("");
   const [showMore, setShowMore] = useState(false);
   const [refNote, setRefNote] = useState(null);
+  const [capturedRef, setCapturedRef] = useState(null);
   const [f, setF] = useState({
     name: "", age: "", gender: "", race: "",
     appearance: "", clothing: "", details: "",
@@ -38,6 +40,7 @@ export function CreateCharacterScreen({
 
   useEffect(() => {
     if (!refContext) return;
+    setCapturedRef(refContext);
     setF((p) => ({ ...p, name: refContext.name || "" }));
     setShowMore(true);
     setRefNote({ sourceName: refContext.sourceName, sourceFieldKey: refContext.sourceFieldKey });
@@ -50,7 +53,9 @@ export function CreateCharacterScreen({
   const generate = async () => {
     onStartGenerating();
     try {
-      const mentionContext = buildMentionContext(world, pitch);
+      const sourceCtx = buildSourceMentionContext(capturedRef ?? refContext, world);
+      const pitchMentionCtx = buildMentionContext(world, pitch);
+      const mentionContext = [sourceCtx, pitchMentionCtx].filter(Boolean).join("\n");
       const raw = await callClaudeStreaming(
         buildPrompt(world, world.characters, { role, style, pitch, mentionContext, ...f }, targetLead),
         "Generate the character.",
@@ -105,7 +110,7 @@ export function CreateCharacterScreen({
               world={world}
               anchorRect={mentionState.anchorRect}
               selectedIdx={selectedIdx}
-              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType)}
+              onSelect={(item) => selectMention(pitch, setPitch, item.name, item.entityType, item.id)}
               onDismiss={clearMention}
               onMoveSelection={onMoveSelection}
             />

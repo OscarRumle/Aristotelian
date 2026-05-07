@@ -1,4 +1,4 @@
-import { REFERENCE_SYNTAX_INSTRUCTION } from "./referenceInstruction.js";
+import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
 
 export function buildFieldExpandPrompt(entityType, entity, world, fieldKey, mode, direction = "", currentValue = null) {
   if (currentValue === null) currentValue = entity[fieldKey];
@@ -25,6 +25,7 @@ ${modeInstruction}
 
 ${directionClause}
 
+${buildEntityIdListing(world)}
 ${REFERENCE_SYNTAX_INSTRUCTION}
 Write ONLY the new content to append. Do not repeat or summarize the existing text. Do not include labels, headers, or preamble. Plain prose only.`;
 }

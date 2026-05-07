@@ -14,7 +14,7 @@ export function WorldHub({ worlds, onSelectWorld, onNewWorld }) {
       {worlds.length === 0 ? (
         <EmptyState
           quote='"A character who has no real choices is not a character. They are a prop."'
-          body="Create a world to begin. Every character you forge will be shaped by its tone, rules, and history."
+          body="Create a world to begin. Every character you create will be shaped by its tone, rules, and history."
         />
       ) : (
         <div className="card-list">

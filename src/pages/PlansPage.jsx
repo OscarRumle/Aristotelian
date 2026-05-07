@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 const plans = [
   {
     name: "Quill", price: "Free", period: "", credits: "20 credits / month",
-    tagline: "Try the forge. No card needed.",
+    tagline: "Try it free. No card needed.",
     highlight: false,
     included: ["20 credits per month", "Simple world creation", "Up to 3 characters per world", "Full character sheet", "Field regeneration"],
     excluded: ["Advanced world interview", "Lore bible generation", "World documents", "Expand character", "Export to PDF / Markdown"],

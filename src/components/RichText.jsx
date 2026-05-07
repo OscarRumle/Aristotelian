@@ -72,7 +72,7 @@ export function RichText({ text, world, onNavigate, onCreateFromRef, sourceConte
             return seg.value;
           }
 
-          const resolved = resolveEntity(world, seg.name, seg.typeHint);
+          const resolved = resolveEntity(world, { id: seg.id, name: seg.name, typeHint: seg.typeHint });
 
           if (resolved) {
             return (
