@@ -109,4 +109,4 @@ The internal_tension should identify the gap between what this faction believes 
 - `addFaction(f)` and `updateFaction(f)` follow the same immutable `.map()` pattern
 - Association IDs reference `world.characters` and `world.locations` (when locations exist)
 - Once multiple factions exist, faction-to-faction associations (ally/rival/enemy) can be added as a fourth field in the associations section
-- Streaming: same `useStream` hook, 3 phases (describing → contextualising → finishing)
+- Streaming: same `useGeneratingProgress` hook, 3 phases (describing → contextualising → finishing)

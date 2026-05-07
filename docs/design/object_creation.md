@@ -160,4 +160,4 @@ The dramatic_weight should address: what conflict or meaning does this object ca
 - World objects stored in `world.objects` array, same pattern as `world.characters`
 - `addObject(o)` and `updateObject(o)` follow the same immutable `.map()` pattern as character state mutations
 - The associations field stores IDs, not names — names are resolved at render and prompt-build time
-- Streaming: use the same `useStream` hook as character generation; objects are simpler so phase count can be reduced to 3 (describing → contextualising → finishing)
+- Streaming: use the same `useGeneratingProgress` hook as character generation; objects are simpler so phase count can be reduced to 3 (describing → contextualising → finishing)

@@ -106,5 +106,5 @@ The description should be sensory and specific — not "a dark castle" but what 
 - `addLocation(l)` and `updateLocation(l)` follow the same immutable `.map()` pattern
 - Association IDs reference `world.characters` and `world.factions`
 - Once locations exist, they become available as association options in Create Object and Create Faction forms
-- Streaming: same `useStream` hook, 3 phases (describing → contextualising → finishing)
+- Streaming: same `useGeneratingProgress` hook, 3 phases (describing → contextualising → finishing)
 - Scale field maps to a rough prompt instruction about how much geographic/physical detail to include

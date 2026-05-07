@@ -1,6 +1,6 @@
 # Docs — Aristotle Character Forge
 
-Navigation index for everything in this folder. Read `BACKLOG.md` and `../CLAUDE.md` first if you're new to the project.
+Navigation index for everything in this folder. Read `docs/backlog/BACKLOG_01.md` and `../CLAUDE.md` first if you're new to the project.
 
 ---
 
@@ -9,7 +9,6 @@ Navigation index for everything in this folder. Read `BACKLOG.md` and `../CLAUDE
 | File | Purpose |
 |---|---|
 | `CLAUDE.md` | **Start here.** Full codebase context for Claude Code. Architecture, key constants, prompt system, what not to touch. |
-| `HANDOVER.md` | Written by `/handover` at end of each session. Current state, progress, next steps. |
 | `aristotelian-3.jsx` | Original single-file artifact. Read-only reference. Do not edit. |
 | `src/` | The actual web app (Vite + React). This is what gets built and run. |
 
@@ -42,5 +41,3 @@ The Aristotle guides. These are the theoretical source of truth that the prompt 
 | `Aristotle_Dialogue_Guide.md` | Speech modes: Ethos, Pathos, Logos. Subtext and voice. |
 | `Aristotle_Comedy_Guide.md` | Six comic types, gap theory, affectionate vs. contemptuous framing |
 
-### `aristotelian-sprint-retro.md`
-Sprint history and retrospective notes. Useful for understanding past decisions and what was tried.

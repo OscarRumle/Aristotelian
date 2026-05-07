@@ -158,7 +158,7 @@ Association fields store IDs, not names. Names are resolved at render time and p
 
 ## Streaming and generation
 
-All three tools use the existing `useStream` hook. Objects, Factions, and Locations are simpler than characters, so use 3 phases instead of 6:
+All three tools use the existing `useGeneratingProgress` hook. Objects, Factions, and Locations are simpler than characters, so use 3 phases instead of 6:
 
 ```
 Phase 1: describing    — streaming the description field
