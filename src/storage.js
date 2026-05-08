@@ -1,4 +1,4 @@
-import { STORAGE_KEY, STORAGE_VERSION } from "./constants.js";
+import { STORAGE_KEY, STORAGE_VERSION, IMAGE_STYLE_DEFAULTS } from "./constants.js";
 
 /**
  * Storage schema versioning.
@@ -60,6 +60,58 @@ function migrate(parsed) {
   if (version < 8) {
     worlds = worlds.map((w) => ({ ...w, factions: w.factions ?? [], locations: w.locations ?? [] }));
     version = 8;
+  }
+
+  // v8 → v9: backfill empty `associations: []` on lore documents, scenes,
+  // and dialogues so future cross-references can attach without per-entity
+  // null checks. No mutation of existing association entries on
+  // characters / objects / factions / locations — the optional `relation`
+  // field is added on demand.
+  if (version < 9) {
+    worlds = worlds.map((w) => ({
+      ...w,
+      documents: (w.documents ?? []).map((d) => ({ associations: [], ...d })),
+      scenes: (w.scenes ?? []).map((s) => ({
+        ...s,
+        associations: s.associations ?? [],
+        dialogues: (s.dialogues ?? []).map((d) => ({ associations: [], ...d })),
+      })),
+    }));
+    version = 9;
+  }
+
+  // v9 → v10: add image generation fields. Each asset (character, object,
+  // location, faction) gets `image: null`. Each world gets `imageStyles`
+  // (per-asset-type style preset map) and `autoGenerateImages: false`.
+  // Per-asset prompt overrides also live as `imageStyleOverrides: {}` on each
+  // asset — empty object means "use the world preset as-is".
+  if (version < 10) {
+    worlds = worlds.map((w) => ({
+      ...w,
+      imageStyles: w.imageStyles ?? {
+        character: { ...IMAGE_STYLE_DEFAULTS.character },
+        object:    { ...IMAGE_STYLE_DEFAULTS.object },
+        location:  { ...IMAGE_STYLE_DEFAULTS.location },
+        faction:   { ...IMAGE_STYLE_DEFAULTS.faction },
+      },
+      autoGenerateImages: w.autoGenerateImages ?? false,
+      characters: (w.characters ?? []).map((c) => ({ image: null, imageStyleOverrides: {}, ...c })),
+      objects:    (w.objects ?? []).map((o)    => ({ image: null, imageStyleOverrides: {}, ...o })),
+      locations:  (w.locations ?? []).map((l)  => ({ image: null, imageStyleOverrides: {}, ...l })),
+      factions:   (w.factions ?? []).map((f)   => ({ image: null, imageStyleOverrides: {}, ...f })),
+    }));
+    version = 10;
+  }
+
+  // v10 → v11: characters get `imagePromptDraft: null`. This is the cached
+  // image-model-friendly visual subject, populated lazily by the translator
+  // (src/api/translateCharacterPrompt.js) on first generate. User-editable.
+  if (version < 11) {
+    worlds = worlds.map((w) => ({
+      ...w,
+      characters: (w.characters ?? []).map((c) => ({ imagePromptDraft: null, ...c })),
+    }));
+    version = 11;
   }
 
   return { __version: version, worlds };

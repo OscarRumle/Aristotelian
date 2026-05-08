@@ -6,6 +6,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const apiKey = env.ANTHROPIC_API_KEY || "";
   const anthropicVersion = env.ANTHROPIC_VERSION || "2023-06-01";
+  const hfKeyId = env.HIGGSFIELD_KEY_ID || "";
+  const hfKeySecret = env.HIGGSFIELD_KEY_SECRET || "";
+  const hfAuth = hfKeyId && hfKeySecret ? `Key ${hfKeyId}:${hfKeySecret}` : "";
 
   return {
     plugins: [react()],
@@ -30,6 +33,20 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (proxyReq) => {
               if (apiKey) proxyReq.setHeader("x-api-key", apiKey);
               proxyReq.setHeader("anthropic-version", anthropicVersion);
+              proxyReq.removeHeader("origin");
+              proxyReq.removeHeader("referer");
+            });
+          },
+        },
+        "/api/higgsfield": {
+          target: "https://platform.higgsfield.ai",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/api\/higgsfield/, ""),
+          configure: (proxy) => {
+            proxy.on("proxyReq", (proxyReq) => {
+              if (hfAuth) proxyReq.setHeader("Authorization", hfAuth);
+              proxyReq.setHeader("User-Agent", "aristotelian-dev/1.0");
               proxyReq.removeHeader("origin");
               proxyReq.removeHeader("referer");
             });

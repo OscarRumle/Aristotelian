@@ -1,5 +1,157 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 8;
+export const STORAGE_VERSION = 11;
+
+// ── Image generation defaults ──────────────────────────────────────────────
+// Per-asset-type style presets used to compose Higgsfield image prompts.
+// `subject` is computed per-asset from the asset's own visual fields and is
+// intentionally absent here. Every other key is a free-form text field the
+// user can edit per-world via ImageStyleSettings.
+//
+// Field shape kept stable across asset types so a single composer
+// (buildImagePrompt) can render any of them. Add new fields by extending
+// IMAGE_STYLE_FIELDS below.
+export const IMAGE_STYLE_FIELDS = [
+  { key: "location",     label: "Location" },
+  { key: "year",         label: "Year" },
+  { key: "artistStyle",  label: "Artist Style" },
+  { key: "gameStyle",    label: "Game art style inspiration" },
+  { key: "medium",       label: "Medium" },
+  { key: "expression",   label: "Expression" },
+  { key: "rendering",    label: "Rendering" },
+  { key: "lighting",     label: "Lighting" },
+  { key: "color",        label: "Color" },
+];
+
+// Per-asset-type label overrides for IMAGE_STYLE_FIELDS. The default label is
+// used everywhere except where overridden. Used by buildImagePrompt (the line
+// prefix sent to FLUX) and the editor UIs (AssetImage + ImageStyleSettings).
+export const IMAGE_STYLE_FIELD_LABEL_OVERRIDES = {
+  character: { location: "Background" },
+};
+
+export function getImageFieldLabel(type, key) {
+  const override = IMAGE_STYLE_FIELD_LABEL_OVERRIDES[type]?.[key];
+  if (override) return override;
+  const field = IMAGE_STYLE_FIELDS.find((f) => f.key === key);
+  return field?.label || key;
+}
+
+const SHARED_STYLE_DEFAULTS = {
+  location:    "",
+  year:        "",
+  artistStyle: "Sergey Kolesov",
+  gameStyle:   "Dishonored 2",
+  medium:      "Stylized Digital Concept Art",
+  expression:  "Textures are broad, expressive, and painterly, while maintaining clean, architectural silhouettes.",
+  rendering:   "faces, bodies, and fabrics rendered with sharp, angular, geometric facets rather than smooth curves",
+  lighting:    "Cinematic Atmospheric, High Contrast shadows",
+  color:       "Slightly desaturated color scheme",
+};
+
+export const IMAGE_STYLE_DEFAULTS = {
+  character: { ...SHARED_STYLE_DEFAULTS, location: "solid color #F4EDE4", year: "1992" },
+  object:    { ...SHARED_STYLE_DEFAULTS, location: "still-life staging on weathered wood", year: "" },
+  location:  { ...SHARED_STYLE_DEFAULTS, location: "", year: "" },
+  faction:   { ...SHARED_STYLE_DEFAULTS, location: "emblematic group portrait or insignia", year: "" },
+};
+
+export const IMAGE_ASPECT_RATIOS = {
+  character: "3:4",
+  object:    "3:4",
+  location:  "16:9",
+  faction:   "1:1",
+};
+
+// Higgsfield model endpoint per asset type. Path is appended to
+// https://platform.higgsfield.ai/ (via /api/higgsfield proxy) so we use
+// slash-separated slugs without a leading slash.
+//
+// Default: FLUX.2 MAX. Endpoint slug verified by probing 2026-05-07.
+// Known fallback: "flux-pro/kontext/max/text-to-image" (FLUX.1 Pro Kontext Max).
+export const IMAGE_MODEL_DEFAULT = "flux-2-max";
+
+export const IMAGE_MODELS = {
+  character: IMAGE_MODEL_DEFAULT,
+  object:    IMAGE_MODEL_DEFAULT,
+  location:  IMAGE_MODEL_DEFAULT,
+  faction:   IMAGE_MODEL_DEFAULT,
+};
+
+// ── Relationship taxonomy for associations ─────────────────────────────────
+// Each entry: { value, label, inverse, description }
+// `inverse` is the label that should display on the *other* entity when this
+// relation is set. Symmetric relations have inverse === value.
+// Used by AssociationsPanel selector and reciprocal-display logic.
+export const RELATION_CATEGORIES = [
+  {
+    id: "social",
+    label: "Social",
+    description: "Relationships, bonds, emotions",
+    relations: [
+      { value: "Ally",         inverse: "Ally",          description: "Shared goals, mutual support" },
+      { value: "Rival",        inverse: "Rival",         description: "Competition, opposition" },
+      { value: "Family",       inverse: "Family",        description: "Blood, marriage, kinship" },
+      { value: "Love",         inverse: "Love",          description: "Romance, desire, attraction" },
+      { value: "Mentor",       inverse: "Student of",    description: "Teacher → student" },
+      { value: "Student of",   inverse: "Mentor",        description: "Student → teacher" },
+      { value: "Betrayed by",  inverse: "Betrayed",      description: "Trust broken, wounded" },
+      { value: "Oath-bound",   inverse: "Oath-bound",    description: "Sworn, contract, binding promise" },
+    ],
+  },
+  {
+    id: "historical",
+    label: "Historical",
+    description: "Lineage, events, causality",
+    relations: [
+      { value: "Trained by",      inverse: "Trainer of",   description: "Student of, learned from" },
+      { value: "Caused",          inverse: "Caused by",    description: "Other entity is consequence of this one" },
+      { value: "Witnessed",       inverse: "Witnessed by", description: "Was present for, saw happen" },
+      { value: "Descended from",  inverse: "Ancestor of",  description: "Bloodline, inheritance" },
+      { value: "Built by",        inverse: "Builder of",   description: "Created, crafted, constructed" },
+      { value: "Destroyed",       inverse: "Destroyed by", description: "Ruined, ended, unmade" },
+      { value: "Prophesied",      inverse: "Prophesied by",description: "Fated, destined, foretold" },
+    ],
+  },
+  {
+    id: "physical",
+    label: "Physical",
+    description: "Ownership, containment, location",
+    relations: [
+      { value: "Contains",     inverse: "Contained in", description: "Inside, held by, houses" },
+      { value: "Owned by",     inverse: "Owner of",     description: "Possession, property" },
+      { value: "Located in",   inverse: "Location of",  description: "At, situated within" },
+      { value: "Made from",    inverse: "Material of",  description: "Material, substance" },
+      { value: "Guarded by",   inverse: "Guardian of",  description: "Protected, defended" },
+    ],
+  },
+  {
+    id: "mystical",
+    label: "Mystical",
+    description: "Curses, blessings, fate",
+    relations: [
+      { value: "Cursed by",    inverse: "Curse on",     description: "Afflicted, hexed, bound" },
+      { value: "Blessed by",   inverse: "Blessing on",  description: "Favored, protected, enhanced" },
+      { value: "Bound to",     inverse: "Bound to",     description: "Linked, tethered, entwined" },
+      { value: "Haunted by",   inverse: "Haunts",       description: "Visited, observed by spirit" },
+      { value: "Empowered by", inverse: "Empowers",     description: "Given strength, magic, ability" },
+    ],
+  },
+];
+
+// Flat lookup: relation value → { category, inverse, description }.
+export const RELATION_LOOKUP = (() => {
+  const out = {};
+  for (const cat of RELATION_CATEGORIES) {
+    for (const rel of cat.relations) {
+      out[rel.value] = { category: cat.id, categoryLabel: cat.label, inverse: rel.inverse, description: rel.description };
+    }
+  }
+  return out;
+})();
+
+export function inverseRelation(value) {
+  return RELATION_LOOKUP[value]?.inverse ?? null;
+}
 
 export const CHAR_COLORS = [
   "#C87941",

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { metaLine } from "../util.js";
+import { collectUnresolvedAcrossWorld } from "../utils/unresolvedMentions.js";
 import { ROLE_OPTIONS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { EmptyState } from "./EmptyState.jsx";
@@ -10,6 +11,7 @@ import { EditableText } from "./EditableText.jsx";
 import { ObjectsTab } from "./ObjectsTab.jsx";
 import { FactionsTab } from "./FactionsTab.jsx";
 import { LocationsTab } from "./LocationsTab.jsx";
+import { ImageStyleSettings } from "./ImageStyleSettings.jsx";
 
 function CharactersPanel({ world, onSelectCharacter }) {
   const [roleTab, setRoleTab] = useState("Recent");
@@ -161,6 +163,7 @@ export function WorldDetail({
   onSelectFaction,
   onNewLocation,
   onSelectLocation,
+  onOpenLooseEnds,
   onNavigate,
   onCreateFromRef,
 }) {
@@ -286,6 +289,7 @@ export function WorldDetail({
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
   const charCount = world.characters.length;
+  const looseEndsCount = collectUnresolvedAcrossWorld(world).length;
 
   const worldBuildingTools = [
     {
@@ -328,6 +332,14 @@ export function WorldDetail({
       unit: (world.locations ?? []).length === 1 ? "location" : "locations",
       onClick: () => onSetToolView("locations"),
     },
+    ...(onOpenLooseEnds ? [{
+      id: "looseEnds",
+      name: "Loose Ends",
+      description: "Mentions in prose that don't yet exist as entities",
+      count: looseEndsCount,
+      unit: looseEndsCount === 1 ? "loose end" : "loose ends",
+      onClick: onOpenLooseEnds,
+    }] : []),
   ];
 
   return (
@@ -417,6 +429,13 @@ export function WorldDetail({
         onSelectCharacter={onSelectCharacter}
         onSelectScene={onSelectScene}
       />
+
+      {onUpdateWorld ? (
+        <details className="wd-visual-style">
+          <summary>Visual style</summary>
+          <ImageStyleSettings world={world} onUpdate={onUpdateWorld} />
+        </details>
+      ) : null}
 
       {/* Bottom bar */}
       <BottomBar>

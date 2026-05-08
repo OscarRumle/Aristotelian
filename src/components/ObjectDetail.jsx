@@ -8,6 +8,8 @@ import { BottomBar } from "./BottomBar.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
+import { AssociationProseInjector } from "./AssociationProseInjector.jsx";
+import { AssetImage } from "./AssetImage.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -27,6 +29,7 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
 
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
+  const [justAddedAssoc, setJustAddedAssoc] = useState(null);
 
   useEffect(() => {
     if (!scrollToFieldKey) return;
@@ -106,6 +109,8 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
       canExpand
       regenningKey={regenningKey}
       world={world}
+      onCreateFromRef={onCreateFromRef}
+      sourceContext={{ entityType: 'object', entityId: object.id, fieldKey }}
     >
       {gen[fieldKey] ? (
         <RichText
@@ -142,6 +147,12 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
 
       {regenError && <ErrorToast message={regenError} />}
 
+      <AssetImage
+        type="object"
+        asset={object}
+        world={world}
+        onUpdate={(patch) => onUpdate({ ...object, ...patch })}
+      />
       {gen.description && (
         <div id="field-description" className="cs-section">{F("Description", "description")}</div>
       )}
@@ -203,7 +214,18 @@ export function ObjectDetail({ object, world, onBack, onUpdate, onNavigate, onCr
         world={world}
         onUpdate={(assocs) => onUpdate({ ...object, associations: assocs })}
         onNavigate={onNavigate}
+        onAfterAdd={(added) => setJustAddedAssoc(added)}
       />
+      {justAddedAssoc && (
+        <AssociationProseInjector
+          world={world}
+          entity={object}
+          entityType="object"
+          target={justAddedAssoc}
+          onWrite={(fieldKey, newText) => onUpdate({ ...object, generated: { ...gen, [fieldKey]: newText } })}
+          onDismiss={() => setJustAddedAssoc(null)}
+        />
+      )}
       <ReferencedIn
         entity={object}
         entityType="object"

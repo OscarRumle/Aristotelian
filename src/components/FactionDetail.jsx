@@ -8,6 +8,7 @@ import { BottomBar } from "./BottomBar.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
+import { AssetImage } from "./AssetImage.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -107,6 +108,8 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
       canExpand
       regenningKey={regenningKey}
       world={world}
+      onCreateFromRef={onCreateFromRef}
+      sourceContext={{ entityType: 'faction', entityId: faction.id, fieldKey }}
     >
       {gen[fieldKey] ? (
         <RichText
@@ -143,6 +146,12 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
 
       {regenError && <ErrorToast message={regenError} />}
 
+      <AssetImage
+        type="faction"
+        asset={faction}
+        world={world}
+        onUpdate={(patch) => onUpdate({ ...faction, ...patch })}
+      />
       {gen.description && (
         <div id="field-description" className="cs-section">{F("Description", "description")}</div>
       )}

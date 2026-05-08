@@ -11,6 +11,8 @@ import { AnimatedVerbs, VERBS } from "./AnimatedVerbs.jsx";
 import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
+import { AssociationProseInjector } from "./AssociationProseInjector.jsx";
+import { AssetImage } from "./AssetImage.jsx";
 
 function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   return (
@@ -59,6 +61,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
   const setTab = onTabChange ?? (() => {});
   const [regenningKey, setRegenningKey] = useState(null);
   const [regenError, setRegenError] = useState(null);
+  const [justAddedAssoc, setJustAddedAssoc] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [showReview, setShowReview] = useState(false);
@@ -170,6 +173,8 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
       regenningKey={regenningKey}
       philNote={phil ? PHIL[phil] : null}
       world={world}
+      onCreateFromRef={onCreateFromRef}
+      sourceContext={{ entityType: 'character', entityId: character.id, fieldKey: key }}
     >
       {character[key] ? (
         <RichText
@@ -251,6 +256,12 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                 </div>
               </div>
             )}
+            <AssetImage
+              type="character"
+              asset={character}
+              world={world}
+              onUpdate={(patch) => onUpdate({ ...character, ...patch })}
+            />
             {character.summary?.filter(Boolean).length > 0 && (
               <ul className="char-summary">
                 {character.summary.filter(Boolean).map((s, i) => (
@@ -478,7 +489,18 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
             world={world}
             onUpdate={(assocs) => onUpdate({ ...character, associations: assocs })}
             onNavigate={onNavigate}
+            onAfterAdd={(added) => setJustAddedAssoc(added)}
           />
+          {justAddedAssoc && (
+            <AssociationProseInjector
+              world={world}
+              entity={character}
+              entityType="character"
+              target={justAddedAssoc}
+              onWrite={(fieldKey, newText) => onUpdate({ ...character, [fieldKey]: newText })}
+              onDismiss={() => setJustAddedAssoc(null)}
+            />
+          )}
           <ReferencedIn
             entity={character}
             entityType="character"

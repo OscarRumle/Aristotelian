@@ -24,6 +24,7 @@ import { FactionDetail } from "./components/FactionDetail.jsx";
 import { CreateLocationScreen } from "./components/CreateLocationScreen.jsx";
 import { LocationDetail } from "./components/LocationDetail.jsx";
 import { EntityHoverPreview } from "./components/EntityHoverPreview.jsx";
+import { LooseEndsPanel } from "./components/LooseEndsPanel.jsx";
 
 function findEntityInWorld(world, entityType, entityId) {
   if (!world || !entityId) return null;
@@ -269,7 +270,7 @@ export default function App() {
   const handleCreateFromRef = ({ entityType, name, sourceText, sourceEntityType, sourceEntityId, sourceFieldKey }) => {
     const sourceEntity = findEntityInWorld(activeWorld, sourceEntityType, sourceEntityId);
     const sourceName = sourceEntity?.name ?? sourceEntity?.title ?? '';
-    setCreateRefContext({ name, sourceText, sourceName, sourceType: sourceEntityType, sourceFieldKey });
+    setCreateRefContext({ name, sourceText, sourceName, sourceType: sourceEntityType, sourceId: sourceEntityId, sourceFieldKey });
     switch (entityType) {
       case 'character': setGenError(null); setView('createCharacter'); break;
       case 'object':    setView('createObject'); break;
@@ -380,8 +381,21 @@ export default function App() {
             onSelectFaction={(id) => { setActiveFactionId(id); setView("faction"); }}
             onNewLocation={() => setView("createLocation")}
             onSelectLocation={(id) => { setActiveLocationId(id); setView("location"); }}
+            onOpenLooseEnds={() => setView("looseEnds")}
             onNavigate={navigate}
             onCreateFromRef={handleCreateFromRef}
+          />
+        )}
+
+        {view === "looseEnds" && activeWorld && (
+          <LooseEndsPanel
+            world={activeWorld}
+            onBack={() => setView("world")}
+            onCreate={(payload) => handleCreateFromRef(payload)}
+            onNavigate={(entityType, entityId, fieldKey) => {
+              setNavScrollToField(fieldKey ?? null);
+              navigate(entityType, entityId);
+            }}
           />
         )}
 
