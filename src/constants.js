@@ -1,5 +1,28 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 11;
+export const STORAGE_VERSION = 12;
+
+// ── User settings ──────────────────────────────────────────────────────────
+// Stored alongside worlds in the storage envelope as `settings`. Empty string
+// for a key means "fall back to env on the proxy side" — never seed real
+// defaults here, the proxy already knows them.
+export const ANTHROPIC_MODEL_OPTIONS = [
+  { value: "claude-opus-4-7",            label: "Opus 4.7 — most capable" },
+  { value: "claude-sonnet-4-6",          label: "Sonnet 4.6 — balanced (default)" },
+  { value: "claude-haiku-4-5-20251001",  label: "Haiku 4.5 — fastest" },
+];
+
+export const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-6";
+
+export const DEFAULT_SETTINGS = {
+  anthropicKey: "",
+  anthropicVersion: "",
+  higgsfieldKeyId: "",
+  higgsfieldKeySecret: "",
+  anthropicModel: "",            // empty = use DEFAULT_ANTHROPIC_MODEL
+  defaultAutoGenerateImages: false,
+  minPhaseMs: 4000,
+  verbCycleMs: 1600,
+};
 
 // ── Image generation defaults ──────────────────────────────────────────────
 // Per-asset-type style presets used to compose Higgsfield image prompts.

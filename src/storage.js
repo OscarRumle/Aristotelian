@@ -1,15 +1,15 @@
-import { STORAGE_KEY, STORAGE_VERSION, IMAGE_STYLE_DEFAULTS } from "./constants.js";
+import { STORAGE_KEY, STORAGE_VERSION, IMAGE_STYLE_DEFAULTS, DEFAULT_SETTINGS } from "./constants.js";
 
 /**
  * Storage schema versioning.
- * Stored blob shape: { __version: number, worlds: World[] }
+ * Stored blob shape: { __version: number, worlds: World[], settings: Settings }
  * Older versions (pre-versioning) stored a bare World[] array — handled as v2.
  */
 
 function migrate(parsed) {
   // Legacy: bare array saved before versioning was introduced.
   if (Array.isArray(parsed)) {
-    return { __version: STORAGE_VERSION, worlds: parsed };
+    return { __version: STORAGE_VERSION, worlds: parsed, settings: { ...DEFAULT_SETTINGS } };
   }
   if (!parsed || typeof parsed !== "object") {
     throw new Error("Stored data is not an object");
@@ -17,6 +17,7 @@ function migrate(parsed) {
 
   let version = parsed.__version ?? 2;
   let worlds = Array.isArray(parsed.worlds) ? parsed.worlds : [];
+  let settings = parsed.settings && typeof parsed.settings === "object" ? parsed.settings : null;
 
   // v2 → v3: no data shape change, just introducing the envelope.
   if (version < 3) version = 3;
@@ -114,8 +115,18 @@ function migrate(parsed) {
     version = 11;
   }
 
-  return { __version: version, worlds };
+  // v11 → v12: introduce the `settings` envelope. Empty-string keys mean
+  // "use the .env fallback on the proxy side" — never seed real keys here.
+  if (version < 12) {
+    settings = { ...DEFAULT_SETTINGS, ...(settings || {}) };
+    version = 12;
+  }
+
+  if (!settings) settings = { ...DEFAULT_SETTINGS };
+  return { __version: version, worlds, settings };
 }
+
+// ── Worlds ─────────────────────────────────────────────────────────────────
 
 export function loadWorlds() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -139,7 +150,8 @@ export function loadWorlds() {
 }
 
 export function saveWorlds(worlds) {
-  const blob = { __version: STORAGE_VERSION, worlds };
+  const settings = loadSettings();
+  const blob = { __version: STORAGE_VERSION, worlds, settings };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(blob));
     return true;
@@ -155,4 +167,79 @@ export function resetStorage() {
   } catch (err) {
     console.error("[storage] reset failed", err);
   }
+}
+
+// ── Settings ───────────────────────────────────────────────────────────────
+
+function readEnvelope() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function loadSettings() {
+  const parsed = readEnvelope();
+  if (!parsed) return { ...DEFAULT_SETTINGS };
+  try {
+    return migrate(parsed).settings;
+  } catch {
+    return { ...DEFAULT_SETTINGS };
+  }
+}
+
+export function saveSettings(partial) {
+  const parsed = readEnvelope();
+  let worlds = [];
+  let prevSettings = { ...DEFAULT_SETTINGS };
+  if (parsed) {
+    try {
+      const migrated = migrate(parsed);
+      worlds = migrated.worlds;
+      prevSettings = migrated.settings;
+    } catch {
+      // fall through with defaults
+    }
+  }
+  const next = { ...prevSettings, ...partial };
+  const blob = { __version: STORAGE_VERSION, worlds, settings: next };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(blob));
+    window.dispatchEvent(new CustomEvent("settingschange", { detail: next }));
+    return next;
+  } catch (err) {
+    console.error("[storage] saveSettings failed", err);
+    return prevSettings;
+  }
+}
+
+// Synchronous read for non-React consumers (api/claude.js, api/higgsfield.js).
+// Reads on every call; localStorage is fast enough and the storage blob is small.
+export function getSettingsSync() {
+  return loadSettings();
+}
+
+// ── Full-store export / import / wipe ──────────────────────────────────────
+
+export function exportAll() {
+  const parsed = readEnvelope();
+  const blob = parsed || { __version: STORAGE_VERSION, worlds: [], settings: { ...DEFAULT_SETTINGS } };
+  return JSON.stringify(blob, null, 2);
+}
+
+export function importAll(jsonText) {
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch (err) {
+    throw new Error("Import file is not valid JSON");
+  }
+  // Run through migrate to validate and bring forward.
+  const migrated = migrate(parsed);
+  const blob = { __version: STORAGE_VERSION, worlds: migrated.worlds, settings: migrated.settings };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(blob));
+  return { worldCount: migrated.worlds.length };
 }

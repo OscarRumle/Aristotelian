@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { loadWorlds, saveWorlds, resetStorage } from "./storage.js";
+import { loadWorlds, saveWorlds, resetStorage, getSettingsSync } from "./storage.js";
 import { callClaude } from "./api/claude.js";
 import { buildExpandPrompt } from "./prompts/expand.js";
 import { extractJson } from "./util.js";
@@ -95,7 +95,13 @@ export default function App() {
     setActiveCharTab("overview");
   }, [activeCharId]);
 
-  const addWorld = (w) => setWorlds((p) => [...p, w]);
+  const addWorld = (w) => {
+    const s = getSettingsSync();
+    const seeded = w.autoGenerateImages == null
+      ? { ...w, autoGenerateImages: !!s.defaultAutoGenerateImages }
+      : w;
+    setWorlds((p) => [...p, seeded]);
+  };
   const deleteWorld = (id) => setWorlds((p) => p.filter((w) => w.id !== id));
   const updateWorld = (w) => setWorlds((p) => p.map((x) => (x.id === w.id ? w : x)));
 

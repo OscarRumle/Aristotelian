@@ -30,9 +30,15 @@ export default defineConfig(({ mode }) => {
           secure: true,
           rewrite: (path) => path.replace(/^\/api\/anthropic/, ""),
           configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq) => {
-              if (apiKey) proxyReq.setHeader("x-api-key", apiKey);
-              proxyReq.setHeader("anthropic-version", anthropicVersion);
+            proxy.on("proxyReq", (proxyReq, req) => {
+              const userKey = req.headers["x-user-anthropic-key"];
+              const userVer = req.headers["x-user-anthropic-version"];
+              const effectiveKey = (typeof userKey === "string" && userKey) || apiKey;
+              const effectiveVer = (typeof userVer === "string" && userVer) || anthropicVersion;
+              if (effectiveKey) proxyReq.setHeader("x-api-key", effectiveKey);
+              proxyReq.setHeader("anthropic-version", effectiveVer);
+              proxyReq.removeHeader("x-user-anthropic-key");
+              proxyReq.removeHeader("x-user-anthropic-version");
               proxyReq.removeHeader("origin");
               proxyReq.removeHeader("referer");
             });
@@ -44,9 +50,15 @@ export default defineConfig(({ mode }) => {
           secure: true,
           rewrite: (path) => path.replace(/^\/api\/higgsfield/, ""),
           configure: (proxy) => {
-            proxy.on("proxyReq", (proxyReq) => {
-              if (hfAuth) proxyReq.setHeader("Authorization", hfAuth);
+            proxy.on("proxyReq", (proxyReq, req) => {
+              const userId = req.headers["x-user-higgsfield-id"];
+              const userSecret = req.headers["x-user-higgsfield-secret"];
+              const haveUserPair = typeof userId === "string" && userId && typeof userSecret === "string" && userSecret;
+              const effectiveAuth = haveUserPair ? `Key ${userId}:${userSecret}` : hfAuth;
+              if (effectiveAuth) proxyReq.setHeader("Authorization", effectiveAuth);
               proxyReq.setHeader("User-Agent", "aristotelian-dev/1.0");
+              proxyReq.removeHeader("x-user-higgsfield-id");
+              proxyReq.removeHeader("x-user-higgsfield-secret");
               proxyReq.removeHeader("origin");
               proxyReq.removeHeader("referer");
             });

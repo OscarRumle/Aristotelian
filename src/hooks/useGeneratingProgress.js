@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PHASES, MIN_PHASE_MS } from "../constants.js";
 import { randItem } from "../util.js";
+import { getSettingsSync } from "../storage.js";
 
 /**
  * Drives the generating overlay. Watches the streamed JSON for each phase's
@@ -41,6 +42,10 @@ export function useGeneratingProgress(active, accumulated) {
 
     const s = makeState();
     state.current = s;
+    const userSettings = getSettingsSync();
+    const verbMs   = Number(userSettings.verbCycleMs) || 1600;
+    const minPhase = Number(userSettings.minPhaseMs)  || MIN_PHASE_MS;
+    s.minPhase = minPhase;
 
     const startPhase = (idx) => {
       if (idx >= PHASES.length) return;
@@ -49,7 +54,7 @@ export function useGeneratingProgress(active, accumulated) {
       setPhaseIdx(idx);
       setVerb(randItem(p.verbs));
       clearInterval(s.verbTimer);
-      s.verbTimer = setInterval(() => setVerb(randItem(p.verbs)), 1600);
+      s.verbTimer = setInterval(() => setVerb(randItem(p.verbs)), verbMs);
     };
 
     const completePhase = (id) => {
@@ -87,10 +92,10 @@ export function useGeneratingProgress(active, accumulated) {
       if (i > s.idx) return;
       if (s.pendingDone.has(p.id)) return;
       if (!p.streamMarker) {
-        if (accumulated.trimEnd().endsWith("}")) s.scheduleComplete(p.id, MIN_PHASE_MS);
+        if (accumulated.trimEnd().endsWith("}")) s.scheduleComplete(p.id, s.minPhase ?? MIN_PHASE_MS);
         return;
       }
-      if (accumulated.includes(p.streamMarker)) s.scheduleComplete(p.id, MIN_PHASE_MS);
+      if (accumulated.includes(p.streamMarker)) s.scheduleComplete(p.id, s.minPhase ?? MIN_PHASE_MS);
     });
   }, [accumulated, active]);
 
