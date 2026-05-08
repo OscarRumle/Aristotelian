@@ -5,7 +5,17 @@
 // official SDK), so the proxy is mandatory — never call platform.higgsfield.ai
 // directly from the app.
 
+import { getSettingsSync } from "../storage.js";
+
 const ENDPOINT_BASE = "/api/higgsfield";
+
+function userHeaders(extra = {}) {
+  const s = getSettingsSync();
+  const h = { ...extra };
+  if (s.higgsfieldKeyId)     h["x-user-higgsfield-id"]     = s.higgsfieldKeyId;
+  if (s.higgsfieldKeySecret) h["x-user-higgsfield-secret"] = s.higgsfieldKeySecret;
+  return h;
+}
 const DEFAULT_MODEL_ENDPOINT = "flux-pro/kontext/max/text-to-image";
 const POLL_INTERVAL_MS = 2000;
 const POLL_MAX_MS = 120_000;
@@ -26,7 +36,7 @@ async function errorFromResponse(res) {
 async function submitGeneration(input, { modelEndpoint = DEFAULT_MODEL_ENDPOINT, signal } = {}) {
   const res = await fetch(`${ENDPOINT_BASE}/${modelEndpoint}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: userHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(input),
     signal,
   });
@@ -37,6 +47,7 @@ async function submitGeneration(input, { modelEndpoint = DEFAULT_MODEL_ENDPOINT,
 async function fetchStatus(requestId, { signal } = {}) {
   const res = await fetch(`${ENDPOINT_BASE}/requests/${requestId}/status`, {
     method: "GET",
+    headers: userHeaders(),
     signal,
   });
   if (!res.ok) throw new Error(await errorFromResponse(res));

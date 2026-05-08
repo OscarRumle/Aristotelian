@@ -1,5 +1,20 @@
+import { getSettingsSync } from "../storage.js";
+import { DEFAULT_ANTHROPIC_MODEL } from "../constants.js";
+
 const ENDPOINT = "/api/anthropic/v1/messages";
-const MODEL = "claude-sonnet-4-6";
+
+function currentModel() {
+  const s = getSettingsSync();
+  return s.anthropicModel || DEFAULT_ANTHROPIC_MODEL;
+}
+
+function userHeaders() {
+  const s = getSettingsSync();
+  const h = { "Content-Type": "application/json" };
+  if (s.anthropicKey) h["x-user-anthropic-key"] = s.anthropicKey;
+  if (s.anthropicVersion) h["x-user-anthropic-version"] = s.anthropicVersion;
+  return h;
+}
 
 // ── Token usage accumulator ───────────────────────────────────────────────────
 
@@ -38,9 +53,9 @@ async function errorFromResponse(res) {
 export async function callClaude(system, userMsg, { maxTokens = 2000, signal } = {}) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: userHeaders(),
     body: JSON.stringify({
-      model: MODEL,
+      model: currentModel(),
       max_tokens: maxTokens,
       system,
       messages: [{ role: "user", content: userMsg }],
@@ -66,9 +81,9 @@ export async function callClaudeStreaming(
 ) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: userHeaders(),
     body: JSON.stringify({
-      model: MODEL,
+      model: currentModel(),
       max_tokens: maxTokens,
       stream: true,
       system,
