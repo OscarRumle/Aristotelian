@@ -6,3 +6,9 @@ dist
 .env.*.local
 .DS_Store
 *.log
+
+# Per-machine Claude Code permissions (do not commit)
+.claude/settings.local.json
+
+# Vite proxy timestamp scratch files
+vite.config.js.timestamp-*.mjs

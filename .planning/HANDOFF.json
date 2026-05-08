@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-08T11:33:36.644Z",
+  "source": "auto-postool",
+  "partial": false,
+  "phase": null,
+  "phase_name": null,
+  "phase_dir": null,
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "auto-checkpoint",
+  "completed_tasks": [],
+  "remaining_tasks": [],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [],
+  "uncommitted_files": [
+    {
+      "status": "??",
+      "path": ".claude/settings.local.json"
+    },
+    {
+      "status": "??",
+      "path": ".planning/"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/DESIGN_cast_analysis_associations.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/DESIGN_reference_network.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/DESIGN_world_graph.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/DESIGN_world_interview_discuss.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/DESIGN_world_interview_question_tone.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/design/global_field_actions.md"
+    }
+  ],
+  "next_action": null,
+  "context_notes": "Recent commits:\n45b3b9f Merge pull request #1 from OscarRumle/feat/settings-page\n3fcab19 feat: settings page with user-supplied API keys\nc68f215 feat: Higgsfield image generation pipeline for assets\n7c540ff feat: id-aware reference network + loose ends + relation taxonomy\nfb28910 docs(backlog): close out fixed items and record Design Pass 02"
+}
