@@ -188,6 +188,7 @@ export const RELATIONSHIP_TYPES = [
   { id: "mirror",     label: "Mirror",     description: "The same flaw, different masks",          directional: false, colorVar: "--rw-mirror" },
   { id: "debt",       label: "Debt",       description: "An obligation that shapes every scene",   directional: true,  colorVar: "--rw-debt" },
   { id: "catalyst",   label: "Catalyst",   description: "One triggers the other's fall",           directional: true,  colorVar: "--rw-catalyst" },
+  { id: "custom",     label: "Custom",     description: "Write your own connection",               directional: false, colorVar: "--rw-custom" },
 ];
 
 export const RELATIONSHIP_TYPES_BY_ID = Object.fromEntries(RELATIONSHIP_TYPES.map((t) => [t.id, t]));
