@@ -176,6 +176,22 @@ export function inverseRelation(value) {
   return RELATION_LOOKUP[value]?.inverse ?? null;
 }
 
+// ── Relationship Web connection types ──────────────────────────────────────
+// Hamartia-driven Aristotelian framings for the Relationship Web. Intentionally
+// separate from RELATION_CATEGORIES above — these describe *dramatic forces*
+// between two characters, not the social/historical/physical/mystical
+// taxonomy used elsewhere. Color tokens are defined in styles.css.
+export const RELATIONSHIP_TYPES = [
+  { id: "conflict",   label: "Conflict",   description: "Their natures cannot coexist",            directional: false, colorVar: "--rw-conflict" },
+  { id: "dependency", label: "Dependency", description: "One's weakness is the other's power",     directional: true,  colorVar: "--rw-dependency" },
+  { id: "loyalty",    label: "Loyalty",    description: "A bond the story will test",              directional: false, colorVar: "--rw-loyalty" },
+  { id: "mirror",     label: "Mirror",     description: "The same flaw, different masks",          directional: false, colorVar: "--rw-mirror" },
+  { id: "debt",       label: "Debt",       description: "An obligation that shapes every scene",   directional: true,  colorVar: "--rw-debt" },
+  { id: "catalyst",   label: "Catalyst",   description: "One triggers the other's fall",           directional: true,  colorVar: "--rw-catalyst" },
+];
+
+export const RELATIONSHIP_TYPES_BY_ID = Object.fromEntries(RELATIONSHIP_TYPES.map((t) => [t.id, t]));
+
 export const CHAR_COLORS = [
   "#C87941",
   "#5B8A6E",

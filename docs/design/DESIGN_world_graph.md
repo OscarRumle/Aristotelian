@@ -1,5 +1,13 @@
 # 3D World Graph — Design Document
 
+> **⚠ DEPRECATED — superseded by [relationship_web.md](relationship_web.md).**
+> This document describes an earlier, broader 3D graph spanning all entity types
+> using the social/historical/physical/mystical relation taxonomy. It has been
+> replaced by the 2D character-only **Relationship Web**, which uses
+> hamartia-driven Aristotelian connection types (Conflict / Dependency / Loyalty
+> / Mirror / Debt / Catalyst). Kept here for historical context only — do not
+> implement from this document.
+
 ## 1. Vision & Overview
 
 The World Graph is a visual map of relationships within a world. It transforms world-building from a linear list of entities (characters, factions, locations, objects, lore) into a living, interconnected network.

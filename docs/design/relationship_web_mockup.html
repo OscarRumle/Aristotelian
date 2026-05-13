@@ -1,0 +1,263 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.rw{font-family:var(--font-sans,-apple-system,sans-serif);overflow:hidden;border-radius:12px}
+.rw-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.rw-title{font-size:11.5px;color:var(--color-text-secondary)}.rw-title b{font-weight:500;color:var(--color-text-primary)}
+.rw-leg{display:flex;gap:10px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--color-text-tertiary)}
+.leg-dot{width:6px;height:6px;border-radius:50%}
+.rw-stage{position:relative;background:#0c0b09;overflow:hidden}
+.rw-stage svg{display:block;width:100%}
+.char-node{cursor:pointer}
+.char-node .hit{fill:transparent}
+.node-ring{fill:none;stroke:#c49a30;stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center}
+.node-body{fill:#1c1a16;stroke:rgba(255,255,255,0.16);stroke-width:1;transform-box:fill-box;transform-origin:center;transition:transform 0.2s}
+.char-node:hover .node-body{transform:scale(1.1);stroke:rgba(255,255,255,0.5)}
+.char-node.sel .node-body{stroke:#c49a30}
+.char-node.sel .node-ring{animation:ringPulse 1.4s ease-out infinite}
+.node-init{fill:rgba(255,255,255,0.72);font-size:12px;font-weight:500;text-anchor:middle;dominant-baseline:central;font-family:var(--font-sans,sans-serif);pointer-events:none}
+.node-lbl{fill:rgba(255,255,255,0.65);font-size:10px;text-anchor:middle;font-family:var(--font-sans,sans-serif);font-weight:500;pointer-events:none}
+.node-role{fill:rgba(255,255,255,0.25);font-size:8.5px;text-anchor:middle;font-family:var(--font-sans,sans-serif);pointer-events:none}
+@keyframes ringPulse{0%{opacity:.8;transform:scale(.85)}100%{opacity:0;transform:scale(1.8)}}
+@keyframes dashFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-18}}
+@keyframes drawIn{from{stroke-dashoffset:var(--len,500)}to{stroke-dashoffset:0}}
+@keyframes nodeIn{from{opacity:0}to{opacity:1}}
+.char-node{animation:nodeIn .5s ease both}
+.rw-panel{background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);min-height:152px;display:flex;flex-direction:column}
+.p-body{padding:16px 20px 12px;flex:1;display:flex;flex-direction:column;gap:10px}
+.p-feet{padding:0 20px 14px;display:flex;gap:8px;justify-content:flex-end}
+.idle-hint{font-size:12px;color:var(--color-text-tertiary);text-align:center;line-height:1.7;margin:auto}
+.first-row{display:flex;align-items:center;gap:11px;animation:fup .2s ease}
+.pip{width:7px;height:7px;border-radius:50%;background:#c49a30;flex-shrink:0}
+.p-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.p-ham{font-size:11px;color:var(--color-text-tertiary);font-style:italic;margin-top:2px}
+.hint-arrow{font-size:11px;color:var(--color-text-tertiary);margin-left:auto;white-space:nowrap}
+.pair-row{display:flex;align-items:flex-start;gap:8px;animation:fup .22s ease}
+.pair-c{flex:1}.pair-cn{font-size:12px;font-weight:500;color:var(--color-text-primary)}.pair-ch{font-size:10.5px;color:var(--color-text-tertiary);font-style:italic;margin-top:2px}
+.pair-arr{font-size:12px;color:var(--color-text-tertiary);padding-top:3px}
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.t-btn{border:0.5px solid var(--color-border-secondary);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;background:transparent;font-family:inherit;text-align:left;transition:border-color .12s,background .12s;line-height:1.4}
+.t-btn:hover{border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.t-btn-d{font-size:9.5px;font-style:italic;opacity:.7;display:block;margin-top:2px;font-weight:400}
+.gen-c{display:flex;align-items:center;justify-content:center;gap:12px;flex:1}
+.spinner{width:17px;height:17px;border:1.5px solid var(--color-border-secondary);border-top-color:var(--color-text-secondary);border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-lbl{font-size:12px;color:var(--color-text-secondary)}
+.rev{animation:fup .28s ease}
+.r-tag{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;margin-bottom:6px}
+.r-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.r-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px}
+.r-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:8px}
+.r-note{font-size:11px;color:var(--color-text-tertiary);font-style:italic;line-height:1.55;border-left:2px solid var(--color-border-secondary);padding-left:10px;border-radius:0}
+.conf-c{display:flex;align-items:center;justify-content:center;gap:10px;flex:1;animation:fup .22s ease}
+.conf-ck{width:24px;height:24px;border-radius:50%;background:#2d7a3a;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.conf-lbl{font-size:12px;color:var(--color-text-secondary)}
+.btn{border-radius:7px;padding:7px 15px;font-size:12px;font-family:inherit;cursor:pointer;border:0.5px solid var(--color-border-secondary);transition:all .12s;white-space:nowrap}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.b-ghost{background:transparent;color:var(--color-text-secondary);border-color:transparent}
+.b-ghost:hover:not(:disabled){background:var(--color-background-secondary)}
+.b-sec{background:transparent;color:var(--color-text-secondary)}
+.b-sec:hover:not(:disabled){background:var(--color-background-secondary);color:var(--color-text-primary)}
+.b-pri{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);font-weight:500}
+.b-pri:hover:not(:disabled){opacity:.86}
+.b-ok{background:#2d7a3a;color:#fff;border-color:#2d7a3a;font-weight:500}
+.b-ok:hover:not(:disabled){background:#256632}
+@keyframes fup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.etip{position:absolute;background:#1a1916;color:rgba(255,255,255,.88);font-size:10.5px;padding:5px 10px;border-radius:6px;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .15s;transform:translateX(-50%)}
+.etip.on{opacity:1}
+</style>
+
+<h2 class="sr-only">Relationship web — interactive character connection builder</h2>
+<div class="rw">
+<div class="rw-header">
+  <div class="rw-title">The Shattered Reach &nbsp;·&nbsp; <b>relationship web</b></div>
+  <div class="rw-leg" id="leg"></div>
+</div>
+<div class="rw-stage" id="stage">
+  <svg id="gsvg" viewBox="0 0 560 285" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="etip" id="etip"></div>
+</div>
+<div class="rw-panel">
+  <div class="p-body" id="pbody"></div>
+  <div class="p-feet" id="pfeet"></div>
+</div>
+</div>
+
+<script>
+const CH=[
+  {id:'caela',    name:'Caela Vorne',      sh:'Caela',    role:'Lead',          h:'Pride disguised as duty',        x:172,y:130,r:22,lead:1},
+  {id:'meren',    name:'Meren Tal',        sh:'Meren',    role:'Deuteragonist', h:'Loyalty as self-erasure',        x:375,y:58, r:18},
+  {id:'orvassen', name:'Duke Orvassen',    sh:'Orvassen', role:'Antagonist',    h:'Calculation without conscience', x:460,y:185,r:20},
+  {id:'lira',     name:'Lira of the Watch',sh:'Lira',     role:'Supporting',    h:'Duty over truth',                x:305,y:244,r:17},
+  {id:'archivist',name:'The Archivist',    sh:'Archivist',role:'Supporting',    h:'Knowledge as control',           x:72, y:216,r:17},
+];
+const TY=[
+  {id:'conflict',  l:'Conflict',  d:'Their natures cannot coexist',        c:'#c46060'},
+  {id:'dependency',l:'Dependency',d:"One's weakness is the other's power", c:'#4a7fa5'},
+  {id:'loyalty',   l:'Loyalty',   d:'A bond the story will test',          c:'#c49a30'},
+  {id:'mirror',    l:'Mirror',    d:'The same flaw, different masks',      c:'#9070c0'},
+  {id:'debt',      l:'Debt',      d:'An obligation that shapes every scene',c:'#9a7020'},
+  {id:'catalyst',  l:'Catalyst',  d:"One triggers the other's fall",       c:'#3a9080'},
+];
+const TC=Object.fromEntries(TY.map(t=>[t.id,t]));
+let edges=[
+  {id:'e1',a:'caela',   b:'meren',   type:'loyalty',   desc:'She trusts him completely. He has never questioned whether that trust is deserved.'},
+  {id:'e2',a:'caela',   b:'orvassen',type:'conflict',  desc:'Direct opposition. Her claim threatens everything he has built.'},
+  {id:'e3',a:'meren',   b:'orvassen',type:'dependency',desc:"Orvassen has been using Meren's access to Caela. Meren doesn't know."},
+];
+const MK={
+  'caela-lira':       {type:'catalyst',  title:'The Mirror She Avoids',         desc:"Lira's rigid sense of duty is everything Caela tells herself she has. Watching Lira follow orders Caela would have broken — and suffer less for it — forces Caela to confront whether her pride is principle or ego.",       note:"Lira catalyses Caela's hamartia by embodying its opposite. Every scene they share is an argument Caela is having with herself."},
+  'caela-archivist':  {type:'debt',      title:'A Debt of Silence',             desc:"The Archivist knows something about Caela's father that Caela has never asked directly. They both know the question is there. Neither has spoken it. The longer it goes unasked, the heavier it becomes.",               note:"Caela's pride prevents the question. The Archivist's need to control information prevents the answer. A silence maintained by two flaws."},
+  'meren-lira':       {type:'mirror',    title:'The Same Cage, Different Bars', desc:"Both have built their identity around serving others. Both have erased themselves doing it. In each other they see what they have become — and they don't like what they see.",                                              note:"Mirrored hamartias create the most uncomfortable relationships. Neither can criticise the other without implicating themselves."},
+  'meren-archivist':  {type:'catalyst',  title:'The Question He Never Asked',   desc:"The Archivist once tried to warn Meren about Orvassen. Meren didn't hear it — or chose not to. The Archivist still has the information. Meren's loyalty makes him a blind spot that cannot be fixed.",                   note:"Meren's hamartia prevents him from receiving what the Archivist knows. They are locked: the information that would free him cannot reach him."},
+  'orvassen-lira':    {type:'dependency',title:'The Useful Instrument',         desc:"Lira follows orders without asking why. Orvassen has made use of this before. She has never learned who gave the orders she carried out three years ago.",                                                                   note:"Orvassen's calculation depends on people whose duty overrides their conscience. He has no contempt for her. She is simply a resource."},
+  'orvassen-archivist':{type:'conflict', title:'Two Kinds of Power',            desc:"Both hold power through information — the Archivist hoards it, Orvassen weaponises it. Each considers the other's method inferior. They have been in a cold war for twenty years.",                                          note:"Their hamartias are different expressions of the same appetite. Neither can afford to let the other win."},
+  'lira-archivist':   {type:'debt',      title:'A Favour Long Owed',            desc:"The Archivist helped Lira get her position in the Watch, years ago, without being asked. They have never spoken of it. Lira has been waiting for the debt to be called in.",                                                  note:"The Archivist collects people who owe them things. Lira's duty-bound nature means she will honour the debt — even if she disagrees with what's asked."},
+};
+function mk(a,b){return[a,b].sort().join('-')}
+function gc(id){return CH.find(c=>c.id===id)}
+function ge(a,b){return edges.find(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a))}
+
+let sel=[],phase='idle',pType=null,pRes=null,newEid=null;
+const gsvg=document.getElementById('gsvg');
+const etip=document.getElementById('etip');
+const pbody=document.getElementById('pbody');
+const pfeet=document.getElementById('pfeet');
+const NS='http://www.w3.org/2000/svg';
+function se(tag,a={}){const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(a))el.setAttribute(k,v);return el}
+
+document.getElementById('leg').innerHTML=TY.map(t=>`<div class="leg"><div class="leg-dot" style="background:${t.c}"></div>${t.l}</div>`).join('');
+
+function draw(){
+  gsvg.innerHTML='';
+  const defs=se('defs');
+  const pat=se('pattern',{id:'dp',width:'26',height:'26',patternUnits:'userSpaceOnUse'});
+  const dc=se('circle',{cx:'1',cy:'1',r:'1',fill:'rgba(255,255,255,0.05)'});
+  pat.appendChild(dc);defs.appendChild(pat);gsvg.appendChild(defs);
+  gsvg.appendChild(se('rect',{width:'560',height:'285',fill:'#0c0b09'}));
+  gsvg.appendChild(se('rect',{width:'560',height:'285',fill:'url(#dp)'}));
+
+  edges.forEach(e=>{
+    const ca=gc(e.a),cb=gc(e.b),ct=TC[e.type];
+    const isNew=e.id===newEid;
+    const len=Math.hypot(cb.x-ca.x,cb.y-ca.y);
+    const ln=se('line',{x1:ca.x,y1:ca.y,x2:cb.x,y2:cb.y,stroke:ct.c,'stroke-width':'1.5','stroke-opacity':isNew?'0.8':'0.45',id:'edge-'+e.id});
+    if(isNew){ln.style.strokeDasharray=len;ln.style.setProperty('--len',len);ln.style.strokeDashoffset=len;ln.style.animation='drawIn 0.75s ease forwards';}
+    gsvg.appendChild(ln);
+    [1,0.4].forEach((op,i)=>{
+      const p=se('circle',{r:i?'2':'2.5',fill:ct.c,opacity:op});
+      const m=se('animateMotion',{dur:(2.6+Math.random()*2).toFixed(1)+'s',repeatCount:'indefinite',path:`M${i?cb.x:ca.x},${i?cb.y:ca.y} L${i?ca.x:cb.x},${i?ca.y:cb.y}`});
+      p.appendChild(m);gsvg.appendChild(p);
+    });
+  });
+
+  if(sel.length===2){
+    const ca=gc(sel[0]),cb=gc(sel[1]);
+    const pl=se('line',{x1:ca.x,y1:ca.y,x2:cb.x,y2:cb.y,stroke:'#c49a30','stroke-width':'1.5','stroke-dasharray':'5 4','stroke-opacity':'0.7'});
+    pl.style.animation=`dashFlow ${phase==='gen'?.38:.95}s linear infinite`;
+    gsvg.appendChild(pl);
+  }
+
+  CH.forEach((ch,i)=>{
+    const g=se('g');
+    g.setAttribute('class','char-node'+(sel.includes(ch.id)?' sel':''));
+    g.setAttribute('id','node-'+ch.id);
+    g.setAttribute('transform',`translate(${ch.x},${ch.y})`);
+    g.style.animationDelay=(i*.09)+'s';
+    const ring=se('circle',{r:ch.r+11,'class':'node-ring'});
+    const body=se('circle',{r:ch.r,'class':'node-body'});
+    if(sel.includes(ch.id))body.setAttribute('stroke','#c49a30');
+    const ini=se('text',{'class':'node-init'});
+    ini.textContent=ch.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+    const lbl=se('text',{'class':'node-lbl',dy:ch.r+13+'',x:'0'});
+    lbl.textContent=ch.sh;
+    const rl=se('text',{'class':'node-role',dy:ch.r+22+'',x:'0'});
+    rl.textContent=ch.role;
+    const hit=se('circle',{r:ch.r+14,'class':'hit'});
+    [ring,body,ini,lbl,rl,hit].forEach(el=>g.appendChild(el));
+    g.addEventListener('click',()=>onN(ch.id));
+    gsvg.appendChild(g);
+  });
+}
+
+function flashE(a,b){
+  const e=ge(a,b);
+  const el=document.getElementById('edge-'+e.id);
+  if(!el)return;
+  el.setAttribute('stroke-opacity','1');el.setAttribute('stroke-width','3');
+  setTimeout(()=>{el.setAttribute('stroke-opacity','0.45');el.setAttribute('stroke-width','1.5');},650);
+  const ca=gc(a),cb=gc(b),mx=(ca.x+cb.x)/2,my=(ca.y+cb.y)/2;
+  const sc=gsvg.getBoundingClientRect().width/560;
+  etip.textContent=`Already connected · ${TC[e.type].l}`;
+  etip.style.left=(mx*sc)+'px';etip.style.top=((my-22)*sc)+'px';
+  etip.classList.add('on');setTimeout(()=>etip.classList.remove('on'),1800);
+}
+
+function onN(id){
+  if(phase==='gen'||phase==='review'||phase==='confirmed')return;
+  if(sel.includes(id)){sel=sel.filter(s=>s!==id);go(sel.length?'first':'idle');return;}
+  if(!sel.length){sel=[id];go('first');return;}
+  if(sel.length===1){
+    if(ge(sel[0],id)){flashE(sel[0],id);return;}
+    sel=[sel[0],id];pType=null;go('type');
+  }
+}
+
+function go(p){phase=p;draw();rp();}
+
+function rp(){
+  pbody.innerHTML='';pfeet.innerHTML='';
+  if(phase==='idle'){
+    pbody.innerHTML=`<div class="idle-hint">Click any character to select them.<br>Select two to generate a dramatic connection.</div>`;
+  } else if(phase==='first'){
+    const ch=gc(sel[0]);
+    pbody.innerHTML=`<div class="first-row"><div class="pip"></div><div><div class="p-name">${ch.name}</div><div class="p-ham">${ch.h}</div></div><div class="hint-arrow">→ select another</div></div>`;
+    const b=document.createElement('button');b.className='btn b-ghost';b.textContent='Clear';b.onclick=()=>{sel=[];go('idle');};pfeet.appendChild(b);
+  } else if(phase==='type'){
+    const ca=gc(sel[0]),cb=gc(sel[1]);
+    pbody.innerHTML=`<div class="pair-row"><div class="pair-c"><div class="pair-cn">${ca.name}</div><div class="pair-ch">${ca.h}</div></div><div class="pair-arr">↔</div><div class="pair-c"><div class="pair-cn">${cb.name}</div><div class="pair-ch">${cb.h}</div></div></div>
+    <div class="t-grid">${TY.map(t=>`<button class="t-btn${pType===t.id?' ':'  '}" id="tb-${t.id}" onclick="pt('${t.id}')" style="${pType===t.id?`border-color:${t.c};color:${t.c};border-width:1.5px;background:${t.c}14`:''}">${t.l}<span class="t-btn-d">${t.d}</span></button>`).join('')}</div>`;
+    const canc=document.createElement('button');canc.className='btn b-ghost';canc.textContent='Cancel';canc.onclick=()=>{sel=[];pType=null;go('idle');};
+    const gen=document.createElement('button');gen.className='btn b-pri';gen.textContent='Generate →';gen.disabled=!pType;gen.id='gbtn';gen.onclick=doGen;
+    pfeet.appendChild(canc);pfeet.appendChild(gen);
+  } else if(phase==='gen'){
+    pbody.innerHTML=`<div class="gen-c"><div class="spinner"></div><div class="gen-lbl">Reading the hamartias…</div></div>`;
+  } else if(phase==='review'){
+    const r=pRes,ct=TC[r.type];
+    pbody.innerHTML=`<div class="rev"><div class="r-tag" style="background:${ct.c}18;color:${ct.c};border:0.5px solid ${ct.c}40"><div class="r-dot" style="background:${ct.c}"></div>${ct.l}</div><div class="r-title">${r.title}</div><div class="r-desc">${r.desc}</div><div class="r-note">${r.note}</div></div>`;
+    const ag=document.createElement('button');ag.className='btn b-sec';ag.textContent='Try again';ag.onclick=()=>{pType=null;go('type');};
+    const cf=document.createElement('button');cf.className='btn b-ok';cf.textContent='Confirm & save';cf.onclick=doConf;
+    pfeet.appendChild(ag);pfeet.appendChild(cf);
+  } else if(phase==='confirmed'){
+    pbody.innerHTML=`<div class="conf-c"><div class="conf-ck"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3.5 3.5 6-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="conf-lbl">Connection added to the web</div></div>`;
+  }
+}
+
+function pt(id){pType=id;rp();}
+
+function doGen(){
+  go('gen');
+  setTimeout(()=>{
+    const key=mk(sel[0],sel[1]);
+    pRes=MK[key]||{type:pType||'conflict',title:'An Untold Connection',desc:"Their histories are more intertwined than either has acknowledged. The connection will surface when the story demands it.",note:"Their hamartias interact in ways neither has fully recognised. The dramatic potential is latent."};
+    if(!pRes.type)pRes.type=pType;
+    phase='review';rp();
+  },1850);
+}
+
+function doConf(){
+  const ne={id:'e'+Date.now(),a:sel[0],b:sel[1],type:pRes.type,desc:pRes.desc};
+  edges.push(ne);newEid=ne.id;
+  sel=[];pType=null;pRes=null;
+  go('confirmed');
+  setTimeout(()=>{newEid=null;phase='idle';rp();},2300);
+}
+
+gsvg.addEventListener('click',e=>{
+  if(!e.target.closest('.char-node')&&phase!=='gen'&&phase!=='review')
+  {sel=[];pType=null;go('idle');}
+});
+
+draw();rp();
+</script>

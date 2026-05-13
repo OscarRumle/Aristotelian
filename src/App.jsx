@@ -390,6 +390,7 @@ export default function App() {
             onOpenLooseEnds={() => setView("looseEnds")}
             onNavigate={navigate}
             onCreateFromRef={handleCreateFromRef}
+            onUpdateCharacter={updateWorldCharacter}
           />
         )}
 

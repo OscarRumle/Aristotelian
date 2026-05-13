@@ -12,6 +12,7 @@ import { ObjectsTab } from "./ObjectsTab.jsx";
 import { FactionsTab } from "./FactionsTab.jsx";
 import { LocationsTab } from "./LocationsTab.jsx";
 import { ImageStyleSettings } from "./ImageStyleSettings.jsx";
+import { RelationshipWeb } from "./RelationshipWeb.jsx";
 
 function CharactersPanel({ world, onSelectCharacter }) {
   const [roleTab, setRoleTab] = useState("Recent");
@@ -166,6 +167,7 @@ export function WorldDetail({
   onOpenLooseEnds,
   onNavigate,
   onCreateFromRef,
+  onUpdateCharacter,
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -268,6 +270,18 @@ export function WorldDetail({
     );
   }
 
+  // ── Relationship Web tool sub-view ────────────────────────────────────────
+  if (toolView === "relationships") {
+    return (
+      <RelationshipWeb
+        world={world}
+        onBack={() => onSetToolView(null)}
+        onUpdateWorld={onUpdateWorld}
+        onUpdateCharacter={onUpdateCharacter}
+      />
+    );
+  }
+
   // ── Locations tool sub-view ───────────────────────────────────────────────
   if (toolView === "locations") {
     return (
@@ -331,6 +345,14 @@ export function WorldDetail({
       count: (world.locations ?? []).length,
       unit: (world.locations ?? []).length === 1 ? "location" : "locations",
       onClick: () => onSetToolView("locations"),
+    },
+    {
+      id: "relationships",
+      name: "Relationship Web",
+      description: "Map how characters' flaws pull against each other",
+      count: (world.relationships ?? []).length,
+      unit: (world.relationships ?? []).length === 1 ? "connection" : "connections",
+      onClick: () => onSetToolView("relationships"),
     },
     ...(onOpenLooseEnds ? [{
       id: "looseEnds",

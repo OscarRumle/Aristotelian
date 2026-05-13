@@ -21,6 +21,7 @@
 | Bottom bar (fixed footer) | `BottomBar.jsx` |
 | Token counter display | `TokenCounter.jsx` |
 | Document library / export viewer | `DocumentLibrary.jsx` + `DocumentViewer.jsx` |
+| Relationship Web (graph stage + connection generation) | `RelationshipWeb.jsx` + `RelationshipPanel.jsx` + `prompts/buildRelationshipPrompt.js` |
 | Loading dots animation | `AnimatedDots.jsx` |
 | Empty state placeholder | `EmptyState.jsx` |
 | Error toast notification | `ErrorToast.jsx` |
@@ -57,3 +58,5 @@
 | `EmptyState.jsx` | Placeholder when list is empty |
 | `ErrorToast.jsx` | Dismissable error notification |
 | `ConfirmModal.jsx` | Confirm dialog for destructive actions. Restores focus to the triggering element on close. Handles Escape key. |
+| `RelationshipWeb.jsx` | 2D SVG character graph. Owns drag-to-move, click flow, LLM generation. State machine via useReducer: idle → first → type → gen → review → confirmed. Reads/writes `world.relationships` and `character.x/y`. |
+| `RelationshipPanel.jsx` | Bottom panel for the Relationship Web. Pure presentational, switches view per phase. |
