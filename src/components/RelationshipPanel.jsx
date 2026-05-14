@@ -47,13 +47,24 @@ export function RelationshipPanel({
   return (
     <div className="rw-panel">
       <div className="rw-panel-body">
-        {phase === "idle" && (
-          <div className="rw-idle-hint">
-            Every character carries a flaw.<br />
-            Map how those flaws pull against each other.
-            <div className="rw-idle-op">Click any character to begin.</div>
-          </div>
-        )}
+        {phase === "idle" && (() => {
+          const charCount = (world?.characters ?? []).length;
+          if (charCount === 1) {
+            return (
+              <div className="rw-idle-hint">
+                One character, alone on the stage.
+                <div className="rw-idle-op">Add more characters to start mapping the forces between them.</div>
+              </div>
+            );
+          }
+          return (
+            <div className="rw-idle-hint">
+              Every character carries a flaw.<br />
+              Map how those flaws pull against each other.
+              <div className="rw-idle-op">Click any character to begin.</div>
+            </div>
+          );
+        })()}
 
         {phase === "first" && charA && (
           <div className="rw-first-row">

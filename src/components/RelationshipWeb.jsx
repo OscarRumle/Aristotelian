@@ -67,6 +67,14 @@ function genId() {
   return "rel_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
+// Stable hash of an edge id → a number in [0, 1). Used to give each edge a
+// slightly different particle drift speed so they don't all sync up.
+function edgeHash01(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return ((h >>> 0) % 1000) / 1000;
+}
+
 const WRITEBACK_FIELD_SET = new Set(RELATIONSHIP_WRITEBACK_FIELDS);
 
 // Strip the LLM patch object down to allowed keys with non-empty string values.
@@ -192,7 +200,7 @@ function reducer(state, action) {
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export function RelationshipWeb({ world, onBack, onUpdateWorld, onUpdateCharacter }) {
+export function RelationshipWeb({ world, onBack, onUpdateWorld, onUpdateCharacter, onNewCharacter }) {
   const characters = world.characters ?? [];
   const relationships = world.relationships ?? [];
 
@@ -294,6 +302,18 @@ export function RelationshipWeb({ world, onBack, onUpdateWorld, onUpdateCharacte
     const t = setTimeout(() => dispatch({ type: "CLEAR_NEW_EDGE" }), 1100);
     return () => clearTimeout(t);
   }, [state.newEdgeId]);
+
+  // Prune orphaned relationships (both endpoints must still exist) whenever the
+  // character roster changes. Render-time filtering already protects the UI;
+  // this clears the data so storage doesn't accumulate dead entries when a
+  // character is removed elsewhere in the app.
+  useEffect(() => {
+    const rels = worldRef.current?.relationships ?? [];
+    const valid = rels.filter((r) => charById[r.a] && charById[r.b]);
+    if (valid.length === rels.length) return;
+    onUpdateWorldRef.current?.({ ...worldRef.current, relationships: valid });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [characters.length]);
 
   // Auto-return to idle after confirmed state.
   // - While writeback is pending, keep the panel sticky long enough that most
@@ -822,10 +842,15 @@ export function RelationshipWeb({ world, onBack, onUpdateWorld, onUpdateCharacte
 
       {characters.length === 0 ? (
         <div className="rw-empty">
-          <p className="t-body">No characters in this world yet.</p>
-          <p className="t-body" style={{ color: "var(--muted)" }}>
-            The Relationship Web maps the dramatic forces between characters. Create a few first, then come back.
+          <p className="rw-empty-quote">"Every character carries a flaw. The web maps how those flaws pull against each other."</p>
+          <p className="rw-empty-body">
+            No characters in this world yet — the web is ready, it just needs people in it.
           </p>
+          {onNewCharacter && (
+            <button type="button" className="btn btn-primary rw-empty-cta" onClick={onNewCharacter}>
+              + Create your first character
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -905,6 +930,22 @@ export function RelationshipWeb({ world, onBack, onUpdateWorld, onUpdateCharacte
                         <title>Writeback to character sheets failed</title>
                       </g>
                     )}
+                    {/* Ambient particles drifting along the edge */}
+                    {!isNew && (() => {
+                      const h = edgeHash01(e.id);
+                      const dur1 = (3 + h * 2).toFixed(2);     // 3.0 – 5.0s
+                      const dur2 = (3.5 + h * 1.5).toFixed(2); // 3.5 – 5.0s, offset
+                      return (
+                        <>
+                          <circle className="rw-edge-particle" r="2.4" fill={`var(${type.colorVar})`} opacity=".75">
+                            <animateMotion dur={`${dur1}s`} repeatCount="indefinite" path={`M${x1},${y1} L${x2},${y2}`} />
+                          </circle>
+                          <circle className="rw-edge-particle" r="1.8" fill={`var(${type.colorVar})`} opacity=".35">
+                            <animateMotion dur={`${dur2}s`} repeatCount="indefinite" path={`M${x2},${y2} L${x1},${y1}`} />
+                          </circle>
+                        </>
+                      );
+                    })()}
                   </g>
                 );
               })}

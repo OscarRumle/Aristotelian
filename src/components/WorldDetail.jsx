@@ -278,6 +278,7 @@ export function WorldDetail({
         onBack={() => onSetToolView(null)}
         onUpdateWorld={onUpdateWorld}
         onUpdateCharacter={onUpdateCharacter}
+        onNewCharacter={onNewCharacter}
       />
     );
   }
