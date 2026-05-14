@@ -9,6 +9,7 @@ import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
 import { AssetImage } from "./AssetImage.jsx";
+import { LensTag } from "./LensTag.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -135,6 +136,11 @@ export function LocationDetail({ location, world, onBack, onUpdate, onNavigate, 
           </span>
         )}
         <h1 className="t-heading">{location.name || "Unnamed Location"}</h1>
+        {location.lens && (
+          <div style={{ marginTop: ".5rem" }}>
+            <LensTag lens={location.lens} entityNoun="location" />
+          </div>
+        )}
         {gen.signature_line && (
           <p className="loc-output-sig" style={{ marginTop: ".35rem" }}>
             "{gen.signature_line}"

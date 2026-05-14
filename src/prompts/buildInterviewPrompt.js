@@ -36,7 +36,7 @@ Apply Aristotle's five analytical lenses to deepen what exists. Use each lens at
 - mimesis: Does the world's internal logic hold? What rules must apply universally, including to protagonists?
 - necessity: What events are inevitable given this world's structure? What is already in motion?
 - polis: Who holds power and how? What does this society reward and punish? What is justice here?
-- hamartia: What is the world's structural flaw or contradiction — two legitimate goods in irresolvable conflict?
+- world_hamartia: What is the world's structural flaw or contradiction — two legitimate goods in irresolvable conflict?
 - possible: What kinds of stories can happen here? What is structurally impossible even if you wanted it?
 
 For EACH question:

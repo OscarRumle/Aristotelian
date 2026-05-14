@@ -1,12 +1,13 @@
 import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
+import { getLensFraming } from "./lensFraming.js";
 
 /**
  * Builds the system prompt for faction generation.
- * formState: { pitch, name, type, size, status, age, typeSpecificFields, associations }
+ * formState: { pitch, name, type, size, status, age, typeSpecificFields, associations, lens }
  * associations: [{ kind: "character"|"location", id, note }]
  */
 export function buildFactionPrompt(world, formState) {
-  const { pitch, name, type, size, status, age, typeSpecificFields = {}, associations = [], mentionContext } = formState;
+  const { pitch, name, type, size, status, age, typeSpecificFields = {}, associations = [], mentionContext, lens } = formState;
 
   const lines = [];
 
@@ -57,6 +58,12 @@ export function buildFactionPrompt(world, formState) {
     }
   }
   lines.push(``);
+
+  const lensFraming = getLensFraming(lens === undefined ? "hamartia" : lens);
+  if (lensFraming) {
+    lines.push(lensFraming);
+    lines.push(``);
+  }
 
   lines.push(`FIELD INSTRUCTIONS:`);
   lines.push(`- "name": A specific, evocative name. Not generic. If the user supplied a name, use it exactly.`);

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { PHASES } from "../constants.js";
+import { PHASES, LENS_LABELS } from "../constants.js";
 import { AnimatedDots } from "./AnimatedDots.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 
-export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone, onCancel }) {
+export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone, onCancel, lens }) {
   const [typed, setTyped] = useState(false);
   useEffect(() => setTyped(false), [verb]);
   const color = justDone ? "var(--sage)" : "var(--amber)";
   const verbBase = verb.replace(/[.…]+$/, "");
+  // Lens indicator — suppress when lens is null/none or unknown.
+  const lensLabel = lens && LENS_LABELS[lens] ? LENS_LABELS[lens] : null;
   return (
     <div className="gen-overlay" role="status" aria-live="polite" aria-label="Generating character">
       <div className="gen-verb-wrap">
@@ -21,6 +23,9 @@ export function GeneratingOverlay({ phaseIdx, doneIds, verb, justDone, onCancel 
           )}
         </p>
         <p className="gen-phase-name">{PHASES[phaseIdx]?.label}</p>
+        {lensLabel && (
+          <p className="gen-lens-indicator">through the lens of <em>{lensLabel}</em></p>
+        )}
       </div>
       {onCancel && (
         <button type="button" className="gen-cancel-btn" onClick={onCancel}>

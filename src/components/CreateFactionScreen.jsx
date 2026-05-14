@@ -16,6 +16,9 @@ import {
   FACTION_PHASES,
 } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
+import { LensSelector } from "./LensSelector.jsx";
+import { DEFAULT_LENS } from "../constants.js";
+import { pickVerbs } from "../prompts/lensFraming.js";
 
 function TypeChips({ value, onChange }) {
   return (
@@ -96,7 +99,7 @@ function AssocRow({ item, checked, note, onToggle, onNoteChange, placeholder, ac
   );
 }
 
-function GenProgress({ accumulated }) {
+function GenProgress({ accumulated, lens }) {
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [verbIdx, setVerbIdx] = useState(0);
   const verbTimer = useRef(null);
@@ -112,17 +115,19 @@ function GenProgress({ accumulated }) {
     setPhaseIdx(nextPhase);
   }, [accumulated]);
 
+  const phase = FACTION_PHASES[phaseIdx];
+  const verbs = pickVerbs(phase, lens);
+
   useEffect(() => {
-    const verbs = FACTION_PHASES[phaseIdx]?.verbs ?? [];
     setVerbIdx(0);
     verbTimer.current = setInterval(() => {
-      setVerbIdx((v) => (v + 1) % verbs.length);
+      setVerbIdx((v) => (v + 1) % Math.max(verbs.length, 1));
     }, 2200);
     return () => clearInterval(verbTimer.current);
-  }, [phaseIdx]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phaseIdx, lens]);
 
-  const phase = FACTION_PHASES[phaseIdx];
-  const verb = phase?.verbs[verbIdx] ?? "…";
+  const verb = verbs[verbIdx] ?? "…";
 
   return (
     <div className="fac-gen-progress">
@@ -141,6 +146,7 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
   const [age, setAge]             = useState("");
   const [typeFields, setTypeFields] = useState({});
   const [associations, setAssociations] = useState([]);
+  const [lens, setLens] = useState(DEFAULT_LENS);
   const [generated, setGenerated] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [genAccumulated, setGenAccumulated] = useState("");
@@ -181,7 +187,7 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
     );
   };
 
-  const formState = { pitch, name, type, size, status, age, typeSpecificFields: typeFields, associations };
+  const formState = { pitch, name, type, size, status, age, typeSpecificFields: typeFields, associations, lens };
 
   const generate = async () => {
     if (!pitch.trim()) return;
@@ -234,6 +240,7 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
       typeSpecificFields: typeFields,
       associations,
       generated,
+      lens,
       isDraft: false,
       createdAt: Date.now(),
     };
@@ -391,7 +398,7 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
         </div>
 
         {generating && (
-          <GenProgress accumulated={genAccumulated} />
+          <GenProgress accumulated={genAccumulated} lens={lens} />
         )}
 
         {genError && (
@@ -430,6 +437,8 @@ export function CreateFactionScreen({ world, onBack, onSave, refContext = null, 
           </div>
         )}
       </div>
+
+      <LensSelector tool="faction" style={null} value={lens} onChange={setLens} />
 
       <BottomBar>
         {discardConfirm ? (

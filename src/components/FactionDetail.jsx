@@ -9,6 +9,7 @@ import { RichText } from "./RichText.jsx";
 import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
 import { AssetImage } from "./AssetImage.jsx";
+import { LensTag } from "./LensTag.jsx";
 
 function DetailPill({ label, value }) {
   if (!value) return null;
@@ -135,6 +136,11 @@ export function FactionDetail({ faction, world, onBack, onUpdate, onNavigate, on
           </span>
         )}
         <h1 className="t-heading">{faction.name || "Unnamed Faction"}</h1>
+        {faction.lens && (
+          <div style={{ marginTop: ".5rem" }}>
+            <LensTag lens={faction.lens} entityNoun="faction" />
+          </div>
+        )}
         {gen.motto && (
           <p className="fac-output-sig" style={{ marginTop: ".35rem" }}>
             "{gen.motto}"

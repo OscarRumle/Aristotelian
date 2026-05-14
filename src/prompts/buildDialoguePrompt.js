@@ -1,5 +1,6 @@
 import { ROLE_OPTIONS } from "../constants.js";
 import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
+import { getLensFraming } from "./lensFraming.js";
 
 function formatExistingLines(lines) {
   return lines
@@ -16,13 +17,13 @@ function formatExistingLines(lines) {
  * @param {object} world
  * @param {object[]} participants - full character objects who speak
  * @param {object[]} mentions - characters who may be referenced but don't speak
- * @param {object} opts - { pitch, mood, hamartiaOn, existingLines, direction, directionTarget }
+ * @param {object} opts - { pitch, mood, lens, existingLines, direction, directionTarget }
  */
 export function buildDialoguePrompt(world, participants, mentions, opts) {
   const {
     pitch = "",
     mood = "",
-    hamartiaOn = false,
+    lens,
     existingLines = [],
     direction = "",
     directionTarget = "@everyone",
@@ -63,9 +64,11 @@ export function buildDialoguePrompt(world, participants, mentions, opts) {
       ? `DIRECTION (apply to ${directionTarget}):\n${direction.trim()}`
       : null;
 
-  const hamartiaInstruction = hamartiaOn
-    ? `HAMARTIA DRIVE: ON — Each character's core flaw must be structurally active in this exchange. The flaw shapes what they do, not just what they say. Their greatest strength and their defining error are the same thing operating in different conditions.`
-    : null;
+  // Lens-driven framing replaces the old hamartiaOn toggle.
+  // lens === undefined here means a caller hasn't been migrated yet — default
+  // to "hamartia" to preserve current behaviour. lens === null is the explicit
+  // opt-out and produces no framing block.
+  const lensFraming = getLensFraming(lens === undefined ? "hamartia" : lens);
 
   const actionVerb = existingLines.length > 0 ? "Continue" : "Generate";
 
@@ -77,7 +80,7 @@ export function buildDialoguePrompt(world, participants, mentions, opts) {
       : null,
     pitch ? `SCENE PITCH:\n${pitch}` : null,
     mood ? `MOOD: ${mood}` : null,
-    hamartiaInstruction,
+    lensFraming,
     existingBlock,
     directionBlock,
   ]

@@ -13,6 +13,7 @@ import { ReferencedIn } from "./ReferencedIn.jsx";
 import { AssociationsPanel } from "./AssociationsPanel.jsx";
 import { AssociationProseInjector } from "./AssociationProseInjector.jsx";
 import { AssetImage } from "./AssetImage.jsx";
+import { LensTag } from "./LensTag.jsx";
 
 function LockedSection({ title, fields, character, onExpand, isExpanding }) {
   return (
@@ -253,6 +254,7 @@ export function CharacterSheet({ character, world, onBack, onUpdate, onExpand, i
                 {meta && <span className="char-meta">{meta}</span>}
                 <div className="char-tags">
                   {style && <span className="char-tag">{style}</span>}
+                  <LensTag lens={character.lens} entityNoun="character" />
                 </div>
               </div>
             )}

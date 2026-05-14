@@ -52,6 +52,7 @@ export default function App() {
   const [storageCorrupted, setStorageCorrupted] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [genLens, setGenLens] = useState(null);
   const [expanding, setExpanding] = useState(false);
   const [genError, setGenError] = useState(null);
   const [genAccumulated, setGenAccumulated] = useState("");
@@ -66,7 +67,7 @@ export default function App() {
 
   const abortRef = useRef(null);
 
-  const { phaseIdx, doneIds, verb, justDone } = useGeneratingProgress(generating, genAccumulated);
+  const { phaseIdx, doneIds, verb, justDone } = useGeneratingProgress(generating, genAccumulated, genLens);
 
   const activeWorld = worlds.find((w) => w.id === activeWorldId);
   const activeChar = activeWorld?.characters.find((c) => c.id === activeCharId);
@@ -213,11 +214,12 @@ export default function App() {
     updateScene({ ...activeScene, dialogues: updatedDialogues });
   };
 
-  const handleStartGenerating = () => {
+  const handleStartGenerating = (lens) => {
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setGenerating(true);
+    setGenLens(lens ?? null);
     setGenError(null);
     setGenAccumulated("");
   };
@@ -329,7 +331,7 @@ export default function App() {
       )}
 
       {generating && (
-        <GeneratingOverlay phaseIdx={phaseIdx} doneIds={doneIds} verb={verb} justDone={justDone} onCancel={handleNavigateAway} />
+        <GeneratingOverlay phaseIdx={phaseIdx} doneIds={doneIds} verb={verb} justDone={justDone} lens={genLens} onCancel={handleNavigateAway} />
       )}
 
       {castAnalysisOpen && activeWorld && (

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PHASES, MIN_PHASE_MS } from "../constants.js";
 import { randItem } from "../util.js";
 import { getSettingsSync } from "../storage.js";
+import { pickVerbs } from "../prompts/lensFraming.js";
 
 /**
  * Drives the generating overlay. Watches the streamed JSON for each phase's
@@ -12,13 +13,18 @@ import { getSettingsSync } from "../storage.js";
  * All timers are tracked explicitly so the effect cleanup can cancel them on
  * unmount or cancellation.
  */
-export function useGeneratingProgress(active, accumulated) {
+export function useGeneratingProgress(active, accumulated, lens) {
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [doneIds, setDoneIds] = useState([]);
   const [verb, setVerb] = useState("");
   const [justDone, setJustDone] = useState(false);
 
   const state = useRef(null);
+  // Keep a ref of the latest lens so the running interval picks the right
+  // verb set even if the lens changes after generation started (rare, but
+  // future-proof).
+  const lensRef = useRef(lens);
+  useEffect(() => { lensRef.current = lens; }, [lens]);
 
   const makeState = () => ({
     idx: 0,
@@ -52,9 +58,13 @@ export function useGeneratingProgress(active, accumulated) {
       const p = PHASES[idx];
       s.startedAt = Date.now();
       setPhaseIdx(idx);
-      setVerb(randItem(p.verbs));
+      const verbs = pickVerbs(p, lensRef.current);
+      setVerb(randItem(verbs));
       clearInterval(s.verbTimer);
-      s.verbTimer = setInterval(() => setVerb(randItem(p.verbs)), verbMs);
+      s.verbTimer = setInterval(() => {
+        const v = pickVerbs(p, lensRef.current);
+        setVerb(randItem(v));
+      }, verbMs);
     };
 
     const completePhase = (id) => {

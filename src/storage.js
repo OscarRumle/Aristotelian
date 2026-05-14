@@ -122,6 +122,36 @@ function migrate(parsed) {
     version = 12;
   }
 
+  // v12 → v13: Aristotelian lens system. Add `lens: "hamartia"` to every
+  // entity that lacks one (characters, factions, locations, objects).
+  // Per-dialogue: migrate `hamartiaOn` (boolean) to `lens` ("hamartia" or null)
+  // and delete the old field. See docs/design/aristotelian_lens_system.md.
+  if (version < 13) {
+    const ensureLens = (e) => (e && "lens" in e ? e : { ...e, lens: "hamartia" });
+    const migrateDialogue = (d) => {
+      const next = { ...d };
+      if ("hamartiaOn" in next) {
+        next.lens = next.hamartiaOn ? "hamartia" : null;
+        delete next.hamartiaOn;
+      } else if (!("lens" in next)) {
+        next.lens = "hamartia";
+      }
+      return next;
+    };
+    worlds = worlds.map((w) => ({
+      ...w,
+      characters: (w.characters ?? []).map(ensureLens),
+      factions:   (w.factions ?? []).map(ensureLens),
+      locations:  (w.locations ?? []).map(ensureLens),
+      objects:    (w.objects ?? []).map(ensureLens),
+      scenes: (w.scenes ?? []).map((s) => ({
+        ...s,
+        dialogues: (s.dialogues ?? []).map(migrateDialogue),
+      })),
+    }));
+    version = 13;
+  }
+
   if (!settings) settings = { ...DEFAULT_SETTINGS };
   return { __version: version, worlds, settings };
 }

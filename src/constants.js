@@ -1,5 +1,5 @@
 export const STORAGE_KEY = "aristotelian-worlds-v2";
-export const STORAGE_VERSION = 12;
+export const STORAGE_VERSION = 13;
 
 // ── User settings ──────────────────────────────────────────────────────────
 // Stored alongside worlds in the storage envelope as `settings`. Empty string
@@ -244,6 +244,15 @@ export const PHASES = [
       "Following the trail back…",
       "Excavating the damage…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Finding what they refuse to look at…", "Tracing the blind spot back…", "Locating the thing unseen…", "Reading what's hidden from themselves…"],
+      peripeteia:  ["Tracing the move that will undo them…", "Finding the seed of the reversal…", "Reading the irony backward…", "Following the choice that breaks them…"],
+      telos:       ["Reading the trajectory…", "Finding where this is heading…", "Following the momentum…", "Tracing the slope downward…"],
+      polis:       ["Reading the world that made them…", "Tracing the social weight…", "Finding what was given and what was taken…", "Hearing what the city said about them…"],
+      rhetoric:    ["Listening for the mode…", "Finding what they argue from…", "Hearing the retreat under pressure…", "Tracing the persuasion…"],
+      gap:         ["Finding the wrongness they can't see…", "Measuring the gap…", "Locating the misunderstanding…", "Tracing the unaware…"],
+      world_hamartia: ["Locating the contradiction they live inside…", "Finding the irresolvable tension…", "Reading what cannot coexist…", "Following the strain of two truths…"],
+    },
   },
   {
     id: "psychology",
@@ -259,6 +268,15 @@ export const PHASES = [
       "Locating the obsession…",
       "Charting the need…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Locating what they don't yet know…", "Mapping the recognition to come…", "Finding the truth approaching…", "Hearing the knock at the door…"],
+      peripeteia:  ["Tracing how the same move becomes the wound…", "Reading the structural irony…", "Following the logic of undoing…", "Finding the choice that turns…"],
+      telos:       ["Reading where the desires lead…", "Following the trajectory of want…", "Finding what they're becoming…", "Tracing the arc forward…"],
+      polis:       ["Reading what the world rewards in them…", "Finding what was made of them…", "Tracing the contradiction the world creates…", "Hearing what they were trained to want…"],
+      rhetoric:    ["Finding what mode they trust…", "Reading who they argue against in their own head…", "Hearing the inner persuasion…", "Locating the retreat under pressure…"],
+      gap:         ["Reading the gap between belief and truth…", "Finding what the audience already knows…", "Measuring the wrongness…", "Locating the affectionate misread…"],
+      world_hamartia: ["Reading the tension they cannot resolve…", "Finding which good they're forced to betray…", "Tracing the irresolvable choice…", "Measuring the cost of either path…"],
+    },
   },
   {
     id: "core",
@@ -276,6 +294,15 @@ export const PHASES = [
       "Sharpening the edges…",
       "Identifying the downfall…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Naming what they don't yet see…", "Finding the recognition latent in the story…", "Locating the moment of seeing…", "Weighing the truth approaching…"],
+      peripeteia:  ["Naming the reversal in them…", "Finding the seed of their own undoing…", "Tracing the structural irony…", "Identifying the move that turns…"],
+      telos:       ["Reading the final cause…", "Finding what this is becoming…", "Naming the trajectory…", "Locating the destination already in motion…"],
+      polis:       ["Naming what the world made of them…", "Finding the social contradiction…", "Reading what the city rewards and destroys…", "Locating the unstated rules…"],
+      rhetoric:    ["Listening for ethos, pathos, logos…", "Finding their mode of argument…", "Naming what they retreat to under pressure…", "Hearing the rhetoric they trust…"],
+      gap:         ["Finding the comic deficiency…", "Naming the gap…", "Measuring the affectionate wrongness…", "Locating what they can't see about themselves…"],
+      world_hamartia: ["Naming the structural tension…", "Finding the two goods that can't coexist…", "Locating the world's irresolvable flaw…", "Reading what can only be managed…"],
+    },
   },
   {
     id: "dialogue",
@@ -291,6 +318,15 @@ export const PHASES = [
       "Choosing what goes unsaid…",
       "Calibrating the subtext…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Hearing what they cannot yet say…", "Listening for the unspoken truth…", "Finding the silence that knows…", "Calibrating the approach of recognition…"],
+      peripeteia:  ["Tuning the voice that will betray them…", "Finding the line that turns…", "Hearing the irony in the speech…", "Calibrating the words that undo…"],
+      telos:       ["Listening for where the voice is heading…", "Hearing the rhetoric of becoming…", "Tuning toward the trajectory…", "Calibrating what they're growing into saying…"],
+      polis:       ["Hearing what the city taught them to say…", "Listening for the social inheritance…", "Tuning the inherited tongue…", "Calibrating the public mask…"],
+      rhetoric:    ["Tuning for ethos, pathos, logos…", "Hearing what they argue from…", "Calibrating the mode of persuasion…", "Listening for the retreat under pressure…"],
+      gap:         ["Tuning the voice that doesn't hear itself…", "Hearing the comic mis-knowing…", "Finding the unwitting line…", "Calibrating the affectionate gap…"],
+      world_hamartia: ["Tuning a voice caught between two goods…", "Hearing the strain of irresolvable speech…", "Calibrating the contradiction…", "Listening for what the tension makes them say…"],
+    },
   },
   {
     id: "finishing",
@@ -449,6 +485,14 @@ export const OBJECT_PHASES = [
       "Following the object through time…",
       "Weighing its significance…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Finding what this object holds and doesn't know it holds…", "Locating the truth hidden inside it…", "Reading the secret in the material…", "Tracing the unspoken weight…"],
+      peripeteia:  ["Tracing how this becomes the instrument of its own undoing…", "Reading the irony in the object's use…", "Finding the reversal it carries…", "Following the turn back on itself…"],
+      telos:       ["Reading where this object is heading…", "Tracing what it becomes…", "Following its trajectory through hands…", "Finding the end it's tending toward…"],
+      polis:       ["Reading what the society makes of this…", "Tracing the social power it carries…", "Finding what the city does with it…", "Hearing what owning this means…"],
+      hamartia:    ["Finding the flaw inside its strength…", "Tracing the virtue that wounds…", "Reading the same edge that protects and undoes…", "Locating the gift that betrays…"],
+      world_hamartia: ["Locating the contradiction this object embodies…", "Finding the irresolvable tension it carries…", "Reading the two goods at war inside it…", "Tracing what cannot be reconciled…"],
+    },
   },
   {
     id: "finishing",
@@ -535,6 +579,14 @@ export const FACTION_PHASES = [
       "Following the power…",
       "Weighing their influence…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Finding what this faction doesn't yet see about itself…", "Tracing the truth hidden in their ranks…", "Locating the recognition latent in their story…", "Reading what they refuse to know…"],
+      peripeteia:  ["Tracing how their strength becomes their undoing…", "Finding the move that turns the faction against itself…", "Reading the structural irony in their power…", "Following the seed of internal reversal…"],
+      telos:       ["Reading where this faction is heading…", "Tracing the trajectory of power…", "Finding what this is becoming…", "Following the momentum forward…"],
+      polis:       ["Reading the social fabric they live inside…", "Tracing what the city makes of them…", "Finding the power they hold and the power they fear…", "Hearing who is excluded by this organisation…"],
+      hamartia:    ["Finding the flaw inside their strength…", "Tracing the virtue that wounds the faction…", "Reading the same edge that protects and undoes…", "Locating the principle that betrays them…"],
+      world_hamartia: ["Locating the irresolvable tension inside the faction…", "Finding two goods at war within them…", "Reading what they manage but cannot resolve…", "Tracing the contradiction they embody…"],
+    },
   },
   {
     id: "finishing",
@@ -611,6 +663,13 @@ export const LOCATION_PHASES = [
       "Following the memory…",
       "Weighing its significance…",
     ],
+    verbsByLens: {
+      anagnorisis: ["Locating what this place still hides…", "Reading the secret in the stones…", "Finding the truth this site doesn't yet release…", "Tracing the recognition waiting to land here…"],
+      peripeteia:  ["Finding the place's structural irony…", "Tracing how this site undoes its own purpose…", "Reading the reversal written into the ground…", "Following the turn the location forces…"],
+      telos:       ["Reading where this place is heading…", "Tracing the trajectory of the ground…", "Finding what this site is becoming…", "Following the slope toward what comes next…"],
+      polis:       ["Reading what the city makes of this place…", "Tracing the social meaning of this ground…", "Finding who is welcomed and who is excluded here…", "Hearing what the community says this site is for…"],
+      world_hamartia: ["Locating the irresolvable tension in this place…", "Finding the two goods at war on this ground…", "Reading the contradiction the site embodies…", "Tracing what cannot be reconciled here…"],
+    },
   },
   {
     id: "finishing",
@@ -623,3 +682,60 @@ export const LOCATION_PHASES = [
     ],
   },
 ];
+
+// ── Aristotelian Lens System ──────────────────────────────────────────────
+// Cross-cutting parameter on every LLM-generated entity. See
+// docs/design/aristotelian_lens_system.md for the full spec.
+
+export const DEFAULT_LENS = "hamartia";
+
+// All lenses, ordered as they appear in spec docs (display ordering is
+// per-tool via PER_TOOL_LENSES below).
+export const LENS_OPTIONS = [
+  { value: "hamartia",        label: "Hamartia",       desc: "Flaw from strength — default" },
+  { value: "anagnorisis",     label: "Recognition",    desc: "What it doesn't yet know" },
+  { value: "peripeteia",      label: "Reversal",       desc: "Seeds of undoing" },
+  { value: "telos",           label: "Direction",      desc: "What it's tending toward" },
+  { value: "polis",           label: "Society",        desc: "Product of its world" },
+  { value: "world_hamartia",  label: "World flaw",     desc: "Structural contradiction" },
+  { value: "rhetoric",        label: "Rhetoric",       desc: "How it argues under pressure" },
+  { value: "gap",             label: "Comic gap",      desc: "What it can't see about itself" },
+  { value: null,              label: "None",           desc: "No framework. Generate freely." },
+];
+
+// Quick lookup from lens value → label. Returns undefined for unknown values
+// (fail-soft for the detail-page tag, which omits itself in that case).
+export const LENS_LABELS = Object.fromEntries(
+  LENS_OPTIONS.map((l) => [l.value, l.label])
+);
+
+// Plain-English user-facing descriptions. Soft cap: 20 words each so the
+// description line never wraps to three lines on narrow screens.
+export const LENS_DESCRIPTIONS = {
+  hamartia:       "Generates from the idea that your character's greatest quality is also what will destroy them.",
+  anagnorisis:    "Generates around what your character doesn't yet understand — and what happens when they finally do.",
+  peripeteia:     "Generates around the structural irony: the choices they're making to protect themselves will undo them.",
+  telos:          "Generates around where this is heading — not what it is now, but what it's becoming.",
+  polis:          "Generates from the social world that shaped this entity — what made it, what it can't escape.",
+  world_hamartia: "Generates from an irresolvable contradiction — two things that are both true and can't both win.",
+  rhetoric:       "Generates from how this character argues — what mode they use, and what they retreat to when losing.",
+  gap:            "Generates from the gap between what this character believes about themselves and what everyone else sees.",
+  // null lens: same lookup pattern via a string key (since object keys are strings)
+  none:           "No framework. Generate without an Aristotelian angle.",
+};
+
+// Per-tool relevance ordering. Default first, conditional/rare options later,
+// None last as the explicit opt-out. The `gap` lens on the character row is
+// conditionally rendered based on style (Comic / Mixed only).
+export const PER_TOOL_LENSES = {
+  character: ["hamartia", "anagnorisis", "peripeteia", "rhetoric", "telos", "polis", "gap", null],
+  faction:   ["polis", "world_hamartia", "telos", "peripeteia", "hamartia", null],
+  location:  ["world_hamartia", "telos", "anagnorisis", "peripeteia", "polis", null],
+  object:    ["hamartia", "telos", "anagnorisis", "peripeteia", "polis", null],
+  dialogue:  ["hamartia", "rhetoric", "anagnorisis", null],
+};
+
+// LocalStorage keys for lens-selector UI state (first-time hint + persistent
+// expanded state).
+export const LENS_DISCOVERED_KEY = "aristotelian-lens-discovered";
+export const LENS_HINT_DISMISSED_KEY = "aristotelian-lens-hint-dismissed";

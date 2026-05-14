@@ -1,12 +1,13 @@
 import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
+import { getLensFraming } from "./lensFraming.js";
 
 /**
  * Builds the system prompt for object generation.
- * formState: { pitch, name, type, rarity, era, condition, typeSpecificFields, associations }
+ * formState: { pitch, name, type, rarity, era, condition, typeSpecificFields, associations, lens }
  * associations: [{ kind: "character", id, note }]
  */
 export function buildObjectPrompt(world, formState) {
-  const { pitch, name, type, rarity, era, condition, typeSpecificFields = {}, associations = [], mentionContext } = formState;
+  const { pitch, name, type, rarity, era, condition, typeSpecificFields = {}, associations = [], mentionContext, lens } = formState;
 
   const lines = [];
 
@@ -63,6 +64,12 @@ export function buildObjectPrompt(world, formState) {
     }
   }
   lines.push(``);
+
+  const lensFraming = getLensFraming(lens === undefined ? "hamartia" : lens);
+  if (lensFraming) {
+    lines.push(lensFraming);
+    lines.push(``);
+  }
 
   lines.push(`FIELD INSTRUCTIONS:`);
   lines.push(`- "name": A specific, evocative name. Not generic. If the user supplied a name, use it exactly.`);

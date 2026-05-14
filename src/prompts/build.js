@@ -5,9 +5,10 @@ import {
   FRAMEWORK_BLOCK,
 } from "./schema.js";
 import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
+import { getLensFraming } from "./lensFraming.js";
 
 export function buildPrompt(world, existingChars, inputs, targetLead) {
-  const { role, style, pitch, mentionContext, ...fields } = inputs;
+  const { role, style, pitch, mentionContext, lens, ...fields } = inputs;
 
   const existing = existingChars.length
     ? existingChars
@@ -32,6 +33,8 @@ export function buildPrompt(world, existingChars, inputs, targetLead) {
 
   const styleBlock = style ? STYLE_INSTRUCTIONS[style] || "" : "";
 
+  const lensFraming = getLensFraming(lens === undefined ? "hamartia" : lens);
+
   const worldDocsBlock =
     world.mode === "advanced" && world.documents?.length > 0
       ? `\nWORLD DOCUMENTS:\n${world.documents
@@ -50,7 +53,7 @@ ${existing}
 
 ${roleBlock}
 ${styleBlock ? styleBlock + "\n" : ""}
-${FRAMEWORK_BLOCK}
+${lensFraming ? lensFraming + "\n\n" : ""}${FRAMEWORK_BLOCK}
 
 USER INPUT:
 ${userInput}

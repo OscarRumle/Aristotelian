@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeStreaming, callClaude } from "../api/claude.js";
 import { buildDialoguePrompt } from "../prompts/buildDialoguePrompt.js";
 import { buildAnalysisPrompt } from "../prompts/buildAnalysisPrompt.js";
-import { ROLE_OPTIONS, CHAR_COLORS, MOOD_OPTIONS } from "../constants.js";
+import { ROLE_OPTIONS, CHAR_COLORS, MOOD_OPTIONS, DEFAULT_LENS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
+import { LensSelector } from "./LensSelector.jsx";
 import { ConfirmModal } from "./ConfirmModal.jsx";
 import { Typewriter } from "./Typewriter.jsx";
 import { EditableText } from "./EditableText.jsx";
@@ -94,7 +95,7 @@ function SetupScreen({ world, scene, onGenerate, onBack }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [pitch, setPitch] = useState(scene?.description ?? "");
   const [mood, setMood] = useState("");
-  const [hamartiaOn, setHamartiaOn] = useState(true);
+  const [lens, setLens] = useState(DEFAULT_LENS);
 
   const { mentionState, handleChange: handleMentionChange, handleKeyDown: handleMentionKeyDown, selectMention, clearMention, selectedIdx, onMoveSelection } = useMentionInput(world);
 
@@ -227,18 +228,7 @@ function SetupScreen({ world, scene, onGenerate, onBack }) {
         </div>
       </div>
 
-      {/* Hamartia toggle */}
-      <label className="hamartia-toggle" style={{ marginTop: "1.25rem" }}>
-        <div className={`hamartia-toggle-track ${hamartiaOn ? "on" : ""}`} onClick={() => setHamartiaOn((p) => !p)}>
-          <div className="hamartia-toggle-thumb" />
-        </div>
-        <div>
-          <span className="hamartia-toggle-label">Let hamartias collide</span>
-          <p className="t-body" style={{ fontSize: ".78rem", marginTop: ".15rem" }}>
-            Each character's core flaw is structurally active in this exchange.
-          </p>
-        </div>
-      </label>
+      <LensSelector tool="dialogue" style={null} value={lens} onChange={setLens} />
 
       <BottomBar>
         <button
@@ -251,7 +241,7 @@ function SetupScreen({ world, scene, onGenerate, onBack }) {
               mentionIds: unselected.map((c) => c.id),
               pitch,
               mood,
-              hamartiaOn,
+              lens,
             })
           }
         >
@@ -342,7 +332,7 @@ function DialogueViewScreen({
     const prompt = buildDialoguePrompt(world, participants, mentions, {
       pitch: setup.pitch,
       mood: setup.mood,
-      hamartiaOn: setup.hamartiaOn,
+      lens: setup.lens,
       existingLines: baseLines,
       direction: extraDirection || direction,
       directionTarget: extraTarget || directionTarget,
@@ -423,7 +413,7 @@ function DialogueViewScreen({
       mentionIds: setup.mentionIds ?? [],
       pitch: setup.pitch,
       mood: setup.mood,
-      hamartiaOn: setup.hamartiaOn,
+      lens: setup.lens,
       lines,
       analysis,
       createdAt: Date.now(),
@@ -636,7 +626,10 @@ export function DialogueWriter({ world, scene, dialogueId, onBack, onSaveDialogu
           mentionIds: existingDialogue.mentionIds,
           pitch: existingDialogue.pitch,
           mood: existingDialogue.mood,
-          hamartiaOn: existingDialogue.hamartiaOn,
+          // Existing dialogues that predate the migration end up with `lens`
+          // already set (true → "hamartia", false → null). Newer dialogues
+          // store lens directly. Default to "hamartia" only as a final fallback.
+          lens: "lens" in existingDialogue ? existingDialogue.lens : "hamartia",
         }
       : null
   );

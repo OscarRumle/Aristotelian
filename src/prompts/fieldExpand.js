@@ -1,4 +1,5 @@
 import { REFERENCE_SYNTAX_INSTRUCTION, buildEntityIdListing } from "./referenceInstruction.js";
+import { getLensFraming } from "./lensFraming.js";
 
 export function buildFieldExpandPrompt(entityType, entity, world, fieldKey, mode, direction = "", currentValue = null) {
   if (currentValue === null) currentValue = entity[fieldKey];
@@ -9,6 +10,9 @@ export function buildFieldExpandPrompt(entityType, entity, world, fieldKey, mode
   const modeInstruction = mode === "vertical"
     ? `VERTICAL EXPAND: Write more about the same subject already present. Add depth, texture, and specificity to what is already described. Do not introduce new topics.`
     : `HORIZONTAL EXPAND: Introduce entirely new content adjacent to what is already described. The new content should not overlap with the existing text — it should open up new ground within the same world/entity context.`;
+
+  const lens = entity && "lens" in entity ? entity.lens : "hamartia";
+  const lensFraming = getLensFraming(lens);
 
   return `You are expanding one field of an existing ${entityType}.
 
@@ -25,7 +29,7 @@ ${modeInstruction}
 
 ${directionClause}
 
-${buildEntityIdListing(world)}
+${lensFraming ? lensFraming + "\n\n" : ""}${buildEntityIdListing(world)}
 ${REFERENCE_SYNTAX_INSTRUCTION}
 Write ONLY the new content to append. Do not repeat or summarize the existing text. Do not include labels, headers, or preamble. Plain prose only.`;
 }

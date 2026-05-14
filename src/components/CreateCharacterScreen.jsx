@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { callClaudeStreaming } from "../api/claude.js";
 import { buildPrompt } from "../prompts/build.js";
 import { extractJson, uid } from "../util.js";
-import { ROLE_OPTIONS, STYLE_OPTIONS } from "../constants.js";
+import { ROLE_OPTIONS, STYLE_OPTIONS, DEFAULT_LENS } from "../constants.js";
 import { BottomBar } from "./BottomBar.jsx";
 import { PillSelect } from "./PillSelect.jsx";
+import { LensSelector } from "./LensSelector.jsx";
 import { useMentionInput } from "../hooks/useMentionInput.js";
 import { MentionAutocomplete } from "./MentionAutocomplete.jsx";
 import { buildMentionContext } from "../utils/entityContext.js";
@@ -25,6 +26,7 @@ export function CreateCharacterScreen({
   const [pitch, setPitch] = useState(initialPitch);
   const [role, setRole] = useState("");
   const [style, setStyle] = useState("");
+  const [lens, setLens] = useState(DEFAULT_LENS);
   const [targetLeadId, setTargetLeadId] = useState("");
   const [showMore, setShowMore] = useState(false);
   const [refNote, setRefNote] = useState(null);
@@ -51,19 +53,21 @@ export function CreateCharacterScreen({
   const targetLead = leads.find((c) => c.id === targetLeadId) || null;
 
   const generate = async () => {
-    onStartGenerating();
+    onStartGenerating(lens);
     try {
       const sourceCtx = buildSourceMentionContext(capturedRef ?? refContext, world);
       const pitchMentionCtx = buildMentionContext(world, pitch);
       const mentionContext = [sourceCtx, pitchMentionCtx].filter(Boolean).join("\n");
       const raw = await callClaudeStreaming(
-        buildPrompt(world, world.characters, { role, style, pitch, mentionContext, ...f }, targetLead),
+        buildPrompt(world, world.characters, { role, style, pitch, mentionContext, lens, ...f }, targetLead),
         "Generate the character.",
         { maxTokens: 3000, signal, onChunk }
       );
       const parsed = extractJson(raw);
       if (!parsed) throw new Error("JSON");
-      onGenerated({ id: uid(), worldId: world.id, pitch, createdAt: Date.now(), ...JSON.parse(parsed) });
+      // Atomic write: lens lands on the entity at the same moment the parsed
+      // JSON is committed. Failed generations never produce an orphan lens.
+      onGenerated({ id: uid(), worldId: world.id, pitch, lens, createdAt: Date.now(), ...JSON.parse(parsed) });
     } catch (err) {
       if (err.name === "AbortError") return;
       onError(
@@ -219,6 +223,8 @@ export function CreateCharacterScreen({
           </>
         )}
       </div>
+
+      <LensSelector tool="character" style={style} value={lens} onChange={setLens} />
 
       <BottomBar>
         <button type="button" className="btn btn-primary" onClick={generate}>Generate Character</button>
